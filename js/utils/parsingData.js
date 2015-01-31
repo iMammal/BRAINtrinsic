@@ -11,7 +11,7 @@ var loadCentroids = function (callback) {
         dynamicTyping: true,
         header: true,
         complete: function (results) {
-            positions = results;
+            setCentroids(results);
             callback(null, null);
         }
     });

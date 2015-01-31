@@ -9,6 +9,7 @@ var spheres;
 var groups;
 var labelKeys;
 var brainData;
+var centroids;
 
 
 
@@ -18,7 +19,7 @@ PUBLIC METHODS
  */
 
 /*
-Getter and setters
+Setters
  */
 
 /**
@@ -30,13 +31,26 @@ setLabelKeys = function(labels){
 };
 
 /**
+ *  Centroid Setter
+ */
+
+
+setCentroids = function (d) {
+    centroids = d.data;
+    god = centroids;
+}
+
+/*
+* GETTERS
+ */
+/**
  * Label keys getter.
  * @returns an array of label keys
  */
 
- function getLabelKeys(){
-    l = labelKeys.length;
-    result = [];
+getLabelKeys = function(){
+    var l = labelKeys.length;
+    var result = [];
     //Cloning the array
 
     for(var i =0; i < l; i++){
@@ -44,4 +58,24 @@ setLabelKeys = function(labels){
     }
 
     return result;
+};
+
+
+/**
+ *  Centroid getters
+ *  @return an array of objects with three fields named "x","y","z"
+ */
+
+getCentroids = function(){
+    var l = centroids.length;
+    var results = [];
+    for(var i=0; i < l; i++){
+        var element = {};
+        element.x = centroids[i].x;
+        element.y = centroids[i].y;
+        element.z = centroids[i].z;
+        results[results.length] = element;
+    }
+
+    return results;
 };
