@@ -38,7 +38,8 @@ var loadLabelKeys = function (callback) {
         dynamicTyping: true,
         header: true,
         complete: function (results) {
-            labelKeys = results;
+            //labelKeys = results;
+            setLabelKeys(results);
             callback(null, null);
         }
     });
