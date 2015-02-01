@@ -41,8 +41,9 @@ input[type="file"] {
 .menu > button{
     position: relative;
     width : 89px;
-    height: 30px;
+    height: 40px;
     margin: 4px;
+    font-size: 11px;
 }
 
 #canvas {

@@ -10,6 +10,7 @@ var groups;
 var labelKeys;
 var brainData;
 var centroids;
+var lookUpTable;
 
 
 
@@ -37,9 +38,12 @@ setLabelKeys = function(labels){
 
 setCentroids = function (d) {
     centroids = d.data;
-    god = centroids;
 }
 
+
+setLookUpTable = function (d) {
+    lookUpTable = d.data;
+}
 /*
 * GETTERS
  */
@@ -79,3 +83,47 @@ getCentroids = function(){
 
     return results;
 };
+
+
+/**
+ * Get the entire dataset to render the scene
+ */
+
+getDataset = function () {
+    var row;
+    var arrayLength = labelKeys.length;
+    var result =[];
+    var group = [];
+
+    for(var i=0; i < arrayLength; i++ ){
+        row ={};
+        row.x = centroids[i].x;
+        row.y = centroids[i].y;
+        row.z = centroids[i].z;
+        var label = labelKeys[i].labelKey;
+        var lengthLookUpTable= lookUpTable.length;
+        var index;
+        //Looking for the right element in the lookup table
+
+        for(var j = 0,found = 0; j < lengthLookUpTable && found == 0; j++){
+
+            if(lookUpTable[j].label === label){
+                found == 1;
+                index = j;
+            }
+        }
+        row.group = lookUpTable[index].group;
+        row.name = lookUpTable[index].region_name;
+
+        result[result.length] = row;
+
+        var groupIndex = group.indexOf(row.group);
+
+        if(groupIndex == -1){
+            group [group.length] = row.group;
+        }
+    }
+
+    return result;
+};
+

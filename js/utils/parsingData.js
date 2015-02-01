@@ -26,6 +26,7 @@ var loadLookUpTable = function (callback) {
         header: true,
         complete: function (results) {
             lookUpTable = results;
+            setLookUpTable(results);
             callback(null, null);
         }
     });
