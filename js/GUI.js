@@ -28,7 +28,8 @@ initGUI = function() {
                             complete: function (results) {
                                 positions = results;
                                 console.log("complete uploading");
-                                updateRendering();
+                                setCentroids(results);
+                                updateScene();
                             }
                         }
                     );
@@ -77,7 +78,7 @@ initGUI = function() {
 
 var createLegend = function () {
 
-    var scaleColorGroup = d3.scale.category20();
+    //var scaleColorGroup = d3.scale.category20();
     var legendMenu = d3.select("#legend");
     var activeGroup = getActiveGroup();
     var l = activeGroup.length;
@@ -99,4 +100,4 @@ var createLegend = function () {
             .attr("dy",5)
             .attr("fill","rgb(191, 191, 191)");
     }
-}
+};

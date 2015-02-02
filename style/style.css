@@ -4,16 +4,18 @@ body {
 }
 
 button{
-    background-color: rgb(197, 239, 247) ;
+    background-color: #3498db; /*rgb(197, 239, 247) ;*/
     border-width: 0px;
     text-align: center;
     -webkit-border-radius: 2px;
     font-family: 'Open Sans', sans-serif;
-    font-size: 13px;
+    font-size: 15px;
+    color: floralwhite;
+    font-weight: 400;
 }
 
 button:hover{
-    background: rgb(82, 179, 217);
+    background: #BDC3C7;/*rgb(82, 179, 217);*/
 }
 
 
@@ -35,7 +37,7 @@ input[type="file"] {
 
 
 .menu{
-    background-color: rgba(46,36,33, 0.7);
+    background-color:  rgba(46,36,33, 0.7);
 }
 
 .menu > button{

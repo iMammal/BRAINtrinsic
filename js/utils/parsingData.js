@@ -45,3 +45,11 @@ var loadLabelKeys = function (callback) {
         }
     });
 };
+
+var loadConnections = function(callback){
+    Papa.parse("data/avgNW.csv",{
+        download: true,
+        dynamicTyping: true,
+
+    })
+}

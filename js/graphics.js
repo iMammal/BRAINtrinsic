@@ -12,7 +12,7 @@ var renderer;
 var controls;
 var scene;
 var spheres;
-
+//var scaleColorGroup = d3.scale.category20();
 var dimensionScale;
 
 /**
@@ -21,7 +21,6 @@ var dimensionScale;
 
 initCanvas = function () {
 
-    var scaleColorGroup = d3.scale.category20();
     var material;
     var geometry;
 
@@ -44,35 +43,8 @@ initCanvas = function () {
     controls = new THREE.TrackballControls(camera, renderer.domElement);
     controls.rotateSpeed = 0.5;
 
-    var dataset = getDataset();
+    drawScene(getDataset())
 
-
-    var l = dataset.length;
-
-    createDimensionScale(dataset);
-
-    var geometry = geometry = new THREE.SphereGeometry(0.5, 10, 10);
-    for(var i=0; i < l; i++){
-        material = new THREE.MeshPhongMaterial({
-            color: scaleColorGroup(dataset[i].group),
-            shininess: 15,
-            transparent: true,
-            opacity: 0.7
-        });
-
-        spheres[spheres.length] = new THREE.Mesh(geometry, material);
-        spheres[i].position.set(totalScale(dataset[i].x), totalScale(dataset[i].y), totalScale(dataset[i].z));
-        scene.add(spheres[i]);
-    }
-    /*
-    material = new THREE.MeshPhongMaterial({color: 0xE4F1FE});
-    geometry = new THREE.SphereGeometry(10, 20, 20);
-
-    sphere = new THREE.Mesh(geometry, material);
-
-
-    scene.add(sphere);
-    */
 
     //Adding light
 
@@ -86,6 +58,19 @@ initCanvas = function () {
 
 };
 
+
+/**
+ * This method should be called when a new model is uploaded in the system
+ */
+updateScene = function(){
+    var l = spheres.length
+    for (var i=0; i < l; i++){
+        scene.remove(spheres[i]);
+    }
+
+    drawScene(getDataset());
+    createLegend();
+};
 
 
 
@@ -135,5 +120,26 @@ var createDimensionScale = function(d){
                 return element;
             })
         ]
-    ).range([-50,+50]);
+    ).range([-60,+60]);
+};
+
+
+var drawScene = function(dataset) {
+    var l = dataset.length;
+    var material;
+    createDimensionScale(dataset);
+
+    var geometry = new THREE.SphereGeometry(0.5, 10, 10);
+    for(var i=0; i < l; i++){
+        material = new THREE.MeshPhongMaterial({
+            color: scaleColorGroup(dataset[i].group),
+            shininess: 15,
+            transparent: true,
+            opacity: 0.7
+        });
+
+        spheres[spheres.length] = new THREE.Mesh(geometry, material);
+        spheres[i].position.set(totalScale(dataset[i].x), totalScale(dataset[i].y), totalScale(dataset[i].z));
+        scene.add(spheres[i]);
+    }
 };
