@@ -7,6 +7,7 @@ queue()
     .defer(loadCentroids)
     .defer(loadLabelKeys)
     .defer(loadLookUpTable)
+    .defer(loadConnections)
     .awaitAll( function() {
         init();
     });

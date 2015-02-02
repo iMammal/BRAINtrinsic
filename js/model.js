@@ -12,6 +12,7 @@ var brainData;
 var centroids;
 var lookUpTable;
 var activeGroup;
+var connectionMatrix;
 
 
 
@@ -45,8 +46,15 @@ setCentroids = function (d) {
 setLookUpTable = function (d) {
     lookUpTable = d.data;
 }
+
+
+setConnectionMatrix = function(d){
+    connectionMatrix = d.data;
+}
+
+
 /*
-* GETTERS
+ * GETTERS
  */
 /**
  * Label keys getter.
@@ -141,5 +149,30 @@ getActiveGroup = function () {
         result[result.length] = activeGroup[i];
     }
     return result;
-}
+};
+
+/**
+ * This method gets the data about the connection matrix.
+ * @returns a matrix of connections.
+ */
+
+getConnectionMatrix = function () {
+    /* For performance reasons it is not possible to clone the entire object. Since the matrix is symmetric, and idea could be
+    to clone just one half of the entire matrix. Now.. are we dealing always with symmetric matrices?
+     */
+    /*
+    var clone = [];
+    var clonedRow = [];
+    var l = connectionMatrix.length;
+    for(var i = 0; i < l; i++ ){
+        var l_inner = connectionMatrix;
+        for (var j = 0; j < l_inner; j++ ){
+            clonedRow[clonedRow.length] = connectionMatrix[i][j];
+        }
+        clone[clone.length] = clonedRow;
+    }
+
+    return clone;*/
+    return connectionMatrix;
+};
 

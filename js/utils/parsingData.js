@@ -25,7 +25,6 @@ var loadLookUpTable = function (callback) {
         dynamicTyping: true,
         header: true,
         complete: function (results) {
-            lookUpTable = results;
             setLookUpTable(results);
             callback(null, null);
         }
@@ -50,6 +49,10 @@ var loadConnections = function(callback){
     Papa.parse("data/avgNW.csv",{
         download: true,
         dynamicTyping: true,
-
+        header: false,
+        complete: function(results){
+            setConnectionMatrix(results);
+            callback(null,null);
+        }
     })
 }
