@@ -81,9 +81,10 @@ initCanvas = function () {
     });
     scene.add(light);
 
+    createLegend();
     animate();
 
-}
+};
 
 
 
@@ -108,7 +109,8 @@ render = function() {
 
     // Use the following line to render the scene on the oculus rift
     //effect.render( scene, camera );
-}
+};
+
 
 
 //Private methods

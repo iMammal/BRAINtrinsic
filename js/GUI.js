@@ -73,3 +73,30 @@ initGUI = function() {
 
 
 }
+
+
+var createLegend = function () {
+
+    var scaleColorGroup = d3.scale.category20();
+    var legendMenu = d3.select("#legend");
+    var activeGroup = getActiveGroup();
+    var l = activeGroup.length;
+    document.getElementById("legend").style.height = 25*l+"px";
+    for(var i=0; i < l; i++){
+        var elementGroup = legendMenu.append("g").attr("transform","translate(10,"+i*25+")");
+        elementGroup.append("circle")
+            .attr("cx",5)
+            .attr("cy",10)
+            .attr("fill",scaleColorGroup(activeGroup[i]))
+            .attr("r",8);
+        elementGroup.append("text")
+            .text(activeGroup[i])
+            .attr("font-family","'Open Sans',sans-serif")
+            .attr("font-size","15px")
+            .attr("x",20)
+            .attr("y",10)
+            .attr("text-anchor","left")
+            .attr("dy",5)
+            .attr("fill","rgb(191, 191, 191)");
+    }
+}

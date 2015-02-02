@@ -6,11 +6,12 @@ private variables
  */
 
 var spheres;
-var groups;
+var groups = [];
 var labelKeys;
 var brainData;
 var centroids;
 var lookUpTable;
+var activeGroup;
 
 
 
@@ -124,6 +125,21 @@ getDataset = function () {
         }
     }
 
+    groups[groups.length] = group;
+
+    activeGroup = group;
+
     return result;
 };
+
+
+getActiveGroup = function () {
+    var l = activeGroup.length;
+    var result = [];
+
+    for(var i=0; i < l; i++){
+        result[result.length] = activeGroup[i];
+    }
+    return result;
+}
 
