@@ -12,6 +12,7 @@ var renderer;
 var controls;
 var scene;
 var spheres;
+var lines;
 //var scaleColorGroup = d3.scale.category20();
 var dimensionScale;
 
@@ -43,7 +44,9 @@ initCanvas = function () {
     controls = new THREE.TrackballControls(camera, renderer.domElement);
     controls.rotateSpeed = 0.5;
 
-    drawScene(getDataset())
+    drawRegions(getDataset())
+
+    drawConnections(getConnectionMatrix());
 
 
     //Adding light
@@ -68,7 +71,7 @@ updateScene = function(){
         scene.remove(spheres[i]);
     }
 
-    drawScene(getDataset());
+    drawRegions(getDataset());
     createLegend();
 };
 
@@ -120,11 +123,14 @@ var createDimensionScale = function(d){
                 return element;
             })
         ]
-    ).range([-60,+60]);
+    ).range([-100,+100]);
 };
 
+/*
+ * This method drwas all the regions of the brain as spheres.
+ */
 
-var drawScene = function(dataset) {
+var drawRegions = function(dataset) {
     var l = dataset.length;
     var material;
     createDimensionScale(dataset);
@@ -141,5 +147,41 @@ var drawScene = function(dataset) {
         spheres[spheres.length] = new THREE.Mesh(geometry, material);
         spheres[i].position.set(totalScale(dataset[i].x), totalScale(dataset[i].y), totalScale(dataset[i].z));
         scene.add(spheres[i]);
+    }
+};
+
+
+/*
+ * This method draws all the connection between the regions. It needs the connection matrix.
+ */
+
+var drawConnections = function(connectionMatrix){
+    var rows = connectionMatrix.length;
+    //the following variable is set just for performances reason. Since the matrix is symmetric,
+    //we can scan just half of it.
+    var stoppingIndex = 0;
+
+    var material = new THREE.LineBasicMaterial({
+        color: 0x0000ff
+    });
+
+    var line = new THREE.Line( geometry, material );
+    scene.add( line );
+
+    for(var i=0; i < rows; i++){
+        for(var j = 0; j < stoppingIndex+1; j++){
+            if(connectionMatrix[i][j] > 30){
+                var start = new THREE.Vector3(spheres[i].position.x, spheres[i].position.y,spheres[i].position.z);
+                var end = new THREE.Vector3(spheres[j].position.x, spheres[j].position.y,spheres[j].position.z);
+                var geometry = new THREE.Geometry();
+                geometry.vertices.push(
+                    start,
+                    end
+                );
+                var line = new THREE.Line(geometry, material);
+                scene.add(line);
+            }
+        }
+        stoppingIndex+=1;
     }
 };
