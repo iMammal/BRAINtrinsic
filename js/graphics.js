@@ -13,6 +13,7 @@ var renderer;
 var controls;
 var scene;
 var spheres;
+var sphereNodeDictionary ={};
 var oculusControl;
 //var scaleColorGroup = d3.scale.category20();
 var dimensionScale;
@@ -22,8 +23,8 @@ var effect;
 
 
 /*
- * This method is used to interact with obejects in scene. I just copied it from stackoverflow, so it should be tested and
- * fixed.
+ * This method is used to interact with objects in scene.
+ *
  */
 function onDocumentMouseDown( event ) {
 
@@ -41,16 +42,16 @@ function onDocumentMouseDown( event ) {
 
     var intersects = ray.intersectObjects( spheres );
 
-    god = intersects;
 
     if ( intersects.length > 0 ) {
 
-        intersects[ 0 ].object.material.color.setHex( Math.random() * 0xffffff );
+        var index = sphereNodeDictionary[intersects[0].object.uuid]
+        console.log(index);
+        console.log("Node Information");
+        var dataset = getDataset();
+        console.log(dataset[index]);
 
-        var particleMaterial = new THREE.MeshBasicMaterial({color: 0xffffff});
-        var particle = new THREE.Particle( particleMaterial );
-        particle.position = intersects[ 0 ].point;
-        scene.add( particle );
+        intersects[ 0 ].object.material.color.setHex( Math.random() * 0xffffff );
 
     }
 
@@ -201,8 +202,13 @@ var drawRegions = function(dataset) {
             opacity: 0.9
         });
 
+
         spheres[spheres.length] = new THREE.Mesh(geometry, material);
+
         spheres[i].position.set(totalScale(dataset[i].x), totalScale(dataset[i].y), totalScale(dataset[i].z));
+
+        sphereNodeDictionary[spheres[i].uuid] = i;
+
         scene.add(spheres[i]);
     }
 
