@@ -16,5 +16,5 @@ queue()
 
 init = function () {
     initGUI();
-    initCanvas();
+    //initCanvas();
 }

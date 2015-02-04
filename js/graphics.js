@@ -12,19 +12,17 @@ var renderer;
 var controls;
 var scene;
 var spheres;
-var lines;
+var oculusControl;
 //var scaleColorGroup = d3.scale.category20();
 var dimensionScale;
+var effect;
 
 /**
  * This method should be called to init th canvas where we render the brain
  */
 
 initCanvas = function () {
-
-    var material;
-    var geometry;
-
+    var light;
 
     projector = new THREE.Projector();
     scene = new THREE.Scene();
@@ -43,6 +41,15 @@ initCanvas = function () {
 
     controls = new THREE.TrackballControls(camera, renderer.domElement);
     controls.rotateSpeed = 0.5;
+
+    /*
+    effect = new THREE.OculusRiftEffect( renderer, { worldScale: 1 } );
+    effect.setSize( window.innerWidth, window.innerHeight );*/
+
+    /*
+     oculuscontrol = new THREE.OculusControls( camera );
+
+     oculuscontrol.connect();*/
 
     drawRegions(getDataset())
 
@@ -106,6 +113,9 @@ render = function() {
 var createDimensionScale = function(d){
     var l = d.length;
     var allCoordinates = [];
+    var xCentroid;
+    var yCentroid;
+    var zCentroid;
 
     for(var i=0; i < l; i++) {
         allCoordinates[allCoordinates.length] = d[i].x;
@@ -123,7 +133,7 @@ var createDimensionScale = function(d){
                 return element;
             })
         ]
-    ).range([-100,+100]);
+    ).range([-80,+80]);
 };
 
 /*
@@ -135,19 +145,21 @@ var drawRegions = function(dataset) {
     var material;
     createDimensionScale(dataset);
 
-    var geometry = new THREE.SphereGeometry(0.5, 10, 10);
+    var geometry = new THREE.SphereGeometry(0.8, 10, 10);
     for(var i=0; i < l; i++){
         material = new THREE.MeshPhongMaterial({
             color: scaleColorGroup(dataset[i].group),
             shininess: 15,
             transparent: true,
-            opacity: 0.7
+            opacity: 0.9
         });
 
         spheres[spheres.length] = new THREE.Mesh(geometry, material);
         spheres[i].position.set(totalScale(dataset[i].x), totalScale(dataset[i].y), totalScale(dataset[i].z));
         scene.add(spheres[i]);
     }
+
+
 };
 
 
@@ -161,16 +173,19 @@ var drawConnections = function(connectionMatrix){
     //we can scan just half of it.
     var stoppingIndex = 0;
 
-    var material = new THREE.LineBasicMaterial({
-        color: 0x0000ff
-    });
 
+
+    /*
     var line = new THREE.Line( geometry, material );
-    scene.add( line );
+    scene.add( line );*/
 
     for(var i=0; i < rows; i++){
         for(var j = 0; j < stoppingIndex+1; j++){
             if(connectionMatrix[i][j] > 30){
+                var material = new THREE.LineBasicMaterial({
+                    color: 0x67809F,
+                    linewidth: connectionMatrix[i][j]/25.0
+            });
                 var start = new THREE.Vector3(spheres[i].position.x, spheres[i].position.y,spheres[i].position.z);
                 var end = new THREE.Vector3(spheres[j].position.x, spheres[j].position.y,spheres[j].position.z);
                 var geometry = new THREE.Geometry();

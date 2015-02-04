@@ -72,6 +72,13 @@ initGUI = function() {
         .text("Upload Groups")
         .attr("id", "groupUploadButton");
 
+    uploadMenu.append("button")
+        .text("Start Visualization")
+        .attr("id", "startVisualization")
+        .on("click", function() {
+            initCanvas();
+        })
+
 
 }
 
