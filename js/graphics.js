@@ -22,6 +22,7 @@ var effect;
  */
 
 initCanvas = function () {
+    removeStartButton();
     var light;
 
     projector = new THREE.Projector();

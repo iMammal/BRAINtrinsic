@@ -147,7 +147,12 @@ initGUI = function() {
         })
 
 
-}
+};
+
+removeStartButton = function(){
+    var elem = document.getElementById('startVisualization');
+    elem.parentNode.removeChild(elem);
+};
 
 
 var createLegend = function () {
