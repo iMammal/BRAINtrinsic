@@ -51,7 +51,7 @@ initCanvas = function () {
 
      oculuscontrol.connect();*/
 
-    drawRegions(getDataset())
+    drawRegions(getDataset());
 
     drawConnections(getConnectionMatrix());
 

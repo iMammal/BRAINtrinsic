@@ -55,4 +55,4 @@ var loadConnections = function(callback){
             callback(null,null);
         }
     })
-}
+};

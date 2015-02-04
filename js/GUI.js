@@ -10,26 +10,24 @@ initGUI = function() {
         .attr("id", "centroidUploadBtn")
         .append("input")
         .attr("type", "file")
-        .attr("id", "file-name")
+        .attr("id", "centroids")
         .on("change", function () {
-            var f = document.getElementById("file-name");
+            var f = document.getElementById("centroids");
             if (f.files && f.files[0]) {
                 var reader = new FileReader();
 
                 reader.onload = function (e) {
-                    console.log("On load event");
-                    console.log(e);
-                    v = e.target.result;
+                    var v = e.target.result;
                     Papa.parse(v, {
                             download: true,
-                            delimiter: " ",
+                            delimiter: ",",
                             dynamicTyping: true,
                             header: true,
                             complete: function (results) {
                                 positions = results;
-                                console.log("complete uploading");
+                                console.log("complete uploading centroids");
                                 setCentroids(results);
-                                updateScene();
+                                //updateScene();
                             }
                         }
                     );
@@ -44,8 +42,9 @@ initGUI = function() {
         .attr("id", "labelKeyUploadBtn")
         .append("input")
         .attr("type", "file")
+        .attr("id","labelKey")
         .on("change", function () {
-            var f = document.getElementById("file-name");
+            var f = document.getElementById("labelKey");
             if (f.files && f.files[0]) {
                 var reader = new FileReader();
 
@@ -60,6 +59,7 @@ initGUI = function() {
                             header: true,
                             complete: function (results) {
                                 console.log("complete Uploading Label Keys ");
+                                setLabelKeys(results);
                             }
                         }
                     );
@@ -69,14 +69,81 @@ initGUI = function() {
         });
 
     uploadMenu.append("button")
-        .text("Upload Groups")
-        .attr("id", "groupUploadButton");
+        .text("Upload LookUpTable")
+        .attr("id", "groupUploadButton")
+        .append("input")
+        .attr("type","file")
+        .attr("id","lookUpTable")
+        .on("change", function(){
+            console.log("on Change Event look up table");
+
+            var f = document.getElementById("lookUpTable");
+
+            variabile = f;
+
+            if(f.files && f.files[0]){
+                var reader = new FileReader();
+                reader.onload = function(e){
+                    console.log("On load event LookUpTable");
+                    console.log(e);
+                    console.log()
+                    v = e.target.result;
+
+                    console.log("Parsing LookUpTable");
+                    Papa.parse(v, {
+                        download: true,
+                        delimiter: ";",
+                        dynamicTyping: true,
+                        header: true,
+                        complete: function(results){
+                            setLookUpTable(results);
+                            console.log("look Up Table Uploaded");
+                        }
+                    })
+
+                }
+                reader.readAsDataURL(f.files[0]);
+            }
+        });
+
+    uploadMenu.append("button")
+        .text("Upload Connections")
+        .attr("id","uploadConnectionsButton")
+        .append("input")
+        .attr("type","file")
+        .attr("id","connections")
+        .on("change", function() {
+            var f = document.getElementById("connections");
+            if (f.files && f.files[0]) {
+                var reader = new FileReader();
+
+                reader.onload = function (e) {
+                    var v = e.target.result;
+                    Papa.parse(v, {
+                        download: true,
+                        dynamicTyping: true,
+                        header: false,
+                        complete: function (results) {
+                            setConnectionMatrix(results);
+                            console.log("Connection Matrix uploaded");
+                        }
+                    })
+                }
+                reader.readAsDataURL(f.files[0]);
+            }
+        });
 
     uploadMenu.append("button")
         .text("Start Visualization")
         .attr("id", "startVisualization")
         .on("click", function() {
-            initCanvas();
+            if(lookUpTable && labelKeys && centroids && connectionMatrix){
+                initCanvas();
+            } else
+            {
+                console.log("data are missing");
+            }
+
         })
 
 

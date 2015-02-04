@@ -52,6 +52,13 @@ setConnectionMatrix = function(d){
     connectionMatrix = d.data;
 }
 
+/**
+ * Setter for group
+ */
+
+setGroup = function (d) {
+    groups[groups.length] = d.data;
+}
 
 /*
  * GETTERS
@@ -160,6 +167,7 @@ getConnectionMatrix = function () {
     /* For performance reasons it is not possible to clone the entire object. Since the matrix is symmetric, and idea could be
     to clone just one half of the entire matrix. Now.. are we dealing always with symmetric matrices?
      */
+
     /*
     var clone = [];
     var clonedRow = [];
