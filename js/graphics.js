@@ -2,6 +2,7 @@
  * Created by giorgioconte on 31/01/15.
  */
 
+
 /*
  * private variables.
  */
@@ -16,6 +17,51 @@ var oculusControl;
 //var scaleColorGroup = d3.scale.category20();
 var dimensionScale;
 var effect;
+
+
+
+
+/*
+ * This method is used to interact with obejects in scene. I just copied it from stackoverflow, so it should be tested and
+ * fixed.
+ */
+function onDocumentMouseDown( event ) {
+
+    event.preventDefault();
+
+    var vector = new THREE.Vector3(
+        ( event.clientX / window.innerWidth ) * 2 - 1,
+        - ( event.clientY / window.innerHeight ) * 2 + 1,
+        0.5
+    );
+    vector = vector.unproject( camera );
+
+    var ray = new THREE.Raycaster( camera.position,
+        vector.sub( camera.position ).normalize() );
+
+    var intersects = ray.intersectObjects( spheres );
+
+    god = intersects;
+
+    if ( intersects.length > 0 ) {
+
+        intersects[ 0 ].object.material.color.setHex( Math.random() * 0xffffff );
+
+        var particleMaterial = new THREE.MeshBasicMaterial({color: 0xffffff});
+        var particle = new THREE.Particle( particleMaterial );
+        particle.position = intersects[ 0 ].point;
+        scene.add( particle );
+
+    }
+
+    /*
+     // Parse all the faces
+     for ( var i in intersects ) {
+     intersects[ i ].face.material[ 0 ].color
+     .setHex( Math.random() * 0xffffff | 0x80000000 );
+     }
+     */
+};
 
 /**
  * This method should be called to init th canvas where we render the brain
@@ -33,10 +79,10 @@ initCanvas = function () {
 
     canvas = document.getElementById('canvas');
 
-
     renderer = new THREE.WebGLRenderer();
     renderer.setSize(window.innerWidth, window.innerHeight);
 
+    window.addEventListener( 'mousedown', onDocumentMouseDown, true );
     canvas.appendChild(renderer.domElement);
 
 
@@ -138,7 +184,7 @@ var createDimensionScale = function(d){
 };
 
 /*
- * This method drwas all the regions of the brain as spheres.
+ * This method draws all the regions of the brain as spheres.
  */
 
 var drawRegions = function(dataset) {
@@ -201,3 +247,5 @@ var drawConnections = function(connectionMatrix){
         stoppingIndex+=1;
     }
 };
+
+
