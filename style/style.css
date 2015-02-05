@@ -74,9 +74,14 @@ input[type="file"] {
 #nodeInfoPanel{
     position: absolute;
     width: 200px;
-    height: 100px;
+    height: 50px;
     bottom: 10px;
     left: 10px;
     z-index: 2;
     color: antiquewhite;
+}
+
+#nodeInfoPanel > p{
+    text-align:center;
+    vertical-align: middle;
 }

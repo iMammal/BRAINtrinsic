@@ -26,7 +26,7 @@ var effect;
  * This method is used to interact with objects in scene.
  *
  */
-function onDocumentMouseDown( event ) {
+function onClick( event ) {
 
     event.preventDefault();
 
@@ -49,8 +49,7 @@ function onDocumentMouseDown( event ) {
         var dataset = getDataset();
 
         setNodeInfoPanel(dataset[index].name);
-        console.log("index " + index);
-        drawEdgesGivenNode(index);
+
 
         //intersects[ 0 ].object.material.color.setHex( Math.random() * 0xffffff );
 
@@ -64,6 +63,33 @@ function onDocumentMouseDown( event ) {
      }
      */
 };
+
+function onDblClick( event ){
+    event.preventDefault();
+
+    var vector = new THREE.Vector3(
+        ( event.clientX / window.innerWidth ) * 2 - 1,
+        - ( event.clientY / window.innerHeight ) * 2 + 1,
+        0.5
+    );
+    vector = vector.unproject( camera );
+
+    var ray = new THREE.Raycaster( camera.position,
+        vector.sub( camera.position ).normalize() );
+
+    var intersects = ray.intersectObjects( spheres );
+
+
+    if ( intersects.length > 0 ) {
+
+        var index = sphereNodeDictionary[intersects[0].object.uuid]
+        var dataset = getDataset();
+
+        drawEdgesGivenNode(index);
+
+    }
+};
+
 
 /**
  * This method should be called to init th canvas where we render the brain
@@ -84,7 +110,9 @@ initCanvas = function () {
     renderer = new THREE.WebGLRenderer();
     renderer.setSize(window.innerWidth, window.innerHeight);
 
-    window.addEventListener( 'mousedown', onDocumentMouseDown, true );
+    window.addEventListener('dblclick', onDblClick , true);
+    window.addEventListener( 'click', onClick, true );
+
     canvas.appendChild(renderer.domElement);
 
 
