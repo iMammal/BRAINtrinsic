@@ -149,12 +149,35 @@ initGUI = function() {
 
 };
 
+/*
+ * This method removes the start button so that is not possible to create more than one scene and
+ * renderer.
+ */
 removeStartButton = function(){
     var elem = document.getElementById('startVisualization');
     elem.parentNode.removeChild(elem);
 };
 
+setNodeInfoPanel = function (regionName){
+    var panel = document.getElementById('nodeInfoPanel');
 
+    while (panel.firstChild) {
+        panel.removeChild(panel.firstChild);
+    }
+
+    var para = document.createElement("p");
+    var node = document.createTextNode(regionName);
+
+    panel.appendChild(para)
+        .appendChild(node);
+};
+
+
+
+
+/*
+ * This method is used to create the legend panel.
+ */
 var createLegend = function () {
 
     //var scaleColorGroup = d3.scale.category20();

@@ -51,7 +51,9 @@ function onDocumentMouseDown( event ) {
         var dataset = getDataset();
         console.log(dataset[index]);
 
-        intersects[ 0 ].object.material.color.setHex( Math.random() * 0xffffff );
+        setNodeInfoPanel(dataset[index].name);
+
+        //intersects[ 0 ].object.material.color.setHex( Math.random() * 0xffffff );
 
     }
 

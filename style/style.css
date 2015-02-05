@@ -70,3 +70,13 @@ input[type="file"] {
     top: 10px;
     left: 10px
 }
+
+#nodeInfoPanel{
+    position: absolute;
+    width: 200px;
+    height: 100px;
+    bottom: 10px;
+    left: 10px;
+    z-index: 2;
+    color: antiquewhite;
+}
