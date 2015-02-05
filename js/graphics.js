@@ -48,7 +48,7 @@ function onClick( event ) {
         var index = sphereNodeDictionary[intersects[0].object.uuid]
         var dataset = getDataset();
 
-        setNodeInfoPanel(dataset[index].name);
+        setNodeInfoPanel(dataset[index].name, index);
 
 
         //intersects[ 0 ].object.material.color.setHex( Math.random() * 0xffffff );
@@ -110,8 +110,8 @@ initCanvas = function () {
     renderer = new THREE.WebGLRenderer();
     renderer.setSize(window.innerWidth, window.innerHeight);
 
-    window.addEventListener('dblclick', onDblClick , true);
-    window.addEventListener( 'click', onClick, true );
+    canvas.addEventListener('dblclick', onDblClick , true);
+    canvas.addEventListener( 'click', onClick, true );
 
     canvas.appendChild(renderer.domElement);
 

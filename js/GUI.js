@@ -112,7 +112,7 @@ initGUI = function() {
         .append("input")
         .attr("type","file")
         .attr("id","connections")
-        .on("change", function() {
+        .on("click", function() {
             var f = document.getElementById("connections");
             if (f.files && f.files[0]) {
                 var reader = new FileReader();
@@ -158,18 +158,23 @@ removeStartButton = function(){
     elem.parentNode.removeChild(elem);
 };
 
-setNodeInfoPanel = function (regionName){
+setNodeInfoPanel = function (regionName, index){
     var panel = document.getElementById('nodeInfoPanel');
 
     while (panel.firstChild) {
         panel.removeChild(panel.firstChild);
     }
 
-    var para = document.createElement("p");
-    var node = document.createTextNode(regionName);
+    var connectionRow = getConnectionMatrixRow(index);
 
+    var nodalStrength = computeNodalStrength(connectionRow);
+
+
+    var para = document.createElement("p");
+    var node = document.createTextNode(regionName + " " + nodalStrength);
     panel.appendChild(para)
         .appendChild(node);
+
 };
 
 
@@ -186,7 +191,10 @@ var createLegend = function () {
     var l = activeGroup.length;
     document.getElementById("legend").style.height = 25*l+"px";
     for(var i=0; i < l; i++){
-        var elementGroup = legendMenu.append("g").attr("transform","translate(10,"+i*25+")");
+        var elementGroup = legendMenu.append("g").attr("transform","translate(10,"+i*25+")")
+            .on("click", function(e){
+
+            });
         elementGroup.append("circle")
             .attr("cx",5)
             .attr("cy",10)
