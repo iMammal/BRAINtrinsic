@@ -184,3 +184,8 @@ getConnectionMatrix = function () {
     return connectionMatrix;
 };
 
+
+getConnectionMatrixRow = function(index){
+    return connectionMatrix[index];
+}
+

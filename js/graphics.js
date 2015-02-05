@@ -46,12 +46,11 @@ function onDocumentMouseDown( event ) {
     if ( intersects.length > 0 ) {
 
         var index = sphereNodeDictionary[intersects[0].object.uuid]
-        console.log(index);
-        console.log("Node Information");
         var dataset = getDataset();
-        console.log(dataset[index]);
 
         setNodeInfoPanel(dataset[index].name);
+        console.log("index " + index);
+        drawEdgesGivenNode(index);
 
         //intersects[ 0 ].object.material.color.setHex( Math.random() * 0xffffff );
 
@@ -103,7 +102,7 @@ initCanvas = function () {
 
     drawRegions(getDataset());
 
-    drawConnections(getConnectionMatrix());
+    //drawConnections(getConnectionMatrix());
 
 
     //Adding light
@@ -224,21 +223,16 @@ var drawRegions = function(dataset) {
 
 var drawConnections = function(connectionMatrix){
     var rows = connectionMatrix.length;
-    //the following variable is set just for performances reason. Since the matrix is symmetric,
-    //we can scan just half of it.
-    var stoppingIndex = 0;
-
-
 
     /*
     var line = new THREE.Line( geometry, material );
     scene.add( line );*/
-
+    var scale = getConnectionMatrixScale();
     for(var i=0; i < rows; i++){
-        for(var j = 0; j < stoppingIndex+1; j++){
+        for(var j = 0; j < i; j++){
             if(connectionMatrix[i][j] > 30){
                 var material = new THREE.LineBasicMaterial({
-                    color: 0x67809F,
+                    color: scale(connectionMatrix[i][j]),
                     linewidth: connectionMatrix[i][j]/25.0
             });
                 var start = new THREE.Vector3(spheres[i].position.x, spheres[i].position.y,spheres[i].position.z);
@@ -252,8 +246,29 @@ var drawConnections = function(connectionMatrix){
                 scene.add(line);
             }
         }
-        stoppingIndex+=1;
     }
 };
+
+
+var drawEdgesGivenNode = function (indexNode) {
+    var connectionRow = getConnectionMatrixRow(indexNode);
+
+    var l = connectionRow.length;
+    for(var i=0; i < l ; i++){
+        if(connectionRow[i] > 30) {
+            var material = new THREE.LineBasicMaterial;
+            var start = new THREE.Vector3(spheres[indexNode].position.x, spheres[indexNode].position.y, spheres[indexNode].position.z);
+            var end = new THREE.Vector3(spheres[i].position.x, spheres[i].position.y, spheres[i].position.z);
+            var geometry = new THREE.Geometry();
+            geometry.vertices.push(
+                start,
+                end
+            );
+            var line = new THREE.Line(geometry, material);
+            scene.add(line);
+        }
+    }
+};
+
 
 
