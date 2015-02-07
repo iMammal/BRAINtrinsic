@@ -340,16 +340,13 @@ var removeEdgesGivenNode = function (indexNode) {
 
     for(var i=0; i < l; i++){
         var edge = displayedEdges[i];
-        // god.geometry.vertices[0]
+
         var xStart = edge.geometry.vertices[0].x;
         var yStart = edge.geometry.vertices[0].y;
         var zStart = edge.geometry.vertices[0].z;
 
-        var xEnd = edge.geometry.vertices[1].x;
-        var yEnd = edge.geometry.vertices[1].y;
-        var zEnd = edge.geometry.vertices[1].z;
-
-        if((x == xStart && y == yStart && z == zStart) || (x == xEnd && y == yEnd && z == zEnd)){
+        //removing only the esges that starts from that node
+        if(x == xStart && y == yStart && z == zStart){
             scene.remove(edge);
         }
     }
