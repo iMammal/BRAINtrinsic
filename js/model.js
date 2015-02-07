@@ -84,7 +84,7 @@ getLabelKeys = function(){
     //Cloning the array
 
     for(var i =0; i < l; i++){
-        result[result.length] = labelKeys[i].labelKey;
+        result[result.length] = labelKeys[i];
     }
 
     return result;

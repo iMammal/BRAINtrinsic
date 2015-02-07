@@ -51,9 +51,8 @@ initGUI = function() {
                     var v = e.target.result;
                     Papa.parse(v, {
                             download: true,
-                            delimiter: " ",
                             dynamicTyping: true,
-                            header: true,
+                            header: false,
                             complete: function (results) {
                                 console.log("complete Uploading Label Keys ");
                                 setLabelKeys(results);

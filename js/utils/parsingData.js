@@ -36,7 +36,6 @@ var loadLabelKeys = function (callback) {
         download: true,
         dynamicTyping: true,
         complete: function (results) {
-            //labelKeys = results;
             setLabelKeys(results);
             callback(null, null);
         }
@@ -47,6 +46,7 @@ var loadConnections = function(callback){
     Papa.parse("data/avgNW.csv",{
         download: true,
         dynamicTyping: true,
+        delimiter: ',',
         header: false,
         complete: function(results){
             setConnectionMatrix(results);
