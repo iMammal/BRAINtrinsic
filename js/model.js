@@ -250,14 +250,22 @@ getConnectionMatrixRow = function(index){
 };
 
 
+getRegionByNode = function (nodeIndex) {
+    return groups[activeGroup][0][nodeIndex];
+};
+
+
+
+isRegionActive = function(region){
+    return regionsActivated[region];
+};
+
 toggleRegion = function (regionName){
     if(regionsActivated[regionName]){
         regionsActivated[regionName] = false;
     } else {
         regionsActivated[regionName] = true;
     }
-    console.log(regionsActivated);
-    console.log("toggled region");
     updateScene();
 };
 

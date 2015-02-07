@@ -216,7 +216,6 @@ var createLegend = function () {
             .attr("transform","translate(10,"+i*25+")")
             .attr("id",activeGroup[i])
             .on("click", function(){
-                console.log(this);
                 toggleRegion(this.id);
             });
         elementGroup.append("circle")
@@ -224,6 +223,15 @@ var createLegend = function () {
             .attr("cy",10)
             .attr("fill",scaleColorGroup(activeGroup[i]))
             .attr("r",8);
+
+        //choose color of the text
+        var textColor;
+        if(regionsActivated[activeGroup[i]]){
+            textColor = "rgb(191,191,191)";
+        } else{
+            textColor = "rgb(0,0,0)";
+        }
+
         elementGroup.append("text")
             .text(activeGroup[i])
             .attr("font-family","'Open Sans',sans-serif")
@@ -232,6 +240,6 @@ var createLegend = function () {
             .attr("y",10)
             .attr("text-anchor","left")
             .attr("dy",5)
-            .attr("fill","rgb(191, 191, 191)");
+            .attr("fill",textColor);
     }
 };

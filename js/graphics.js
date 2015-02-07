@@ -2,10 +2,9 @@
  * Created by giorgioconte on 31/01/15.
  */
 
+var threshold = 30;
 
-/*
- * private variables.
- */
+
 var projector;
 var camera;
 var canvas;
@@ -15,7 +14,7 @@ var scene;
 var spheres;
 var sphereNodeDictionary ={};
 var oculusControl;
-//var scaleColorGroup = d3.scale.category20();
+
 var dimensionScale;
 var effect;
 
@@ -170,7 +169,14 @@ updateScene = function(){
         scene.remove(spheres[i]);
     }
 
+    for(i=0; i < displayedEdges.length; i++){
+        scene.remove(displayedEdges[i]);
+    }
+
+    displayedEdges = [];
+
     drawRegions(getDataset());
+    drawConnections();
     createLegend();
 };
 
@@ -235,7 +241,7 @@ var drawRegions = function(dataset) {
     var material;
     createDimensionScale(dataset);
 
-    var geometry = new THREE.SphereGeometry(0.8, 10, 10);
+    var geometry = new THREE.SphereGeometry(1.0, 10, 10);
 
     var xCentroid = d3.mean(dataset, function(d){
         return totalScale(d.x);
@@ -281,12 +287,15 @@ var drawRegions = function(dataset) {
  * This method draws all the connection between the regions. It needs the connection matrix.
  */
 
+/*
 var drawConnections = function(connectionMatrix){
     var rows = connectionMatrix.length;
 
     /*
     var line = new THREE.Line( geometry, material );
-    scene.add( line );*/
+    scene.add( line );
+    */
+    /*
     var scale = getConnectionMatrixScale();
     for(var i=0; i < rows; i++){
         for(var j = 0; j < i; j++){
@@ -307,7 +316,27 @@ var drawConnections = function(connectionMatrix){
             }
         }
     }
+};*/
+
+
+var drawConnections = function () {
+
+    for(var i= 0; i < nodesSelected.length; i++){
+        if(isRegionActive(getRegionByNode(nodesSelected[i]))){
+            var row = getConnectionMatrixRow(nodesSelected[i]);
+            for(var j=0; j < row.length; j++){
+                if(isRegionActive(getRegionByNode(j)) && row[j] > threshold){
+                    var start = new THREE.Vector3(spheres[nodesSelected[i]].position.x, spheres[nodesSelected[i]].position.y, spheres[nodesSelected[i]].position.z);
+                    var end = new THREE.Vector3(spheres[j].position.x, spheres[j].position.y, spheres[j].position.z);
+                    var line = drawEdge(start,end);
+                    displayedEdges[displayedEdges.length] = line;
+                }
+            }
+
+        }
+    }
 };
+
 
 
 var drawEdgesGivenNode = function (indexNode) {
@@ -315,20 +344,32 @@ var drawEdgesGivenNode = function (indexNode) {
 
     var l = connectionRow.length;
     for(var i=0; i < l ; i++){
-        if(connectionRow[i] > 30) {
-            var material = new THREE.LineBasicMaterial;
+        if(connectionRow[i] > threshold  && isRegionActive(getRegionByNode(i))) {
             var start = new THREE.Vector3(spheres[indexNode].position.x, spheres[indexNode].position.y, spheres[indexNode].position.z);
             var end = new THREE.Vector3(spheres[i].position.x, spheres[i].position.y, spheres[i].position.z);
-            var geometry = new THREE.Geometry();
-            geometry.vertices.push(
-                start,
-                end
-            );
-            var line = new THREE.Line(geometry, material);
+            var line = drawEdgeWithName(start,end, indexNode);
             displayedEdges[displayedEdges.length] = line;
-            scene.add(line);
         }
     }
+};
+
+
+var drawEdge = function (start,end) {
+    var material = new THREE.LineBasicMaterial;
+    var geometry = new THREE.Geometry();
+    geometry.vertices.push(
+        start,
+        end
+    );
+    var line = new THREE.Line(geometry, material);
+    scene.add(line);
+    return line;
+};
+
+var drawEdgeWithName = function (start, end, name) {
+    var line = drawEdge(start,end);
+    line.name = name;
+    return line;
 };
 
 var removeEdgesGivenNode = function (indexNode) {
@@ -350,7 +391,7 @@ var removeEdgesGivenNode = function (indexNode) {
             scene.remove(edge);
         }
     }
-}
+};
 
 
 
