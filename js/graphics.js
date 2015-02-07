@@ -235,10 +235,10 @@ var drawRegions = function(dataset) {
                 opacity: 0.9
             });
 
-
             spheres[spheres.length] = new THREE.Mesh(geometry, material);
 
             spheres[i].position.set(totalScale(dataset[i].x), totalScale(dataset[i].y), totalScale(dataset[i].z));
+            //console.log("drawn region " + i + " in position x: " + totalScale(dataset[i].x) + ", y: " + totalScale(dataset[i].y)+ ", "+ "z: " +totalScale(dataset[i].z));
 
             sphereNodeDictionary[spheres[i].uuid] = i;
 

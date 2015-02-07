@@ -8,10 +8,9 @@ private variables
 var spheres;
 var groups = [];
 var labelKeys;
-var brainData;
 var centroids;
 var lookUpTable;
-var activeGroup;
+var activeGroup =0;
 var connectionMatrix;
 var regionsActivated = [];
 
@@ -41,13 +40,14 @@ setLabelKeys = function(labels){
 
 setCentroids = function (d) {
     var data = d.data;
+    god = data;
     var len = data.length;
     centroids = [];
     for(var i=0; i < len; i++){
         var element = {};
-        element.x = data[0][0];
-        element.y = data[0][1];
-        element.z = data[0][2];
+        element.x = data[i][0];
+        element.y = data[i][1];
+        element.z = data[i][2];
         centroids[centroids.length] = element;
     }
 };
@@ -55,12 +55,12 @@ setCentroids = function (d) {
 
 setLookUpTable = function (d) {
     lookUpTable = d.data;
-}
+};
 
 
 setConnectionMatrix = function(d){
     connectionMatrix = d.data;
-}
+};
 
 /**
  * Setter for group
@@ -114,7 +114,7 @@ getCentroids = function(){
 /**
  * Get the entire dataset to render the scene
  */
-
+/*
 getDataset = function () {
     var row;
     var arrayLength = labelKeys.length;
@@ -126,7 +126,7 @@ getDataset = function () {
         row.x = centroids[i].x;
         row.y = centroids[i].y;
         row.z = centroids[i].z;
-        var label = labelKeys[i].labelKey;
+        var label = labelKeys[i];
         var lengthLookUpTable= lookUpTable.length;
         var index;
         //Looking for the right element in the lookup table
@@ -138,11 +138,12 @@ getDataset = function () {
                 index = j;
             }
         }
-        row.group = lookUpTable[index].group;
-        row.name = lookUpTable[index].region_name;
+        row.group = groups[activeGroup][index];
+
+        //row.name = lookUpTable[index].region_name;
 
         result[result.length] = row;
-
+        /*
         var groupIndex = group.indexOf(row.group);
 
         if(groupIndex == -1){
@@ -150,23 +151,71 @@ getDataset = function () {
         }
     }
 
-    groups[groups.length] = group;
+    //groups[groups.length] = group;
 
-    activeGroup = group;
+    //activeGroup = group;
 
 
+    return result;
+};*/
+
+
+getDataset = function () {
+    var row;
+    var arrayLength = labelKeys.length;
+    //var index;
+    var result = [];
+
+    for (var i = 0; i < arrayLength; i++) {
+        row = {};
+
+        //getting Centroids
+        row.x = centroids[i].x;
+        row.y = centroids[i].y;
+        row.z = centroids[i].z;
+
+
+        var label = labelKeys[i];
+        var lengthLookUpTable= lookUpTable.length;
+
+        //Looking for the right element in the lookup table
+
+        for (var j = 0, found = 0; j < lengthLookUpTable && found == 0; j++) {
+
+            if (lookUpTable[j].label == label) {
+                found == 1;
+                row.name = lookUpTable[j].region_name;
+            }
+        }
+
+        row.group = groups[activeGroup][0][i];
+
+        result[result.length] = row;
+    }
     return result;
 };
 
 
 getActiveGroup = function () {
+    /*
     var l = activeGroup.length;
     var result = [];
 
     for(var i=0; i < l; i++){
         result[result.length] = activeGroup[i];
     }
-    return result;
+    return result;*/
+
+
+    var l = groups[activeGroup][0].length;
+    var results = [];
+    for(var i = 0; i < l; i++){
+        var element = groups[activeGroup][0][i];
+        if(results.indexOf(element) == -1){
+            results[results.length] = element;
+        }
+    }
+    return results;
 };
 
 /**
@@ -217,5 +266,5 @@ setRegionsActivated = function (){
     for(var i =0; i < l; i++){
         regionsActivated[activeGroup[i]] = true;
     }
-}
+};
 

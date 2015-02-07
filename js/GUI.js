@@ -63,7 +63,7 @@ initGUI = function() {
                 reader.readAsDataURL(f.files[0]);
             }
         });
-
+    /*
     uploadMenu.append("button")
         .text("Upload LookUpTable")
         .attr("id", "groupUploadButton")
@@ -84,9 +84,9 @@ initGUI = function() {
                     console.log("Parsing LookUpTable");
                     Papa.parse(v, {
                         download: true,
-                        delimiter: ";",
+                        delimiter: ",",
                         dynamicTyping: true,
-                        header: true,
+                        header: false,
                         complete: function(results){
                             setLookUpTable(results);
                             console.log("look Up Table Uploaded");
@@ -96,6 +96,34 @@ initGUI = function() {
                 };
                 reader.readAsDataURL(f.files[0]);
             }
+        });*/
+    
+    uploadMenu.append("button")
+        .text("Upload Regions Group")
+        .attr("id", "groupUploadButton")
+        .append("input")
+        .attr("type", "file")
+        .attr("id", "group")
+        .on("change", function () {
+            var f = document.getElementById("group");
+
+            if(f.files && f.files[0]){
+                var reader = new FileReader();
+                reader.onload = function (e) {
+                    var v = e.target.result;
+                    Papa.parse(v, {
+                        download: true,
+                        delimiter: ',',
+                        dynamicTyping: true,
+                        header: false,
+                        complete: function(results){
+                            setGroup(results);
+                        }
+                    })
+                }
+                reader.readAsDataURL(f.files[0]);
+            };
+
         });
 
     uploadMenu.append("button")

@@ -43,7 +43,7 @@ var loadLabelKeys = function (callback) {
 };
 
 var loadConnections = function(callback){
-    Papa.parse("data/avgNW.csv",{
+    Papa.parse("data/NW.csv",{
         download: true,
         dynamicTyping: true,
         delimiter: ',',
@@ -54,3 +54,17 @@ var loadConnections = function(callback){
         }
     })
 };
+
+
+var loadColorMap = function(callback){
+    Papa.parse("data/colorMap.csv", {
+        download: true,
+        delimiter: ',',
+        dynamicTyping: true,
+        header: false,
+        complete: function(results){
+            setGroup(results);
+            callback(null,null);
+        }
+    })
+}
