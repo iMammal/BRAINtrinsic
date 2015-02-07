@@ -262,9 +262,10 @@ toggleRegion = function (regionName){
 };
 
 setRegionsActivated = function (){
-    var l = activeGroup.length;
+    var l = groups[activeGroup][0].length;;
     for(var i =0; i < l; i++){
-        regionsActivated[activeGroup[i]] = true;
+        var element = groups[activeGroup][0][i];
+        regionsActivated[element] = true;
     }
 };
 

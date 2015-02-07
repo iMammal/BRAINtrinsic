@@ -19,6 +19,8 @@ var oculusControl;
 var dimensionScale;
 var effect;
 
+var nodesSelected = [];
+
 
 
 
@@ -97,7 +99,7 @@ function onDblClick( event ){
 
 initCanvas = function () {
     removeStartButton();
-    //setRegionsActivated();
+    setRegionsActivated();
     var light;
 
     projector = new THREE.Projector();
@@ -239,7 +241,7 @@ var drawRegions = function(dataset) {
     });
 
     for(var i=0; i < l; i++){
-        //if(regionsActivated[dataset[i].group]) {
+        if(regionsActivated[dataset[i].group]) {
             material = new THREE.MeshPhongMaterial({
                 color: scaleColorGroup(dataset[i].group),
                 shininess: 15,
@@ -259,7 +261,7 @@ var drawRegions = function(dataset) {
             sphereNodeDictionary[spheres[i].uuid] = i;
 
             scene.add(spheres[i]);
-       // }
+       }
     }
 
 
