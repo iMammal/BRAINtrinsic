@@ -21,6 +21,8 @@ var effect;
 
 var nodesSelected = [];
 
+var displayedEdges = [];
+
 
 
 
@@ -84,11 +86,21 @@ function onDblClick( event ){
 
     if ( intersects.length > 0 ) {
 
-        var index = sphereNodeDictionary[intersects[0].object.uuid]
+        var nodeIndex = sphereNodeDictionary[intersects[0].object.uuid]
         var dataset = getDataset();
 
-        drawEdgesGivenNode(index);
+        var el = nodesSelected.indexOf(nodeIndex);
 
+        if( el == -1 ){
+            //if the node is not already selected -> draw edges and add in the nodesSelected Array
+            drawEdgesGivenNode(nodeIndex);
+            nodesSelected[nodesSelected.length] = nodeIndex;
+        } else
+        { //if the nodes is already selected, remove edges and remove from the nodeSelected Array
+
+            nodesSelected.splice(el, 1);
+            removeEdgesGivenNode(nodeIndex);
+        }
     }
 };
 
@@ -193,9 +205,6 @@ render = function() {
 var createDimensionScale = function(d){
     var l = d.length;
     var allCoordinates = [];
-    var xCentroid;
-    var yCentroid;
-    var zCentroid;
 
     for(var i=0; i < l; i++) {
         allCoordinates[allCoordinates.length] = d[i].x;
@@ -316,10 +325,35 @@ var drawEdgesGivenNode = function (indexNode) {
                 end
             );
             var line = new THREE.Line(geometry, material);
+            displayedEdges[displayedEdges.length] = line;
             scene.add(line);
         }
     }
 };
+
+var removeEdgesGivenNode = function (indexNode) {
+    var x = spheres[indexNode].position.x;
+    var y = spheres[indexNode].position.y;
+    var z = spheres[indexNode].position.z;
+
+    var l = displayedEdges.length;
+
+    for(var i=0; i < l; i++){
+        var edge = displayedEdges[i];
+        // god.geometry.vertices[0]
+        var xStart = edge.geometry.vertices[0].x;
+        var yStart = edge.geometry.vertices[0].y;
+        var zStart = edge.geometry.vertices[0].z;
+
+        var xEnd = edge.geometry.vertices[1].x;
+        var yEnd = edge.geometry.vertices[1].y;
+        var zEnd = edge.geometry.vertices[1].z;
+
+        if((x == xStart && y == yStart && z == zStart) || (x == xEnd && y == yEnd && z == zEnd)){
+            scene.remove(edge);
+        }
+    }
+}
 
 
 
