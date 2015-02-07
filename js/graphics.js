@@ -211,7 +211,8 @@ var createDimensionScale = function(d){
                 return element;
             })
         ]
-    ).range([-80,+80]);
+    ).range([-100,+100]);
+
 };
 
 /*
@@ -225,6 +226,17 @@ var drawRegions = function(dataset) {
 
     var geometry = new THREE.SphereGeometry(0.8, 10, 10);
 
+    var xCentroid = d3.mean(dataset, function(d){
+        return totalScale(d.x);
+    });
+
+    var yCentroid = d3.mean(dataset, function(d){
+        return totalScale(d.y);
+    });
+
+    var zCentroid = d3.mean(dataset, function(d){
+        return totalScale(d.z);
+    });
 
     for(var i=0; i < l; i++){
         //if(regionsActivated[dataset[i].group]) {
@@ -237,7 +249,11 @@ var drawRegions = function(dataset) {
 
             spheres[spheres.length] = new THREE.Mesh(geometry, material);
 
-            spheres[i].position.set(totalScale(dataset[i].x), totalScale(dataset[i].y), totalScale(dataset[i].z));
+            var x = totalScale(dataset[i].x) - xCentroid;
+            var y = totalScale(dataset[i].y) - yCentroid;
+            var z = totalScale(dataset[i].z) - zCentroid;
+
+        spheres[i].position.set(x, y, z);
             //console.log("drawn region " + i + " in position x: " + totalScale(dataset[i].x) + ", y: " + totalScale(dataset[i].y)+ ", "+ "z: " +totalScale(dataset[i].z));
 
             sphereNodeDictionary[spheres[i].uuid] = i;
