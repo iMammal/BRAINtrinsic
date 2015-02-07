@@ -23,14 +23,12 @@ initGUI = function() {
                             delimiter: ",",
                             dynamicTyping: true,
                             complete: function (results) {
-                                god = results;
                                 console.log("complete uploading centroids");
                                 setCentroids(results);
                                 //updateScene();
                             }
                         }
-                    );
-                };
+                    )};
                 reader.readAsDataURL(f.files[0]);
             }
         });
@@ -82,8 +80,6 @@ initGUI = function() {
                 var reader = new FileReader();
                 reader.onload = function(e){
                     console.log("On load event LookUpTable");
-                    console.log(e);
-                    console.log()
                     v = e.target.result;
 
                     console.log("Parsing LookUpTable");
@@ -98,7 +94,7 @@ initGUI = function() {
                         }
                     })
 
-                }
+                };
                 reader.readAsDataURL(f.files[0]);
             }
         });
@@ -109,8 +105,8 @@ initGUI = function() {
         .append("input")
         .attr("type","file")
         .attr("id","connections")
-        .on("click", function() {
-            var f = document.getElementById("connections");
+        .on("change", function() {
+            f = document.getElementById("connections");
             if (f.files && f.files[0]) {
                 var reader = new FileReader();
 
@@ -118,14 +114,15 @@ initGUI = function() {
                     var v = e.target.result;
                     Papa.parse(v, {
                         download: true,
+                        delimiter:',',
                         dynamicTyping: true,
                         header: false,
                         complete: function (results) {
-                            setConnectionMatrix(results);
                             console.log("Connection Matrix uploaded");
+                            setConnectionMatrix(results);
                         }
                     })
-                }
+                };
                 reader.readAsDataURL(f.files[0]);
             }
         });
