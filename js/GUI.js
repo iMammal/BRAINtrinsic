@@ -22,9 +22,8 @@ initGUI = function() {
                             download: true,
                             delimiter: ",",
                             dynamicTyping: true,
-                            header: true,
                             complete: function (results) {
-                                positions = results;
+                                god = results;
                                 console.log("complete uploading centroids");
                                 setCentroids(results);
                                 //updateScene();
@@ -78,8 +77,6 @@ initGUI = function() {
             console.log("on Change Event look up table");
 
             var f = document.getElementById("lookUpTable");
-
-            variabile = f;
 
             if(f.files && f.files[0]){
                 var reader = new FileReader();
@@ -191,9 +188,12 @@ var createLegend = function () {
     var l = activeGroup.length;
     document.getElementById("legend").style.height = 25*l+"px";
     for(var i=0; i < l; i++){
-        var elementGroup = legendMenu.append("g").attr("transform","translate(10,"+i*25+")")
-            .on("click", function(e){
-
+        var elementGroup = legendMenu.append("g")
+            .attr("transform","translate(10,"+i*25+")")
+            .attr("id",activeGroup[i])
+            .on("click", function(){
+                console.log(this);
+                toggleRegion(this.id);
             });
         elementGroup.append("circle")
             .attr("cx",5)

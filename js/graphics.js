@@ -97,6 +97,7 @@ function onDblClick( event ){
 
 initCanvas = function () {
     removeStartButton();
+    //setRegionsActivated();
     var light;
 
     projector = new THREE.Projector();
@@ -223,22 +224,26 @@ var drawRegions = function(dataset) {
     createDimensionScale(dataset);
 
     var geometry = new THREE.SphereGeometry(0.8, 10, 10);
+
+
     for(var i=0; i < l; i++){
-        material = new THREE.MeshPhongMaterial({
-            color: scaleColorGroup(dataset[i].group),
-            shininess: 15,
-            transparent: true,
-            opacity: 0.9
-        });
+        //if(regionsActivated[dataset[i].group]) {
+            material = new THREE.MeshPhongMaterial({
+                color: scaleColorGroup(dataset[i].group),
+                shininess: 15,
+                transparent: true,
+                opacity: 0.9
+            });
 
 
-        spheres[spheres.length] = new THREE.Mesh(geometry, material);
+            spheres[spheres.length] = new THREE.Mesh(geometry, material);
 
-        spheres[i].position.set(totalScale(dataset[i].x), totalScale(dataset[i].y), totalScale(dataset[i].z));
+            spheres[i].position.set(totalScale(dataset[i].x), totalScale(dataset[i].y), totalScale(dataset[i].z));
 
-        sphereNodeDictionary[spheres[i].uuid] = i;
+            sphereNodeDictionary[spheres[i].uuid] = i;
 
-        scene.add(spheres[i]);
+            scene.add(spheres[i]);
+       // }
     }
 
 

@@ -9,7 +9,6 @@ var loadCentroids = function (callback) {
         download: true,
         delimiter: ",",
         dynamicTyping: true,
-        header: true,
         complete: function (results) {
             setCentroids(results);
             callback(null, null);
@@ -36,7 +35,6 @@ var loadLabelKeys = function (callback) {
     Papa.parse("data/labelKey.csv", {
         download: true,
         dynamicTyping: true,
-        header: true,
         complete: function (results) {
             //labelKeys = results;
             setLabelKeys(results);

@@ -13,6 +13,7 @@ var centroids;
 var lookUpTable;
 var activeGroup;
 var connectionMatrix;
+var regionsActivated = [];
 
 
 
@@ -39,8 +40,17 @@ setLabelKeys = function(labels){
 
 
 setCentroids = function (d) {
-    centroids = d.data;
-}
+    var data = d.data;
+    var len = data.length;
+    centroids = [];
+    for(var i=0; i < len; i++){
+        var element = {};
+        element.x = data[0][0];
+        element.y = data[0][1];
+        element.z = data[0][2];
+        centroids[centroids.length] = element;
+    }
+};
 
 
 setLookUpTable = function (d) {
@@ -144,6 +154,7 @@ getDataset = function () {
 
     activeGroup = group;
 
+
     return result;
 };
 
@@ -187,5 +198,24 @@ getConnectionMatrix = function () {
 
 getConnectionMatrixRow = function(index){
     return connectionMatrix[index];
+};
+
+
+toggleRegion = function (regionName){
+    if(regionsActivated[regionName]){
+        regionsActivated[regionName] = false;
+    } else {
+        regionsActivated[regionName] = true;
+    }
+    console.log(regionsActivated);
+    console.log("toggled region");
+    updateScene();
+};
+
+setRegionsActivated = function (){
+    var l = activeGroup.length;
+    for(var i =0; i < l; i++){
+        regionsActivated[activeGroup[i]] = true;
+    }
 }
 
