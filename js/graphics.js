@@ -53,18 +53,8 @@ function onClick( event ) {
 
         setNodeInfoPanel(dataset[index].name, index);
 
-
-        //intersects[ 0 ].object.material.color.setHex( Math.random() * 0xffffff );
-
     }
 
-    /*
-     // Parse all the faces
-     for ( var i in intersects ) {
-     intersects[ i ].face.material[ 0 ].color
-     .setHex( Math.random() * 0xffffff | 0x80000000 );
-     }
-     */
 };
 
 function onDblClick( event ){
@@ -133,14 +123,14 @@ initCanvas = function () {
     controls = new THREE.TrackballControls(camera, renderer.domElement);
     controls.rotateSpeed = 0.5;
 
-    /*
-    effect = new THREE.OculusRiftEffect( renderer, { worldScale: 1 } );
-    effect.setSize( window.innerWidth, window.innerHeight );*/
 
-    /*
+    effect = new THREE.OculusRiftEffect( renderer, { worldScale: 1 } );
+    effect.setSize( window.innerWidth, window.innerHeight );
+
+
      oculuscontrol = new THREE.OculusControls( camera );
 
-     oculuscontrol.connect();*/
+     //oculuscontrol.connect();
 
     drawRegions(getDataset());
 
@@ -208,7 +198,7 @@ render = function() {
 
 //Private methods
 
-var createDimensionScale = function(d){
+var createCentroidScale = function(d){
     var l = d.length;
     var allCoordinates = [];
 
@@ -218,7 +208,7 @@ var createDimensionScale = function(d){
         allCoordinates[allCoordinates.length] = d[i].z;
     }
 
-    totalScale = d3.scale.linear().domain(
+    centroidScale = d3.scale.linear().domain(
         [
             d3.min(allCoordinates, function(element){
                 return element;
@@ -239,24 +229,24 @@ var createDimensionScale = function(d){
 var drawRegions = function(dataset) {
     var l = dataset.length;
     var material;
-    createDimensionScale(dataset);
+    createCentroidScale(dataset);
 
     var geometry = new THREE.SphereGeometry(1.0, 10, 10);
 
     var xCentroid = d3.mean(dataset, function(d){
-        return totalScale(d.x);
+        return centroidScale(d.x);
     });
 
     var yCentroid = d3.mean(dataset, function(d){
-        return totalScale(d.y);
+        return centroidScale(d.y);
     });
 
     var zCentroid = d3.mean(dataset, function(d){
-        return totalScale(d.z);
+        return centroidScale(d.z);
     });
 
     for(var i=0; i < l; i++){
-        if(regionsActivated[dataset[i].group]) {
+          if(isRegionActive(dataset[i].group)) {
             material = new THREE.MeshPhongMaterial({
                 color: scaleColorGroup(dataset[i].group),
                 shininess: 15,
@@ -266,12 +256,12 @@ var drawRegions = function(dataset) {
 
             spheres[spheres.length] = new THREE.Mesh(geometry, material);
 
-            var x = totalScale(dataset[i].x) - xCentroid;
-            var y = totalScale(dataset[i].y) - yCentroid;
-            var z = totalScale(dataset[i].z) - zCentroid;
+            var x = centroidScale(dataset[i].x) - xCentroid;
+            var y = centroidScale(dataset[i].y) - yCentroid;
+            var z = centroidScale(dataset[i].z) - zCentroid;
 
         spheres[i].position.set(x, y, z);
-            //console.log("drawn region " + i + " in position x: " + totalScale(dataset[i].x) + ", y: " + totalScale(dataset[i].y)+ ", "+ "z: " +totalScale(dataset[i].z));
+            //console.log("drawn region " + i + " in position x: " + centroidScale(dataset[i].x) + ", y: " + centroidScale(dataset[i].y)+ ", "+ "z: " +centroidScale(dataset[i].z));
 
             sphereNodeDictionary[spheres[i].uuid] = i;
 
@@ -328,34 +318,85 @@ var drawConnections = function () {
                 if(isRegionActive(getRegionByNode(j)) && row[j] > threshold){
                     var start = new THREE.Vector3(spheres[nodesSelected[i]].position.x, spheres[nodesSelected[i]].position.y, spheres[nodesSelected[i]].position.z);
                     var end = new THREE.Vector3(spheres[j].position.x, spheres[j].position.y, spheres[j].position.z);
-                    var line = drawEdge(start,end);
+                    console.log(row[j]);
+                    var line = drawEdgeWithName(start,end, row[j]);
                     displayedEdges[displayedEdges.length] = line;
                 }
             }
 
         }
     }
+
+    setEdgesColor();
 };
 
 
 
+var setEdgesColor = function () {
+    var allDisplayedWeights =[];
+    for(var i = 0; i < displayedEdges.length; i++){
+        allDisplayedWeights[allDisplayedWeights.length] = displayedEdges[i].name;
+    }
+
+    var edgeColorScale =  d3.scale.linear().domain(
+        [
+            d3.min(allDisplayedWeights, function(element){
+                return element;
+            })
+            ,
+            d3.max(allDisplayedWeights, function(element){
+                return element;
+            })
+        ]
+    ).range(["#edf8fb", "#005824"]);
+
+    var edgeDimensionScale = d3.scale.linear().domain(
+        [
+            d3.min(allDisplayedWeights, function(e){
+                return e;
+            })
+            ,
+            d3.max(allDisplayedWeights, function(e) {
+                return e;
+            })
+        ]
+    ).range([1,15]);
+
+
+    for(i = 0; i < displayedEdges.length; i++){
+        var edgeColor = new THREE.Color(edgeColorScale(displayedEdges[i].name));
+        var edgeWidth = edgeDimensionScale(displayedEdges[i].name);
+        var material = new THREE.LineBasicMaterial(
+            {
+                color: edgeColor,
+                linewidth: edgeWidth
+        });
+        displayedEdges[i].material = material;
+    }
+
+};
+
 var drawEdgesGivenNode = function (indexNode) {
     var connectionRow = getConnectionMatrixRow(indexNode);
+
 
     var l = connectionRow.length;
     for(var i=0; i < l ; i++){
         if(connectionRow[i] > threshold  && isRegionActive(getRegionByNode(i))) {
             var start = new THREE.Vector3(spheres[indexNode].position.x, spheres[indexNode].position.y, spheres[indexNode].position.z);
             var end = new THREE.Vector3(spheres[i].position.x, spheres[i].position.y, spheres[i].position.z);
-            var line = drawEdgeWithName(start,end, indexNode);
+            var line = drawEdgeWithName(start,end, connectionRow[i]);
             displayedEdges[displayedEdges.length] = line;
         }
     }
+
+    setEdgesColor();
 };
 
 
 var drawEdge = function (start,end) {
-    var material = new THREE.LineBasicMaterial;
+    var c = new THREE.Color("red");
+    var material = new THREE.LineBasicMaterial();
     var geometry = new THREE.Geometry();
     geometry.vertices.push(
         start,
@@ -389,8 +430,10 @@ var removeEdgesGivenNode = function (indexNode) {
         //removing only the esges that starts from that node
         if(x == xStart && y == yStart && z == zStart){
             scene.remove(edge);
+            displayedEdges.slice(edge,1);
         }
     }
+    setEdgesColor();
 };
 
 
