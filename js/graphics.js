@@ -24,6 +24,8 @@ var displayedEdges = [];
 
 var mouse = {x:0, y:0};
 
+var pointedObject;
+
 
 
 
@@ -49,11 +51,27 @@ function onDocumentMouseMove( event )
     if ( intersects.length > 0 ) {
 
         var index = sphereNodeDictionary[intersects[0].object.uuid];
+
+        if(pointedObject){
+            pointedObject.geometry = new THREE.SphereGeometry(1,10,10);
+        }
+
+        pointedObject = intersects[0].object
+        pointedObject.geometry = new THREE.SphereGeometry(2,10,10);
+
+
+
         var dataset = getDataset();
 
         setNodeInfoPanel(dataset[index].name, index);
 
+    } else{
+        if(pointedObject){
+            pointedObject.geometry = new THREE.SphereGeometry(1,10,10);
+            pointedObject = null
+        }
     }
+
 }
 
 
