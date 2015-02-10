@@ -13,19 +13,25 @@ queue()
         init();
     });
 
-/*
- queue()
- .defer(loadLookUpTable)
- .awaitAll(function(){
- init();
- });*/
-
-
 
 init = function () {
     initGUI();
     initCanvas();
 };
+
+/*
+ queue()
+ .defer(loadLookUpTable)
+ .awaitAll(function(){
+ init();
+ });
+
+
+init = function () {
+    initGUI();
+};*/
+
+
 
 
 

@@ -4,7 +4,7 @@
 
 var connectionMatrixScale;
 
-scaleColorGroup = d3.scale.category20();
+scaleColorGroup = d3.scale.category20c();
 
 
 

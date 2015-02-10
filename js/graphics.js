@@ -22,13 +22,46 @@ var nodesSelected = [];
 
 var displayedEdges = [];
 
+var mouse = {x:0, y:0};
 
+
+
+
+function onDocumentMouseMove( event )
+{
+    // the following line would stop any other event handler from firing
+    // (such as the mouse's TrackballControls)
+    // event.preventDefault();
+
+    // update the mouse variable
+    mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+    mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+
+    var vector = new THREE.Vector3( mouse.x, mouse.y, 1 );
+    vector = vector.unproject( camera );
+
+
+
+    var ray = new THREE.Raycaster( camera.position, vector.sub( camera.position ).normalize() );
+
+    var intersects = ray.intersectObjects( spheres );
+
+    if ( intersects.length > 0 ) {
+
+        var index = sphereNodeDictionary[intersects[0].object.uuid];
+        var dataset = getDataset();
+
+        setNodeInfoPanel(dataset[index].name, index);
+
+    }
+}
 
 
 /*
  * This method is used to interact with objects in scene.
  *
  */
+/*
 function onClick( event ) {
 
     event.preventDefault();
@@ -48,16 +81,20 @@ function onClick( event ) {
 
     if ( intersects.length > 0 ) {
 
-        var index = sphereNodeDictionary[intersects[0].object.uuid]
+        var index = sphereNodeDictionary[intersects[0].object.uuid];
         var dataset = getDataset();
 
         setNodeInfoPanel(dataset[index].name, index);
 
     }
 
-};
+}*/
 
-function onDblClick( event ){
+function onDblClick(event){
+    event.preventDefault();
+}
+
+function onClick( event ){
     event.preventDefault();
 
     var vector = new THREE.Vector3(
@@ -75,25 +112,31 @@ function onDblClick( event ){
 
     if ( intersects.length > 0 ) {
 
-        var nodeIndex = sphereNodeDictionary[intersects[0].object.uuid]
+        var nodeIndex = sphereNodeDictionary[intersects[0].object.uuid];
         var dataset = getDataset();
 
         var el = nodesSelected.indexOf(nodeIndex);
 
         if( el == -1 ){
             //if the node is not already selected -> draw edges and add in the nodesSelected Array
+
+            //god = intersects[0].object;
+            var oldColor = intersects[0].object.material.color.getHSL();
+
+            intersects[0].object.material.color.setHSL(oldColor.h,oldColor.s+0.2*oldColor.s,oldColor.l+0.2*oldColor.l);
+            intersects[0].object.geometry = new THREE.SphereGeometry(1.5,10,10);
             drawEdgesGivenNode(nodeIndex);
             nodesSelected[nodesSelected.length] = nodeIndex;
         } else
         { //if the nodes is already selected, remove edges and remove from the nodeSelected Array
 
+            intersects[ 0 ].object.material.color = new THREE.Color(scaleColorGroup(getRegionByNode(nodeIndex)));
+            intersects[ 0 ].object.geometry = new THREE.SphereGeometry(1.0,10,10);
             nodesSelected.splice(el, 1);
             removeEdgesGivenNode(nodeIndex);
         }
     }
-};
-
-
+}
 /**
  * This method should be called to init th canvas where we render the brain
  */
@@ -118,6 +161,7 @@ initCanvas = function () {
 
     canvas.addEventListener('dblclick', onDblClick , true);
     canvas.addEventListener( 'click', onClick, true );
+    canvas.addEventListener( 'mousemove', onDocumentMouseMove, true );
 
     canvas.appendChild(renderer.domElement);
 
@@ -156,7 +200,7 @@ initCanvas = function () {
  * This method should be called when a new model is uploaded in the system
  */
 updateScene = function(){
-    var l = spheres.length
+    var l = spheres.length;
     for (var i=0; i < l; i++){
         scene.remove(spheres[i]);
     }
@@ -184,7 +228,7 @@ animate = function () {
     //oculuscontrol.update(  );
     render();
 
-}
+};
 
 
 render = function() {
@@ -252,9 +296,10 @@ var drawRegions = function(dataset) {
             material = new THREE.MeshPhongMaterial({
                 color: scaleColorGroup(dataset[i].group),
                 shininess: 15,
-                transparent: true,
+                transparent: false,
                 opacity: 0.9
             });
+
 
             spheres[spheres.length] = new THREE.Mesh(geometry, material);
 
@@ -263,7 +308,6 @@ var drawRegions = function(dataset) {
             var z = centroidScale(dataset[i].z) - zCentroid;
 
             spheres[i].position.set(x, y, z);
-            //console.log("drawn region " + i + " in position x: " + centroidScale(dataset[i].x) + ", y: " + centroidScale(dataset[i].y)+ ", "+ "z: " +centroidScale(dataset[i].z));
 
             sphereNodeDictionary[spheres[i].uuid] = i;
 
@@ -320,7 +364,6 @@ var drawConnections = function () {
                 if(isRegionActive(getRegionByNode(j)) && row[j] > threshold){
                     var start = new THREE.Vector3(spheres[nodesSelected[i]].position.x, spheres[nodesSelected[i]].position.y, spheres[nodesSelected[i]].position.z);
                     var end = new THREE.Vector3(spheres[j].position.x, spheres[j].position.y, spheres[j].position.z);
-                    console.log(row[j]);
                     var line = drawEdgeWithName(start,end, row[j]);
                     displayedEdges[displayedEdges.length] = line;
                 }
@@ -373,7 +416,7 @@ var setEdgesColor = function () {
                 color: edgeColor,
                 //color: 0xbdbdbd,
                 //linewidth: edgeWidth
-                linewidth: 5
+                linewidth: 3
             });
         /*
          var material = new THREE.MeshPhongMaterial(
@@ -385,6 +428,8 @@ var setEdgesColor = function () {
 
         displayedEdges[i].material = material;
     }
+
+    updateEdgeLegend();
 
 };
 
@@ -402,7 +447,6 @@ var drawEdgesGivenNode = function (indexNode) {
 
         }
     }
-    console.log("displayed edges: " + displayedEdges.length);
     setEdgesColor();
 };
 
@@ -419,34 +463,34 @@ var drawEdge = function (start,end) {
     scene.add(line);
 
     /*
-    //Create a closed bent a sine-like wave
-    var middlePoint = start.add(end).divideScalar(2);
-    //var len = start.sub(end).length();
-    var len = start.distanceTo(end);
-    console.log(len);
+     //Create a closed bent a sine-like wave
+     var middlePoint = start.add(end).divideScalar(2);
+     //var len = start.sub(end).length();
+     var len = start.distanceTo(end);
+     console.log(len);
 
-    var dx = Math.floor((Math.random() * len) + 1);
-    var dy = Math.floor((Math.random() * len) + 1);
-    var dz = Math.floor((Math.random() * len) + 1);
-    var dv = new THREE.Vector3(dx,dy,dz);
+     var dx = Math.floor((Math.random() * len) + 1);
+     var dy = Math.floor((Math.random() * len) + 1);
+     var dz = Math.floor((Math.random() * len) + 1);
+     var dv = new THREE.Vector3(dx,dy,dz);
 
-    middlePoint.add(dv);
+     middlePoint.add(dv);
 
-    var curve = new THREE.SplineCurve3( [
-        start,
-        middlePoint,
-        end
-    ] );
+     var curve = new THREE.SplineCurve3( [
+     start,
+     middlePoint,
+     end
+     ] );
 
-    var geometry = new THREE.Geometry();
-    geometry.vertices = curve.getPoints( 50 );
+     var geometry = new THREE.Geometry();
+     geometry.vertices = curve.getPoints( 50 );
 
-    var material = new THREE.LineBasicMaterial( { color : 0xff0000 } );
+     var material = new THREE.LineBasicMaterial( { color : 0xff0000 } );
 
-    //Create the final Object3d to add to the scene
-    var line = new THREE.Line( geometry, material );
+     //Create the final Object3d to add to the scene
+     var line = new THREE.Line( geometry, material );
 
-    scene.add(line);*/
+     scene.add(line);*/
 
 
 
@@ -492,7 +536,7 @@ var removeEdgesGivenNode = function (indexNode) {
     }
 
     displayedEdges = updatedDisplayEdges;
-    console.log("displayed Edges " + displayedEdges.length);
+    //console.log("displayed Edges " + displayedEdges.length);
     setEdgesColor();
 };
 

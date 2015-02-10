@@ -243,3 +243,8 @@ var createLegend = function () {
             .attr("fill",textColor);
     }
 };
+
+
+var updateEdgeLegend = function(){
+
+};
