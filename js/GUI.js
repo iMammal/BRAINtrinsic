@@ -199,6 +199,47 @@ setNodeInfoPanel = function (regionName, index){
 };
 
 
+setInfoLabel = function(regionName, index){
+
+    var nodalStrength = computeNodalStrength(getConnectionMatrixRow(index));
+
+    var body = document.body;
+
+     var canvas = document.getElementsByTagName("canvas");
+
+    var label = document.createElement("div");
+
+
+    label.setAttribute("width", "100px");
+    label.setAttribute("height", "100px");
+    label.setAttribute("background-color", "white");
+    label.setAttribute("position", "fixed");
+    label.setAttribute("left", "100px");
+    label.setAttribute("z-index", "9");
+    label.setAttribute("bottom", "200px");
+
+    var para = document.createElement("p");
+    var node = document.createTextNode("CIAO");
+
+
+    body.appendChild(label).appendChild(para).appendChild(node);
+
+
+/*
+    canvas.append('div')
+        .attr("width", "100px")
+        .attr("height", "50px")
+        .attr("z-index", "2")
+        .attr("class", "menu")
+        .attr("position", "absolute")
+        .attr("left", "100px")
+        .attr("bottom", "400px");*/
+
+
+
+};
+
+
 
 
 /*

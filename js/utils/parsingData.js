@@ -50,6 +50,7 @@ var loadConnections = function(callback){
         header: false,
         complete: function(results){
             setConnectionMatrix(results);
+            computeDistanceMatrix();
             callback(null,null);
         }
     })

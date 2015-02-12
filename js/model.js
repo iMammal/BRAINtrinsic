@@ -277,3 +277,8 @@ setRegionsActivated = function (){
     }
 };
 
+
+getConnectionMatrixDimension = function(){
+    return connectionMatrix.length;
+}
+
