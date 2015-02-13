@@ -2,7 +2,6 @@
  * Created by giorgioconte on 31/01/15.
  */
 
-
 var loadCentroids = function (callback) {
 
     Papa.parse("data/xyz.csv", {

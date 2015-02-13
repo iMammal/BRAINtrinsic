@@ -214,7 +214,6 @@ createThresholdSlider = function (){
         .attr("id", "thresholdSlider")
         .attr("min","0")
         .attr("max", getMaximumWeight())
-        .attr("data-popup-enabled","true")
         .on("change", function () {
             var slider = document.getElementById("thresholdSlider");
             //updating label values

@@ -180,22 +180,14 @@ function onDblClick(event){
 function onClick( event ){
     event.preventDefault();
 
-    var vector = new THREE.Vector3(
-        ( event.clientX / window.innerWidth ) * 2 - 1,
-        - ( event.clientY / window.innerHeight ) * 2 + 1,
-        0.5
-    );
-    vector = vector.unproject( camera );
 
-    var ray = new THREE.Raycaster( camera.position,
-        vector.sub( camera.position ).normalize() );
-
-    var intersects = ray.intersectObjects( spheres );
+    var objectIntersected = getIntersectedObject();
 
 
-    if ( intersects.length > 0 && visibleNodes[sphereNodeDictionary[intersects[0].object.uuid]]) {
+    if (objectIntersected && visibleNodes[sphereNodeDictionary[objectIntersected.object.uuid]]) {
 
-        var nodeIndex = sphereNodeDictionary[intersects[0].object.uuid];
+
+        var nodeIndex = sphereNodeDictionary[objectIntersected.object.uuid];
         var dataset = getDataset();
 
         var el = nodesSelected.indexOf(nodeIndex);
@@ -203,18 +195,21 @@ function onClick( event ){
         if( el == -1 ){
             //if the node is not already selected -> draw edges and add in the nodesSelected Array
 
-            //god = intersects[0].object;
-            var oldColor = intersects[0].object.material.color.getHSL();
 
-            intersects[0].object.material.color.setHSL(oldColor.h,oldColor.s+0.2*oldColor.s,oldColor.l+0.2*oldColor.l);
-            intersects[0].object.geometry = new THREE.SphereGeometry(1.5,10,10);
+
+            var oldColor = objectIntersected.object.material.color.getHSL();
+
+
+            objectIntersected.object.material.color.setHSL(oldColor.h,oldColor.s+0.2*oldColor.s,oldColor.l+0.2*oldColor.l);
+            objectIntersected.object.geometry = new THREE.SphereGeometry(1.5,10,10);
             drawEdgesGivenNode(nodeIndex);
             nodesSelected[nodesSelected.length] = nodeIndex;
         } else
         { //if the nodes is already selected, remove edges and remove from the nodeSelected Array
 
-            intersects[ 0 ].object.material.color = new THREE.Color(scaleColorGroup(getRegionByNode(nodeIndex)));
-            intersects[ 0 ].object.geometry = new THREE.SphereGeometry(1.0,10,10);
+            objectIntersected.object.material.color = new THREE.Color(scaleColorGroup(getRegionByNode(nodeIndex)));
+            objectIntersected.object.geometry = new THREE.SphereGeometry(1.0,10,10);
+
             nodesSelected.splice(el, 1);
             removeEdgesGivenNode(nodeIndex);
         }
@@ -601,6 +596,28 @@ var removeEdgesGivenNode = function (indexNode) {
     //console.log("displayed Edges " + displayedEdges.length);
     setEdgesColor();
 };
+
+
+getIntersectedObject = function () {
+
+    var vector = new THREE.Vector3(
+        ( event.clientX / window.innerWidth ) * 2 - 1,
+        - ( event.clientY / window.innerHeight ) * 2 + 1,
+        0.5
+    );
+    vector = vector.unproject( camera );
+
+    var ray = new THREE.Raycaster( camera.position,
+        vector.sub( camera.position ).normalize() );
+
+    var objectsIntersected = ray.intersectObjects( spheres );
+
+    if(objectsIntersected[0]){
+        return objectsIntersected[0];
+    }
+
+    return undefined;
+}
 
 
 
