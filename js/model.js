@@ -246,7 +246,11 @@ getConnectionMatrix = function () {
 
 
 getConnectionMatrixRow = function(index){
-    return connectionMatrix[index];
+    var row = [];
+    for(var i=0; i < connectionMatrix.length; i++){
+        row[row.length] = connectionMatrix[index][i]
+    }
+    return row;
 };
 
 
@@ -280,5 +284,18 @@ setRegionsActivated = function (){
 
 getConnectionMatrixDimension = function(){
     return connectionMatrix.length;
+}
+
+
+getTopConnectionsByNode = function(indexNode, n){
+    var row = getConnectionMatrixRow(indexNode);
+    var sortedRow = row.sort(function(a, b){return b-a}); //sort in a descending flavor
+
+    var res = {};
+    for(var i=0; i < n; i++){
+        res[getConnectionMatrixRow(indexNode).indexOf(sortedRow[i])] = sortedRow[i];
+    }
+
+    return res;
 }
 

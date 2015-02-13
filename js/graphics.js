@@ -31,6 +31,8 @@ var pointedObject;
 
 var lastRootNode;
 
+var shortestPathEdges = [];
+
 
 
 
@@ -121,7 +123,7 @@ function onClick( event ) {
 
 function onDblClick(event){
     event.preventDefault();
-    var distance;
+    var line;
 
     var vector = new THREE.Vector3(
         ( event.clientX / window.innerWidth ) * 2 - 1,
@@ -158,14 +160,19 @@ function onDblClick(event){
             if(visibleNodes[i]){
                 var prev = spheres[previousMap[i]];
                 if(prev) {
-                    drawEdge(spheres[i].position, prev.position);
+                    line = drawEdgeWithName(spheres[i].position, prev.position, getConnectionMatrix()[i][previousMap[i]]);
+                    displayedEdges[displayedEdges.length] = line;
+                    shortestPathEdges[shortestPathEdges.length] = line;
                 }
             }
         }
 
     }
+    setEdgesColor();
     updateScene();
-
+    if(intersects.length > 0){
+        intersects[0].object.geometry = new THREE.SphereGeometry(3,10,10);
+    }
 }
 
 function onClick( event ){
@@ -322,8 +329,6 @@ render = function() {
 
 
 
-//Private methods
-
 var createCentroidScale = function(d){
     var l = d.length;
     var allCoordinates = [];
@@ -455,6 +460,11 @@ var drawConnections = function () {
         }
     }
 
+    for(i=0; i < shortestPathEdges.length; i++){
+        displayedEdges[displayedEdges.length] = line;
+        scene.add(shortestPathEdges[i]);
+    }
+
     setEdgesColor();
 };
 
@@ -499,8 +509,6 @@ var setEdgesColor = function () {
         var material = new THREE.LineBasicMaterial(
             {
                 color: edgeColor,
-                //color: 0xbdbdbd,
-                //linewidth: edgeWidth
                 linewidth: 3
             });
 
@@ -569,7 +577,6 @@ var removeEdgesGivenNode = function (indexNode) {
         if(x == xStart && y == yStart && z == zStart){
             removedEdges[removedEdges.length] = i;
             scene.remove(edge);
-
         }
     }
 
@@ -580,6 +587,10 @@ var removeEdgesGivenNode = function (indexNode) {
         if( removedEdges.indexOf(i) == -1){
             updatedDisplayEdges[updatedDisplayEdges.length] = displayedEdges[i];
         }
+    }
+
+    for(i=0; i < shortestPathEdges.length; i++){
+        updatedDisplayEdges[updatedDisplayEdges.length] = shortestPathEdges[i];
     }
 
     displayedEdges = updatedDisplayEdges;
