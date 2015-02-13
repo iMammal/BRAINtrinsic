@@ -42,34 +42,26 @@ function onDocumentMouseMove( event )
     // (such as the mouse's TrackballControls)
     // event.preventDefault();
 
-    // update the mouse variable
-    mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
-    mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
-
-    var vector = new THREE.Vector3( mouse.x, mouse.y, 1 );
-    vector = vector.unproject( camera );
+    var intersectedObject = getIntersectedObject();
 
 
+    if ( intersectedObject && visibleNodes[sphereNodeDictionary[intersectedObject.object.uuid]] ) {
 
-    var ray = new THREE.Raycaster( camera.position, vector.sub( camera.position ).normalize() );
-
-    var intersects = ray.intersectObjects( spheres );
-
-    if ( intersects.length > 0 && visibleNodes[sphereNodeDictionary[intersects[0].object.uuid]] ) {
-
-        var index = sphereNodeDictionary[intersects[0].object.uuid];
+        var index = sphereNodeDictionary[intersectedObject.object.uuid];
 
         if(pointedObject){
             pointedObject.geometry = new THREE.SphereGeometry(1,10,10);
         }
 
-        pointedObject = intersects[0].object;
+
+        pointedObject = intersectedObject.object;
+
         pointedObject.geometry = new THREE.SphereGeometry(2,10,10);
 
         var dataset = getDataset();
 
         setNodeInfoPanel(dataset[index].name, index);
-        //setInfoLabel(dataset[index].name, index);
+
 
         drawEdgesGivenNode(index);
 
