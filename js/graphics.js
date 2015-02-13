@@ -2,7 +2,7 @@
  * Created by giorgioconte on 31/01/15.
  */
 
-var threshold = 30;
+//var threshold = 30;
 
 
 var projector;
@@ -168,8 +168,10 @@ function onDblClick(event){
         }
 
     }
+
     setEdgesColor();
     updateScene();
+    console.log(displayedEdges);
     if(intersects.length > 0){
         intersects[0].object.geometry = new THREE.SphereGeometry(3,10,10);
     }
@@ -225,6 +227,8 @@ function onClick( event ){
 initCanvas = function () {
     removeStartButton();
     setRegionsActivated();
+
+    setThreshold(30);
     var light;
 
     projector = new THREE.Projector();
@@ -449,7 +453,7 @@ var drawConnections = function () {
         if(isRegionActive(getRegionByNode(nodesSelected[i]))){
             var row = getConnectionMatrixRow(nodesSelected[i]);
             for(var j=0; j < row.length; j++){
-                if(isRegionActive(getRegionByNode(j)) && row[j] > threshold && visibleNodes[j]){
+                if(isRegionActive(getRegionByNode(j)) && row[j] > getThreshold() && visibleNodes[j]){
                     var start = new THREE.Vector3(spheres[nodesSelected[i]].position.x, spheres[nodesSelected[i]].position.y, spheres[nodesSelected[i]].position.z);
                     var end = new THREE.Vector3(spheres[j].position.x, spheres[j].position.y, spheres[j].position.z);
                     var line = drawEdgeWithName(start,end, row[j]);
@@ -461,7 +465,7 @@ var drawConnections = function () {
     }
 
     for(i=0; i < shortestPathEdges.length; i++){
-        displayedEdges[displayedEdges.length] = line;
+        displayedEdges[displayedEdges.length] = shortestPathEdges[i];
         scene.add(shortestPathEdges[i]);
     }
 
@@ -526,7 +530,7 @@ var drawEdgesGivenNode = function (indexNode) {
 
     var l = connectionRow.length;
     for(var i=0; i < l ; i++){
-        if(connectionRow[i] > threshold  && isRegionActive(getRegionByNode(i)) && visibleNodes[i]) {
+        if(connectionRow[i] > getThreshold()  && isRegionActive(getRegionByNode(i)) && visibleNodes[i]) {
             var start = new THREE.Vector3(spheres[indexNode].position.x, spheres[indexNode].position.y, spheres[indexNode].position.z);
             var end = new THREE.Vector3(spheres[i].position.x, spheres[i].position.y, spheres[i].position.z);
             var line = drawEdgeWithName(start,end, connectionRow[i]);

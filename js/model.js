@@ -15,6 +15,9 @@ var connectionMatrix;
 var regionsActivated = [];
 
 
+var threshold;
+
+
 
 
 /*
@@ -52,6 +55,14 @@ setCentroids = function (d) {
     }
 };
 
+
+setThreshold = function (t) {
+    threshold = t;
+};
+
+getThreshold = function () {
+    return threshold;
+}
 
 setLookUpTable = function (d) {
     lookUpTable = d.data;
@@ -297,5 +308,17 @@ getTopConnectionsByNode = function(indexNode, n){
     }
 
     return res;
+}
+
+
+getMaximumWeight = function () {
+
+    var max = d3.max(connectionMatrix, function(d){
+        return d3.max(d, function(d){
+            return d;
+        })
+    });
+
+    return max;
 }
 

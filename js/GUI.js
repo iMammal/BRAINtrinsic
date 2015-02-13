@@ -165,8 +165,10 @@ initGUI = function() {
                 console.log("data are missing");
             }
 
-        })
+        });
 
+
+    setThresholdSlider();
 
 };
 
@@ -195,6 +197,26 @@ setNodeInfoPanel = function (regionName, index){
     var node = document.createTextNode(regionName + " " + nodalStrength);
     panel.appendChild(para)
         .appendChild(node);
+
+};
+
+
+setThresholdSlider = function (){
+
+    var menu = d3.select("#edgeInfoPanel");
+
+    menu.append("input")
+        .attr("type", "range")
+        .attr("value", "30")
+        .attr("id", "thresholdSlider")
+        .attr("min","0")
+        .attr("max", getMaximumWeight())
+        .attr("data-popup-enabled","true")
+        .on("change", function () {
+            var slider = document.getElementById("thresholdSlider");
+            setThreshold(slider.value);
+            updateScene();
+        })
 
 };
 
