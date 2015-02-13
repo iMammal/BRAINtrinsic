@@ -168,7 +168,7 @@ initGUI = function() {
         });
 
 
-    setThresholdSlider();
+    createThresholdSlider();
 
 };
 
@@ -201,9 +201,12 @@ setNodeInfoPanel = function (regionName, index){
 };
 
 
-setThresholdSlider = function (){
+createThresholdSlider = function (){
 
     var menu = d3.select("#edgeInfoPanel");
+    menu.append("label")
+        .attr("for", "thresholdSlider")
+        .text("Threshold");
 
     menu.append("input")
         .attr("type", "range")
@@ -214,9 +217,16 @@ setThresholdSlider = function (){
         .attr("data-popup-enabled","true")
         .on("change", function () {
             var slider = document.getElementById("thresholdSlider");
+            //updating label values
+
             setThreshold(slider.value);
             updateScene();
-        })
+        });
+
+    menu.append("output")
+        .attr("for","thresholdSlider")
+        .attr("id", "thresholdOutput");
+
 
 };
 

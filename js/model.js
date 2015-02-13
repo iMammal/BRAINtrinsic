@@ -57,6 +57,7 @@ setCentroids = function (d) {
 
 
 setThreshold = function (t) {
+    document.getElementById("thresholdOutput").value = t;
     threshold = t;
 };
 
