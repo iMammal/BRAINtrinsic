@@ -85,74 +85,47 @@ function onDocumentMouseMove( event )
  *
  */
 /*
-function onClick( event ) {
+ function onClick( event ) {
 
-    event.preventDefault();
+ event.preventDefault();
 
-    var vector = new THREE.Vector3(
-        ( event.clientX / window.innerWidth ) * 2 - 1,
-        - ( event.clientY / window.innerHeight ) * 2 + 1,
-        0.5
-    );
-    vector = vector.unproject( camera );
+ var vector = new THREE.Vector3(
+ ( event.clientX / window.innerWidth ) * 2 - 1,
+ - ( event.clientY / window.innerHeight ) * 2 + 1,
+ 0.5
+ );
+ vector = vector.unproject( camera );
 
-    var ray = new THREE.Raycaster( camera.position,
-        vector.sub( camera.position ).normalize() );
+ var ray = new THREE.Raycaster( camera.position,
+ vector.sub( camera.position ).normalize() );
 
-    var intersects = ray.intersectObjects( spheres );
+ var intersects = ray.intersectObjects( spheres );
 
 
-    if ( intersects.length > 0 ) {
+ if ( intersects.length > 0 ) {
 
-        var index = sphereNodeDictionary[intersects[0].object.uuid];
-        var dataset = getDataset();
+ var index = sphereNodeDictionary[intersects[0].object.uuid];
+ var dataset = getDataset();
 
-        setNodeInfoPanel(dataset[index].name, index);
+ setNodeInfoPanel(dataset[index].name, index);
 
-    }
+ }
 
-}*/
+ }*/
 
 function onDblClick(event){
     event.preventDefault();
+
+
     var line;
 
     var intersectedObject = getIntersectedObject();
 
-    if(intersectedObject){
+    if(intersectedObject) {
         var nodeIndex = sphereNodeDictionary[intersectedObject.object.uuid];
 
-        var len = getConnectionMatrixDimension();
-        var dist = computeShortestPathDistances(nodeIndex);
-
-        nodesSelected = [];
-
-        for(var i=0; i < len; i++){
-            if(dist[i] < 0.01){
-                visibleNodes[i] = true;
-            }
-            else
-            {
-                visibleNodes[i] = false;
-            }
-        }
-
-        for(i=0; i < visibleNodes.length; i++){
-            if(visibleNodes[i]){
-                var prev = spheres[previousMap[i]];
-                if(prev) {
-                    line = drawEdgeWithName(spheres[i].position, prev.position, getConnectionMatrix()[i][previousMap[i]]);
-                    displayedEdges[displayedEdges.length] = line;
-                    shortestPathEdges[shortestPathEdges.length] = line;
-                }
-            }
-        }
-
+        drawShortestPath(nodeIndex);
     }
-
-    addDistanceSlider();
-    setEdgesColor();
-    updateScene();
 }
 
 function onClick( event ){
@@ -228,8 +201,8 @@ initCanvas = function () {
     controls.rotateSpeed = 0.5;
 
     /*
-    effect = new THREE.OculusRiftEffect( renderer, { worldScale: 1 } );
-    effect.setSize( window.innerWidth, window.innerHeight );*/
+     effect = new THREE.OculusRiftEffect( renderer, { worldScale: 1 } );
+     effect.setSize( window.innerWidth, window.innerHeight );*/
 
 
     //oculuscontrol = new THREE.OculusControls( camera );
@@ -356,23 +329,23 @@ var drawRegions = function(dataset) {
     for(var i=0; i < l; i++){
         if(isRegionActive(dataset[i].group)) {
             if(visibleNodes[i]){
-            material = new THREE.MeshPhongMaterial({
-                color: scaleColorGroup(dataset[i].group),
-                shininess: 15,
-                transparent: false,
-                opacity: 0.9
-            });
+                material = new THREE.MeshPhongMaterial({
+                    color: scaleColorGroup(dataset[i].group),
+                    shininess: 15,
+                    transparent: false,
+                    opacity: 0.9
+                });
 
 
-            spheres[spheres.length] = new THREE.Mesh(geometry, material);
+                spheres[spheres.length] = new THREE.Mesh(geometry, material);
 
-            var x = centroidScale(dataset[i].x) - xCentroid;
-            var y = centroidScale(dataset[i].y) - yCentroid;
-            var z = centroidScale(dataset[i].z) - zCentroid;
+                var x = centroidScale(dataset[i].x) - xCentroid;
+                var y = centroidScale(dataset[i].y) - yCentroid;
+                var z = centroidScale(dataset[i].z) - zCentroid;
 
-            spheres[i].position.set(x, y, z);
+                spheres[i].position.set(x, y, z);
 
-            sphereNodeDictionary[spheres[i].uuid] = i;
+                sphereNodeDictionary[spheres[i].uuid] = i;
 
 
                 scene.add(spheres[i]);
@@ -595,6 +568,42 @@ getIntersectedObject = function () {
     }
 
     return undefined;
+};
+
+
+
+drawShortestPath = function (nodeIndex) {
+    var line;
+    var len = getConnectionMatrixDimension();
+    var dist = computeShortestPathDistances(nodeIndex);
+
+    nodesSelected = [];
+
+    for(var i=0; i < len; i++){
+        if(dist[i] < 0.01){
+            visibleNodes[i] = true;
+        }
+        else
+        {
+            visibleNodes[i] = false;
+        }
+    }
+
+    for(i=0; i < visibleNodes.length; i++){
+        if(visibleNodes[i]){
+            var prev = spheres[previousMap[i]];
+            if(prev) {
+                line = drawEdgeWithName(spheres[i].position, prev.position, getConnectionMatrix()[i][previousMap[i]]);
+                displayedEdges[displayedEdges.length] = line;
+                shortestPathEdges[shortestPathEdges.length] = line;
+            }
+        }
+    }
+
+    addDistanceSlider();
+    setEdgesColor();
+    updateScene();
+
 }
 
 
