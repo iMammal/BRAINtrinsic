@@ -33,6 +33,8 @@ var root;
 
 var shortestPathEdges = [];
 
+var distanceArray;
+
 
 
 
@@ -541,7 +543,7 @@ var removeEdgesGivenNode = function (indexNode) {
     }
 
     displayedEdges = updatedDisplayEdges;
-    //console.log("displayed Edges " + displayedEdges.length);
+
     setEdgesColor();
 };
 
@@ -577,10 +579,12 @@ drawShortestPath = function (nodeIndex) {
     var len = getConnectionMatrixDimension();
     var dist = computeShortestPathDistances(nodeIndex);
 
-    var distanceArray = [];
+    distanceArray = [];
     for(var i=0; i < getConnectionMatrixDimension(); i++){
         distanceArray[distanceArray.length] = dist[i];
     }
+
+    setDistanceArray(distanceArray);
 
 
     if(!document.getElementById("distanceThresholdSlider")){
@@ -606,16 +610,13 @@ drawShortestPath = function (nodeIndex) {
             var prev = spheres[previousMap[i]];
             if(prev) {
                 line = drawEdgeWithName(spheres[i].position, prev.position, getConnectionMatrix()[i][previousMap[i]]);
-                //displayedEdges[displayedEdges.length] = line;
                 shortestPathEdges[shortestPathEdges.length] = line;
             }
         }
     }
 
-
     setEdgesColor();
     updateScene();
-
 };
 
 

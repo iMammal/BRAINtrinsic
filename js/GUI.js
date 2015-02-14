@@ -2,6 +2,7 @@
  * Created by giorgioconte on 31/01/15.
  */
 
+
 initGUI = function() {
     var uploadMenu = d3.select("#upload");
 
@@ -235,7 +236,7 @@ setInfoLabel = function(regionName, index){
 
     var body = document.body;
 
-     var canvas = document.getElementsByTagName("canvas");
+    var canvas = document.getElementsByTagName("canvas");
 
     var label = document.createElement("div");
 
@@ -335,7 +336,6 @@ var addDistanceSlider = function (distances) {
 
     var maxDistance = d3.max(distances);
 
-    console.log("Max distance " + maxDistance);
 
     menu.append("input")
         .attr("type", "range")

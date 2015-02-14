@@ -18,17 +18,24 @@ var regionsActivated = [];
 
 var distanceThreshold;
 var threshold;
+var distanceArray;
 
 
 
-
-/*
-PUBLIC METHODS
- */
 
 /*
 Setters
  */
+
+
+setDistanceArray = function(array){
+    distanceArray = array;
+}
+
+
+getMaximumDistance = function(){
+    return d3.max(distanceArray);
+}
 
 /**
  * Label Keys setter
@@ -58,7 +65,9 @@ setCentroids = function (d) {
 
 setDistanceThreshold = function (dt) {
     if(document.getElementById("distanceThresholdOutput")){
-        document.getElementById("distanceThresholdOutput").value = dt;
+        var percentage = dt/getMaximumDistance();
+        var value = Math.floor(percentage*100)/100;
+        document.getElementById("distanceThresholdOutput").value = value+ " %";
     }
     distanceThreshold = dt;
 };
