@@ -33,7 +33,7 @@ function Graph(){
         this.vertices[name] = edges;
     }
 
-    this.shortestPath = function (start, finish) {
+    this.shortestPath = function (start) {
         var nodes = new PriorityQueue(),
             distances = {},
             previous = {},
@@ -56,21 +56,6 @@ function Graph(){
         while(!nodes.isEmpty()) {
             smallest = nodes.dequeue();
 
-            if(smallest === finish) {
-                path;
-
-                while(previous[smallest]) {
-                    path.push(smallest);
-                    smallest = previous[smallest];
-                }
-
-                break;
-            }
-
-            if(!smallest || distances[smallest] === INFINITY){
-                continue;
-            }
-
             for(neighbor in this.vertices[smallest]) {
                 alt = distances[smallest] + this.vertices[smallest][neighbor];
 
@@ -84,6 +69,7 @@ function Graph(){
         }
 
         previousMap = previous;
+        debug = distances;
         return distances;
     }
 }

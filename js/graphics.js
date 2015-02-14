@@ -117,23 +117,12 @@ function onDblClick(event){
     event.preventDefault();
     var line;
 
-    var vector = new THREE.Vector3(
-        ( event.clientX / window.innerWidth ) * 2 - 1,
-        - ( event.clientY / window.innerHeight ) * 2 + 1,
-        0.5
-    );
-    vector = vector.unproject( camera );
+    var intersectedObject = getIntersectedObject();
 
-    var ray = new THREE.Raycaster( camera.position,
-        vector.sub( camera.position ).normalize() );
-
-    var intersects = ray.intersectObjects( spheres );
-
-    if(intersects.length > 0){
-        var nodeIndex = sphereNodeDictionary[intersects[0].object.uuid];
+    if(intersectedObject){
+        var nodeIndex = sphereNodeDictionary[intersectedObject.object.uuid];
 
         var len = getConnectionMatrixDimension();
-
         var dist = computeShortestPathDistances(nodeIndex);
 
         nodesSelected = [];
@@ -161,12 +150,9 @@ function onDblClick(event){
 
     }
 
+    addDistanceSlider();
     setEdgesColor();
     updateScene();
-    console.log(displayedEdges);
-    if(intersects.length > 0){
-        intersects[0].object.geometry = new THREE.SphereGeometry(3,10,10);
-    }
 }
 
 function onClick( event ){

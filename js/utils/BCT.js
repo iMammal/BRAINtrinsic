@@ -28,11 +28,12 @@ var computeDistanceMatrix = function(){
         distanceMatrix[distanceMatrix.length] = row;
         graph.addVertex(i,vertexes);
     }
+
 };
 
 var computeShortestPathDistances = function(rootNode) {
 
-    return graph.shortestPath(String(rootNode), '1');;
+    return graph.shortestPath(String(rootNode));
 };
 
 

@@ -320,3 +320,9 @@ var createLegend = function () {
 var updateEdgeLegend = function(){
 
 };
+
+
+
+var addDistanceSlider = function () {
+
+};
