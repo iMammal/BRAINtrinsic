@@ -69,7 +69,6 @@ function Graph(){
         }
 
         previousMap = previous;
-        debug = distances;
         return distances;
     }
 }

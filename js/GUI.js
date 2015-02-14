@@ -215,9 +215,8 @@ createThresholdSlider = function (){
         .attr("min","0")
         .attr("max", getMaximumWeight())
         .on("change", function () {
-            var slider = document.getElementById("thresholdSlider");
-            //updating label values
 
+            var slider = document.getElementById("thresholdSlider");
             setThreshold(slider.value);
             updateScene();
         });
@@ -323,6 +322,40 @@ var updateEdgeLegend = function(){
 
 
 
-var addDistanceSlider = function () {
+var addDistanceSlider = function (distances) {
+    var menu = d3.select("#edgeInfoPanel");
 
+    menu.append("br");
+
+    menu.append("label")
+        .attr("for", "distanceThresholdSlider")
+        .text("Max Distance");
+
+    var meanDistance = d3.mean(distances);
+
+    var maxDistance = d3.max(distances);
+
+    console.log("Max distance " + maxDistance);
+
+    menu.append("input")
+        .attr("type", "range")
+        .attr("value", meanDistance)
+        .attr("id", "distanceThresholdSlider")
+        .attr("min","0")
+        .attr("max", maxDistance)
+        .attr("step", maxDistance/1000)
+        .on("change", function () {
+            var slider = document.getElementById("distanceThresholdSlider");
+
+            //console.log("on Change distance threshold value:" + slider.value);
+            setDistanceThreshold(slider.value);
+            drawShortestPath(root);
+        });
+
+
+    menu.append("output")
+        .attr("for","distanceThresholdSlider")
+        .attr("id", "distanceThresholdOutput");
+
+    setDistanceThreshold(meanDistance);
 };

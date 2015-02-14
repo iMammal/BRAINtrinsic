@@ -29,7 +29,7 @@ var mouse = {x:0, y:0};
 
 var pointedObject;
 
-var lastRootNode;
+var root;
 
 var shortestPathEdges = [];
 
@@ -117,8 +117,6 @@ function onDblClick(event){
     event.preventDefault();
 
 
-    var line;
-
     var intersectedObject = getIntersectedObject();
 
     if(intersectedObject) {
@@ -130,7 +128,6 @@ function onDblClick(event){
 
 function onClick( event ){
     event.preventDefault();
-
 
     var objectIntersected = getIntersectedObject();
 
@@ -574,13 +571,28 @@ getIntersectedObject = function () {
 
 drawShortestPath = function (nodeIndex) {
     var line;
+
+    root = nodeIndex;
+
     var len = getConnectionMatrixDimension();
     var dist = computeShortestPathDistances(nodeIndex);
 
+    var distanceArray = [];
+    for(var i=0; i < getConnectionMatrixDimension(); i++){
+        distanceArray[distanceArray.length] = dist[i];
+    }
+
+
+    if(!document.getElementById("distanceThresholdSlider")){
+        addDistanceSlider(distanceArray);
+        console.log("add distance threshold slider");
+    }
+
     nodesSelected = [];
+    shortestPathEdges = [];
 
     for(var i=0; i < len; i++){
-        if(dist[i] < 0.01){
+        if(dist[i] < getDistanceThreshold()){
             visibleNodes[i] = true;
         }
         else
@@ -594,17 +606,17 @@ drawShortestPath = function (nodeIndex) {
             var prev = spheres[previousMap[i]];
             if(prev) {
                 line = drawEdgeWithName(spheres[i].position, prev.position, getConnectionMatrix()[i][previousMap[i]]);
-                displayedEdges[displayedEdges.length] = line;
+                //displayedEdges[displayedEdges.length] = line;
                 shortestPathEdges[shortestPathEdges.length] = line;
             }
         }
     }
 
-    addDistanceSlider();
+
     setEdgesColor();
     updateScene();
 
-}
+};
 
 
 

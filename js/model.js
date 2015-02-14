@@ -15,6 +15,8 @@ var connectionMatrix;
 var regionsActivated = [];
 
 
+
+var distanceThreshold;
 var threshold;
 
 
@@ -43,7 +45,6 @@ setLabelKeys = function(labels){
 
 setCentroids = function (d) {
     var data = d.data;
-    god = data;
     var len = data.length;
     centroids = [];
     for(var i=0; i < len; i++){
@@ -55,6 +56,17 @@ setCentroids = function (d) {
     }
 };
 
+setDistanceThreshold = function (dt) {
+    if(document.getElementById("distanceThresholdOutput")){
+        document.getElementById("distanceThresholdOutput").value = dt;
+    }
+    distanceThreshold = dt;
+};
+
+
+getDistanceThreshold = function () {
+    return distanceThreshold;
+};
 
 setThreshold = function (t) {
     document.getElementById("thresholdOutput").value = t;
@@ -321,5 +333,8 @@ getMaximumWeight = function () {
     });
 
     return max;
-}
+};
+
+
+
 
