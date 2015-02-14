@@ -121,6 +121,8 @@ function onDblClick(event){
 
     var intersectedObject = getIntersectedObject();
 
+    removeThresholdSlider();
+
     if(intersectedObject) {
         var nodeIndex = sphereNodeDictionary[intersectedObject.object.uuid];
 
@@ -170,13 +172,14 @@ function onClick( event ){
  */
 
 initCanvas = function () {
+    console.log("init Canvas");
     removeStartButton();
     setRegionsActivated();
 
     setThreshold(30);
     var light;
 
-    projector = new THREE.Projector();
+    //projector = new THREE.Projector();
     scene = new THREE.Scene();
     camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
 
@@ -298,7 +301,7 @@ var createCentroidScale = function(d){
                 return element;
             })
         ]
-    ).range([-100,+100]);
+    ).range([-200,+200]);
 
 };
 
@@ -617,6 +620,21 @@ drawShortestPath = function (nodeIndex) {
 
     setEdgesColor();
     updateScene();
+};
+
+
+resizeScene = function(){
+    console.log("resizeScene");
+
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+
+
+    renderer.setSize(window.innerWidth, window.innerHeight);
+
+
+    animate();
+
 };
 
 

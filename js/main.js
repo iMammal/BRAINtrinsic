@@ -15,6 +15,11 @@ queue()
 
 
 init = function () {
+    $(window).resize(function(e){
+        e.preventDefault();
+        console.log("on resize event");
+        resizeScene();
+    });
     initGUI();
     initCanvas();
 };

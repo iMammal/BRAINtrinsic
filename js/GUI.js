@@ -193,7 +193,7 @@ setNodeInfoPanel = function (regionName, index){
 
     var nodalStrength = computeNodalStrength(connectionRow);
 
-
+    nodalStrength = Math.floor(nodalStrength*100)/100;
     var para = document.createElement("p");
     var node = document.createTextNode(regionName + " " + nodalStrength);
     panel.appendChild(para)
@@ -207,6 +207,7 @@ createThresholdSlider = function (){
     var menu = d3.select("#edgeInfoPanel");
     menu.append("label")
         .attr("for", "thresholdSlider")
+        .attr("id", "thresholdSliderLabel")
         .text("Threshold");
 
     menu.append("input")
@@ -330,6 +331,7 @@ var addDistanceSlider = function (distances) {
 
     menu.append("label")
         .attr("for", "distanceThresholdSlider")
+        .attr("id", "distanceThresholdSliderLabel")
         .text("Max Distance");
 
     var meanDistance = d3.mean(distances);
@@ -359,3 +361,17 @@ var addDistanceSlider = function (distances) {
 
     setDistanceThreshold(meanDistance);
 };
+
+
+removeThresholdSlider = function(){
+
+    var elem = document.getElementById('thresholdSlider');
+    elem.parentNode.removeChild(elem);
+
+    elem = document.getElementById('thresholdOutput');
+    elem.parentNode.removeChild(elem);
+
+    elem = document.getElementById('thresholdSliderLabel');
+    elem.parentNode.removeChild(elem);
+
+}
