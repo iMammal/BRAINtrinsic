@@ -169,7 +169,7 @@ initGUI = function() {
         });
 
 
-    createThresholdSlider();
+
 
 };
 
@@ -202,7 +202,7 @@ setNodeInfoPanel = function (regionName, index){
 };
 
 
-createThresholdSlider = function (){
+addThresholdSlider = function (){
 
     var menu = d3.select("#edgeInfoPanel");
     menu.append("label")
@@ -225,7 +225,9 @@ createThresholdSlider = function (){
 
     menu.append("output")
         .attr("for","thresholdSlider")
-        .attr("id", "thresholdOutput");
+        .attr("id", "thresholdOutput")
+
+    document.getElementById("thresholdOutput").value = getThreshold();
 
 
 };
@@ -374,4 +376,81 @@ removeThresholdSlider = function(){
     elem = document.getElementById('thresholdSliderLabel');
     elem.parentNode.removeChild(elem);
 
+};
+
+addModalityButton = function () {
+    console.log("modality btn added");
+    var menu = d3.select("#upload");
+
+    menu.append("button")
+        .text("Change Modality")
+        .attr("id", "changeModalityBtn")
+        .append("input")
+        .attr("type","checkbox")
+        .attr("id","changeModalityInput")
+        .attr("checked", "true")
+        .on("change", function () {
+            changeModality(this.checked);
+            updateScene();
+        });
+
 }
+
+
+changeModality = function(modality){
+    thresholdModality = modality;
+
+    if(modality){
+        //if it is thresholdModality
+        removeTopNSlider();
+        addThresholdSlider();
+
+    } else{
+        //top N modality
+        removeThresholdSlider();
+        addTopNSlider();
+    }
+
+};
+
+addTopNSlider = function(){
+    var menu = d3.select("#edgeInfoPanel")
+
+
+    menu.append("label")
+        .attr("for", "topNThresholdSlider")
+        .attr("id", "topNThresholdSliderLabel")
+        .text("Number of Edges");
+
+    menu.append("input")
+        .attr("type", "range")
+        .attr("value", getNumberOfEdges())
+        .attr("id", "topNThresholdSlider")
+        .attr("min","0")
+        .attr("max", getConnectionMatrixDimension())
+        .attr("step", "1")
+        .on("change", function () {
+            setNumberOfEdges(this.value);
+            updateScene();
+        });
+
+    menu.append("output")
+        .attr("for","topNThresholdSlider")
+        .attr("id", "topNThresholdSliderOutput")
+        .text(getNumberOfEdges());
+
+};
+
+
+removeTopNSlider= function () {
+
+    var elem = document.getElementById('topNThresholdSlider');
+    elem.parentNode.removeChild(elem);
+
+    elem = document.getElementById('topNThresholdSliderOutput');
+    elem.parentNode.removeChild(elem);
+
+    elem = document.getElementById('topNThresholdSliderLabel');
+    elem.parentNode.removeChild(elem);
+
+};

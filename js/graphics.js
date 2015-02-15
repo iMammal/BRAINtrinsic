@@ -25,8 +25,6 @@ var visibleNodes =[];
 
 var displayedEdges = [];
 
-var mouse = {x:0, y:0};
-
 var pointedObject;
 
 var root;
@@ -34,6 +32,8 @@ var root;
 var shortestPathEdges = [];
 
 var distanceArray;
+
+var thresholdModality = true;
 
 
 
@@ -64,9 +64,11 @@ function onDocumentMouseMove( event )
 
         setNodeInfoPanel(dataset[index].name, index);
 
-
-        drawEdgesGivenNode(index);
-
+        if(thresholdModality) {
+            drawEdgesGivenNode(index);
+        } else{
+          drawTopNEdgesByNode(index, getNumberOfEdges());
+        }
     } else{
         if(pointedObject){
             //this piece of code I think it is not very efficient, but so far it works.
@@ -172,7 +174,9 @@ function onClick( event ){
  */
 
 initCanvas = function () {
-    console.log("init Canvas");
+
+    addThresholdSlider();
+    addModalityButton();
     removeStartButton();
     setRegionsActivated();
 
@@ -396,17 +400,34 @@ var drawRegions = function(dataset) {
 
 
 var drawConnections = function () {
-
+    var row;
     for(var i= 0; i < nodesSelected.length; i++){
         if(isRegionActive(getRegionByNode(nodesSelected[i]))){
-            var row = getConnectionMatrixRow(nodesSelected[i]);
-            for(var j=0; j < row.length; j++){
-                if(isRegionActive(getRegionByNode(j)) && row[j] > getThreshold() && visibleNodes[j]){
-                    var start = new THREE.Vector3(spheres[nodesSelected[i]].position.x, spheres[nodesSelected[i]].position.y, spheres[nodesSelected[i]].position.z);
-                    var end = new THREE.Vector3(spheres[j].position.x, spheres[j].position.y, spheres[j].position.z);
-                    var line = drawEdgeWithName(start,end, row[j]);
-                    displayedEdges[displayedEdges.length] = line;
+            if(thresholdModality){
+                row = getConnectionMatrixRow(nodesSelected[i]);
+                for(var j=0; j < row.length; j++) {
+                    if (isRegionActive(getRegionByNode(j)) && row[j] > getThreshold() && visibleNodes[j]) {
+                        var start = new THREE.Vector3(spheres[nodesSelected[i]].position.x, spheres[nodesSelected[i]].position.y, spheres[nodesSelected[i]].position.z);
+                        var end = new THREE.Vector3(spheres[j].position.x, spheres[j].position.y, spheres[j].position.z);
+                        var line = drawEdgeWithName(start, end, row[j]);
+                        displayedEdges[displayedEdges.length] = line;
+                    }
                 }
+            } else{
+                /*
+                row = getTopConnectionsByNode(nodesSelected[i], numberOfNodes);
+
+                for (var obj in row){
+                    if(isRegionActive(getRegionByNode(obj)) && visibleNodes[obj]){
+                        var start = new THREE.Vector3(spheres[nodesSelected[i]].position.x, spheres[nodesSelected[i]].position.y, spheres[nodesSelected[i]].position.z );
+                        var end = new THREE.Vector3(spheres[obj].position.x, spheres[obj].position.y, spheres[obj].position.z);
+                        var line = drawEdgeWithName(start,end,row[obj]);
+                        displayedEdges[displayedEdges.length] = line;}}
+                        */
+                drawTopNEdgesByNode(nodesSelected[i], getNumberOfEdges());
+
+
+
             }
 
         }
@@ -637,5 +658,21 @@ resizeScene = function(){
 
 };
 
+
+drawTopNEdgesByNode = function (nodeIndex, n) {
+
+    var row = getTopConnectionsByNode(nodeIndex, n);
+
+    for (var obj in row) {
+        if (isRegionActive(getRegionByNode(obj)) && visibleNodes[obj]) {
+            var start = new THREE.Vector3(spheres[nodeIndex].position.x, spheres[nodeIndex].position.y, spheres[nodeIndex].position.z);
+            var end = new THREE.Vector3(spheres[obj].position.x, spheres[obj].position.y, spheres[obj].position.z);
+            var line = drawEdgeWithName(start, end, row[obj]);
+            displayedEdges[displayedEdges.length] = line;
+        }
+    }
+
+    setEdgesColor();
+}
 
 

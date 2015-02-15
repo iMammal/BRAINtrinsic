@@ -19,6 +19,7 @@ var regionsActivated = [];
 var distanceThreshold;
 var threshold;
 var distanceArray;
+var numberOfEdges = 5;
 
 
 
@@ -342,6 +343,19 @@ getMaximumWeight = function () {
     });
 
     return max;
+};
+
+
+getNumberOfEdges = function () {
+  return numberOfEdges;
+};
+
+setNumberOfEdges = function(n){
+    if(document.getElementById("topNThresholdSliderOutput")){
+        document.getElementById("topNThresholdSliderOutput").value = n;
+    }
+
+    numberOfEdges = n;
 };
 
 
