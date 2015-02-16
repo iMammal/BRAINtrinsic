@@ -486,6 +486,9 @@ removeElementsFromEdgePanel = function(){
 }
 
 
-removeMenuButtons = function (){
-    var menu = document.getElementById();
+removeUploadButtons= function (){
+    var menu = document.getElementById("upload");
+    while(menu.hasChildNodes()){
+        menu.removeChild(menu.children[0]);
+    }
 }

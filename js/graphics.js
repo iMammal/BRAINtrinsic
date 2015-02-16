@@ -177,10 +177,12 @@ function onClick( event ){
 initCanvas = function () {
 
     addThresholdSlider();
-    addModalityButton();
+
     removeStartButton();
-    //removeUploadButtons();
+    removeUploadButtons();
     //addGroupList();
+
+    addModalityButton();
     setRegionsActivated();
 
     setThreshold(30);
