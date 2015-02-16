@@ -368,14 +368,21 @@ var addDistanceSlider = function (distances) {
 removeThresholdSlider = function(){
 
     var elem = document.getElementById('thresholdSlider');
-    elem.parentNode.removeChild(elem);
+
+    if(elem) {
+        elem.parentNode.removeChild(elem);
+    }
+
 
     elem = document.getElementById('thresholdOutput');
-    elem.parentNode.removeChild(elem);
+    if(elem) {
+        elem.parentNode.removeChild(elem);
+    }
 
     elem = document.getElementById('thresholdSliderLabel');
-    elem.parentNode.removeChild(elem);
-
+    if(elem) {
+        elem.parentNode.removeChild(elem);
+    }
 };
 
 addModalityButton = function () {
@@ -427,7 +434,7 @@ addTopNSlider = function(){
         .attr("value", getNumberOfEdges())
         .attr("id", "topNThresholdSlider")
         .attr("min","0")
-        .attr("max", getConnectionMatrixDimension())
+        .attr("max", "20")
         .attr("step", "1")
         .on("change", function () {
             setNumberOfEdges(this.value);
@@ -445,12 +452,25 @@ addTopNSlider = function(){
 removeTopNSlider= function () {
 
     var elem = document.getElementById('topNThresholdSlider');
-    elem.parentNode.removeChild(elem);
+    if(elem) {
+        elem.parentNode.removeChild(elem);
+    }
 
     elem = document.getElementById('topNThresholdSliderOutput');
-    elem.parentNode.removeChild(elem);
+
+    if(elem) {
+        elem.parentNode.removeChild(elem);
+    }
+
 
     elem = document.getElementById('topNThresholdSliderLabel');
-    elem.parentNode.removeChild(elem);
-
+    if(elem) {
+        elem.parentNode.removeChild(elem);
+    }
 };
+
+
+removeElementsFromEdgePanel = function(){
+    removeThresholdSlider();
+    removeTopNSlider();
+}

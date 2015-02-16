@@ -123,7 +123,8 @@ function onDblClick(event){
 
     var intersectedObject = getIntersectedObject();
 
-    removeThresholdSlider();
+    removeElementsFromEdgePanel();
+    //removeThresholdSlider();
 
     if(intersectedObject) {
         var nodeIndex = sphereNodeDictionary[intersectedObject.object.uuid];
