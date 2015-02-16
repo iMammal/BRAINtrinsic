@@ -99,7 +99,7 @@ initGUI = function() {
             }
         });*/
     
-    uploadMenu.append("button")
+    /*uploadMenu.append("button")
         .text("Upload Regions Group")
         .attr("id", "groupUploadButton")
         .append("input")
@@ -125,7 +125,7 @@ initGUI = function() {
                 reader.readAsDataURL(f.files[0]);
             };
 
-        });
+        });*/
 
     uploadMenu.append("button")
         .text("Upload Connections")

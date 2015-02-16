@@ -677,6 +677,7 @@ changeColorGroup = function (n) {
     activeGroup = n;
 
     setRegionsActivated();
+    setColorGroupScale();
 
     updateScene();
 

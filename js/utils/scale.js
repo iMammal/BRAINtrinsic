@@ -7,6 +7,13 @@ var connectionMatrixScale;
 scaleColorGroup = d3.scale.category20c();
 
 
+setColorGroupScale = function () {
+ if(getActiveGroup().length <= 10){
+     scaleColorGroup = d3.scale.category10();
+ } else {
+     scaleColorGroup = d3.scale.category20c();
+ }
+};
 
 getConnectionMatrixScale = function () {
     var connectionMatrix = getConnectionMatrix();
