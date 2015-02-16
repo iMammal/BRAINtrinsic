@@ -179,6 +179,8 @@ initCanvas = function () {
     addThresholdSlider();
     addModalityButton();
     removeStartButton();
+    //removeUploadButtons();
+    //addGroupList();
     setRegionsActivated();
 
     setThreshold(30);
@@ -255,7 +257,7 @@ updateScene = function(){
     }
 
     displayedEdges = [];
-    spheres = [];
+
 
     drawRegions(getDataset());
     drawConnections();
@@ -317,7 +319,7 @@ var createCentroidScale = function(d){
  */
 
 var drawRegions = function(dataset) {
-    sphereNodeDictionary = {};
+    //sphereNodeDictionary = {};
     var l = dataset.length;
     var material;
 
@@ -350,7 +352,7 @@ var drawRegions = function(dataset) {
                 });
 
 
-                spheres[spheres.length] = new THREE.Mesh(geometry, material);
+                spheres[i] = new THREE.Mesh(geometry, material);
 
                 var x = centroidScale(dataset[i].x) - xCentroid;
                 var y = centroidScale(dataset[i].y) - yCentroid;
@@ -593,8 +595,8 @@ getIntersectedObject = function () {
 
 drawShortestPath = function (nodeIndex) {
     var line;
-
     root = nodeIndex;
+
 
     var len = getConnectionMatrixDimension();
     var dist = computeShortestPathDistances(nodeIndex);
@@ -609,7 +611,6 @@ drawShortestPath = function (nodeIndex) {
 
     if(!document.getElementById("distanceThresholdSlider")){
         addDistanceSlider(distanceArray);
-        console.log("add distance threshold slider");
     }
 
     nodesSelected = [];
@@ -641,7 +642,6 @@ drawShortestPath = function (nodeIndex) {
 
 
 resizeScene = function(){
-    console.log("resizeScene");
 
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
@@ -679,6 +679,10 @@ changeColorGroup = function (n) {
     setRegionsActivated();
     setColorGroupScale();
 
+    for(var i=0; i < spheres.length; i++){
+        scene.remove(spheres[i]);
+    }
+    spheres = [];
     updateScene();
 
 };

@@ -484,3 +484,8 @@ removeElementsFromEdgePanel = function(){
     removeThresholdSlider();
     removeTopNSlider();
 }
+
+
+removeMenuButtons = function (){
+    var menu = document.getElementById();
+}
