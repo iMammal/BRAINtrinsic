@@ -10,7 +10,7 @@ var groups = [];
 var labelKeys;
 var centroids;
 var lookUpTable;
-var activeGroup =0;
+var activeGroup = 0;
 var connectionMatrix;
 var regionsActivated = [];
 
@@ -308,11 +308,22 @@ toggleRegion = function (regionName){
 };
 
 setRegionsActivated = function (){
+    /*regionsActivated = [];
+
     var l = groups[activeGroup].length;;
     for(var i =0; i < l; i++){
         var element = groups[activeGroup][i];
         regionsActivated[element] = true;
+    }*/
+
+    regionsActivated = {};
+
+    var l = groups[activeGroup].length;;
+    for(var i = 0; i < l; i++){
+        var element = groups[activeGroup][i];
+        regionsActivated[element] = true;
     }
+
 };
 
 
@@ -379,7 +390,10 @@ createGroups = function () {
 
     }
     groups[groups.length] = anatomicalGroup;
+    groups[groups.length] = placeGroup;
+    groups[groups.length] = richClubGroup;
 };
+
 
 
 

@@ -280,9 +280,19 @@ setInfoLabel = function(regionName, index){
  * This method is used to create the legend panel.
  */
 var createLegend = function () {
+    var legendMenu = document.getElementById("legend");
+
+    while(legendMenu.hasChildNodes()){
+        legendMenu.removeChild(legendMenu.childNodes[0]);
+    }
+
 
     //var scaleColorGroup = d3.scale.category20();
-    var legendMenu = d3.select("#legend");
+    legendMenu = d3.select("#legend");
+
+
+
+
     var activeGroup = getActiveGroup();
     var l = activeGroup.length;
     document.getElementById("legend").style.height = 25*l+"px";

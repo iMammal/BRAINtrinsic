@@ -124,7 +124,7 @@ function onDblClick(event){
     var intersectedObject = getIntersectedObject();
 
     removeElementsFromEdgePanel();
-    //removeThresholdSlider();
+
 
     if(intersectedObject) {
         var nodeIndex = sphereNodeDictionary[intersectedObject.object.uuid];
@@ -249,11 +249,13 @@ updateScene = function(){
         scene.remove(spheres[i]);
     }
 
+
     for(i=0; i < displayedEdges.length; i++){
         scene.remove(displayedEdges[i]);
     }
 
     displayedEdges = [];
+    spheres = [];
 
     drawRegions(getDataset());
     drawConnections();
@@ -315,8 +317,11 @@ var createCentroidScale = function(d){
  */
 
 var drawRegions = function(dataset) {
+    sphereNodeDictionary = {};
     var l = dataset.length;
     var material;
+
+
     createCentroidScale(dataset);
 
     var geometry = new THREE.SphereGeometry(1.0, 10, 10);
@@ -332,6 +337,7 @@ var drawRegions = function(dataset) {
     var zCentroid = d3.mean(dataset, function(d){
         return centroidScale(d.z);
     });
+
 
     for(var i=0; i < l; i++){
         if(isRegionActive(dataset[i].group)) {
@@ -415,19 +421,8 @@ var drawConnections = function () {
                     }
                 }
             } else{
-                /*
-                row = getTopConnectionsByNode(nodesSelected[i], numberOfNodes);
 
-                for (var obj in row){
-                    if(isRegionActive(getRegionByNode(obj)) && visibleNodes[obj]){
-                        var start = new THREE.Vector3(spheres[nodesSelected[i]].position.x, spheres[nodesSelected[i]].position.y, spheres[nodesSelected[i]].position.z );
-                        var end = new THREE.Vector3(spheres[obj].position.x, spheres[obj].position.y, spheres[obj].position.z);
-                        var line = drawEdgeWithName(start,end,row[obj]);
-                        displayedEdges[displayedEdges.length] = line;}}
-                        */
                 drawTopNEdgesByNode(nodesSelected[i], getNumberOfEdges());
-
-
 
             }
 
@@ -674,6 +669,21 @@ drawTopNEdgesByNode = function (nodeIndex, n) {
     }
 
     setEdgesColor();
-}
+};
+
+
+
+changeColorGroup = function (n) {
+    activeGroup = n;
+
+    setRegionsActivated();
+
+    updateScene();
+
+};
+
+
+
+
 
 
