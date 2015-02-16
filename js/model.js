@@ -214,15 +214,15 @@ getDataset = function () {
 
         //Looking for the right element in the lookup table
 
-        for (var j = 0, found = 0; j < lengthLookUpTable && found == 0; j++) {
+        for (var j = 0, found = false; j < lengthLookUpTable && !found; j++) {
 
             if (lookUpTable[j].label == label) {
-                found == 1;
+                found = true;
                 row.name = lookUpTable[j].region_name;
             }
         }
 
-        row.group = groups[activeGroup][0][i];
+        row.group = groups[activeGroup][i];
 
         result[result.length] = row;
     }
@@ -241,10 +241,10 @@ getActiveGroup = function () {
     return result;*/
 
 
-    var l = groups[activeGroup][0].length;
+    var l = groups[activeGroup].length;
     var results = [];
     for(var i = 0; i < l; i++){
-        var element = groups[activeGroup][0][i];
+        var element = groups[activeGroup][i];
         if(results.indexOf(element) == -1){
             results[results.length] = element;
         }
@@ -289,7 +289,7 @@ getConnectionMatrixRow = function(index){
 
 
 getRegionByNode = function (nodeIndex) {
-    return groups[activeGroup][0][nodeIndex];
+    return groups[activeGroup][nodeIndex];
 };
 
 
@@ -308,9 +308,9 @@ toggleRegion = function (regionName){
 };
 
 setRegionsActivated = function (){
-    var l = groups[activeGroup][0].length;;
+    var l = groups[activeGroup].length;;
     for(var i =0; i < l; i++){
-        var element = groups[activeGroup][0][i];
+        var element = groups[activeGroup][i];
         regionsActivated[element] = true;
     }
 };
@@ -356,6 +356,29 @@ setNumberOfEdges = function(n){
     }
 
     numberOfEdges = n;
+};
+
+
+
+createGroups = function () {
+    var anatomicalGroup = [];
+    var richClubGroup = [];
+    var placeGroup = [];
+
+    for(var i=0; i < labelKeys.length; i++){
+        var labelKey = labelKeys[i];
+
+        for(var j = 0, found = false; j < lookUpTable.length && !found; j++){
+            if(lookUpTable[j].label == labelKey){
+                found = true;
+                anatomicalGroup[anatomicalGroup.length] = lookUpTable[j].group;
+                placeGroup[placeGroup.length] = lookUpTable[j].place;
+                richClubGroup[richClubGroup.length] = lookUpTable[j].rich_club;
+            }
+        }
+
+    }
+    groups[groups.length] = anatomicalGroup;
 };
 
 

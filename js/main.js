@@ -8,7 +8,7 @@ queue()
     .defer(loadLabelKeys)
     .defer(loadLookUpTable)
     .defer(loadConnections)
-    .defer(loadColorMap)
+    //.defer(loadColorMap)
     .awaitAll( function() {
         init();
     });
@@ -20,6 +20,7 @@ init = function () {
         console.log("on resize event");
         resizeScene();
     });
+    createGroups();
     initGUI();
     initCanvas();
 };
