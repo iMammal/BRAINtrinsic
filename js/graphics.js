@@ -48,6 +48,12 @@ function onDocumentMouseMove( event )
 
     var intersectedObject = getIntersectedObject();
 
+    if ( intersectedObject  && visibleNodes[sphereNodeDictionary[intersectedObject.object.uuid]] && isRegionActive(getRegionByNode(sphereNodeDictionary[intersectedObject.object.uuid]))) {
+       var i = sphereNodeDictionary[intersectedObject.object.uuid];
+        var regionName = getRegionNameByIndex(i);
+        setNodeInfoPanel(regionName, i);
+    }
+
     if ( intersectedObject && nodesSelected.indexOf(sphereNodeDictionary[intersectedObject.object.uuid]) == -1 && visibleNodes[sphereNodeDictionary[intersectedObject.object.uuid]] && isRegionActive(getRegionByNode(sphereNodeDictionary[intersectedObject.object.uuid]))) {
 
         var index = sphereNodeDictionary[intersectedObject.object.uuid];
@@ -58,20 +64,11 @@ function onDocumentMouseMove( event )
         }
 
 
+
         pointedObject = intersectedObject.object;
 
         pointedObject.geometry = new THREE.SphereGeometry(2,10,10);
         pointedObject.material.transparent = false;
-
-        /*
-        if(pointedObject != intersectedObject){
-            pointedObject.geometry = new THREE.SphereGeometry(1,10,10);
-
-            pointedObject = intersectedObject.object;
-            pointedObject.geometry = new THREE.SphereGeometry(2,10,10);
-            pointedObject.material.transparent = false;
-            pointedObject.needsUpdate(true);
-        }*/
 
 
         var regionName = getRegionNameByIndex(index);
@@ -80,6 +77,7 @@ function onDocumentMouseMove( event )
         if(thresholdModality) {
             drawEdgesGivenNode(index);
         } else{
+            console.log("top " + getNumberOfEdges() + "edges");
           drawTopNEdgesByNode(index, getNumberOfEdges());
         }
     } else{
@@ -149,7 +147,11 @@ function onDblClick(event){
 }
 
 function onClick( event ){
+    //TODO: This function does not handle the ways of displaying edges!! FIX IT
+
     event.preventDefault();
+
+
 
     var objectIntersected = getIntersectedObject();
 
@@ -360,7 +362,7 @@ var drawRegions = function(dataset) {
                         color: scaleColorGroup(dataset[i].group),
                         shininess: 15,
                         transparent: true,
-                        opacity: 0.5
+                        opacity: 0.7
                     });
                     geometry = new THREE.SphereGeometry(1.0, 10, 10);
 
@@ -443,9 +445,7 @@ var drawConnections = function () {
                     }
                 }
             } else{
-
                 drawTopNEdgesByNode(nodesSelected[i], getNumberOfEdges());
-
             }
 
         }
@@ -514,7 +514,7 @@ var setEdgesColor = function () {
                 opacity: edgeOpacityScale(displayedEdges[i].name),
                 transparent: true,
                 //color: edgeColor,
-                linewidth: 3
+                linewidth: 2
             });
 
         displayedEdges[i].material = material;
