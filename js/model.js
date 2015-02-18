@@ -395,6 +395,21 @@ createGroups = function () {
 };
 
 
+getRegionNameByIndex = function(index){
+
+    var labelKey = labelKeys[index];
+    var name;
+    for(var i = 0, found = false; i < lookUpTable.length && !found; i++){
+        if(lookUpTable[i].label == labelKey){
+            found = true;
+            name = lookUpTable[i].region_name;
+        }
+    }
+
+    return name;
+}
+
+
 
 
 

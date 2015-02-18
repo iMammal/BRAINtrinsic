@@ -5,6 +5,8 @@
 //var threshold = 30;
 
 
+var SPHERE_SIZE = 1.0;
+
 var projector;
 var camera;
 var canvas;
@@ -42,14 +44,14 @@ function onDocumentMouseMove( event )
 {
     // the following line would stop any other event handler from firing
     // (such as the mouse's TrackballControls)
-    // event.preventDefault();
+    event.preventDefault();
 
     var intersectedObject = getIntersectedObject();
 
-
-    if ( intersectedObject && visibleNodes[sphereNodeDictionary[intersectedObject.object.uuid]] ) {
+    if ( intersectedObject && nodesSelected.indexOf(sphereNodeDictionary[intersectedObject.object.uuid]) == -1 && visibleNodes[sphereNodeDictionary[intersectedObject.object.uuid]] && isRegionActive(getRegionByNode(sphereNodeDictionary[intersectedObject.object.uuid]))) {
 
         var index = sphereNodeDictionary[intersectedObject.object.uuid];
+
 
         if(pointedObject){
             pointedObject.geometry = new THREE.SphereGeometry(1,10,10);
@@ -59,10 +61,21 @@ function onDocumentMouseMove( event )
         pointedObject = intersectedObject.object;
 
         pointedObject.geometry = new THREE.SphereGeometry(2,10,10);
+        pointedObject.material.transparent = false;
 
-        var dataset = getDataset();
+        /*
+        if(pointedObject != intersectedObject){
+            pointedObject.geometry = new THREE.SphereGeometry(1,10,10);
 
-        setNodeInfoPanel(dataset[index].name, index);
+            pointedObject = intersectedObject.object;
+            pointedObject.geometry = new THREE.SphereGeometry(2,10,10);
+            pointedObject.material.transparent = false;
+            pointedObject.needsUpdate(true);
+        }*/
+
+
+        var regionName = getRegionNameByIndex(index);
+        setNodeInfoPanel(regionName, index);
 
         if(thresholdModality) {
             drawEdgesGivenNode(index);
@@ -71,13 +84,15 @@ function onDocumentMouseMove( event )
         }
     } else{
         if(pointedObject){
-            //this piece of code I think it is not very efficient, but so far it works.
 
             pointedObject.geometry = new THREE.SphereGeometry(1,10,10);
+            pointedObject.material.transparent = true;
 
-            //destroyInfoLabel();
-            updateScene();
-            pointedObject = null
+
+            if(nodesSelected.indexOf(sphereNodeDictionary[pointedObject.uuid]) == -1 ) {
+                removeEdgesGivenNode(sphereNodeDictionary[pointedObject.uuid]);
+            }
+            pointedObject = null;
         }
     }
 
@@ -141,24 +156,17 @@ function onClick( event ){
 
     if (objectIntersected && visibleNodes[sphereNodeDictionary[objectIntersected.object.uuid]]) {
 
-
         var nodeIndex = sphereNodeDictionary[objectIntersected.object.uuid];
-        var dataset = getDataset();
 
         var el = nodesSelected.indexOf(nodeIndex);
 
         if( el == -1 ){
             //if the node is not already selected -> draw edges and add in the nodesSelected Array
-
-
-
-            var oldColor = objectIntersected.object.material.color.getHSL();
-
-
-            objectIntersected.object.material.color.setHSL(oldColor.h,oldColor.s+0.2*oldColor.s,oldColor.l+0.2*oldColor.l);
-            objectIntersected.object.geometry = new THREE.SphereGeometry(1.5,10,10);
+            objectIntersected.geometry = new THREE.SphereGeometry(1.5,10,10);
             drawEdgesGivenNode(nodeIndex);
             nodesSelected[nodesSelected.length] = nodeIndex;
+            pointedObject = null;
+
         } else
         { //if the nodes is already selected, remove edges and remove from the nodeSelected Array
 
@@ -229,8 +237,6 @@ initCanvas = function () {
     }
 
     drawRegions(getDataset());
-
-    //drawConnections(getConnectionMatrix());
 
 
     //Adding light
@@ -344,7 +350,7 @@ var drawRegions = function(dataset) {
         return centroidScale(d.z);
     });
 
-
+    var geometry = new THREE.Geometry();
     for(var i=0; i < l; i++){
         if(isRegionActive(dataset[i].group)) {
             if(visibleNodes[i]){
@@ -378,12 +384,10 @@ var drawRegions = function(dataset) {
 
                 sphereNodeDictionary[spheres[i].uuid] = i;
 
-
                 scene.add(spheres[i]);
             }
         }
     }
-
 
 };
 
@@ -630,6 +634,7 @@ drawShortestPath = function (nodeIndex) {
     root = nodeIndex;
 
 
+
     var len = getConnectionMatrixDimension();
     var dist = computeShortestPathDistances(nodeIndex);
 
@@ -670,6 +675,7 @@ drawShortestPath = function (nodeIndex) {
 
     setEdgesColor();
     updateScene();
+
 };
 
 
