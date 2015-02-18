@@ -180,9 +180,11 @@ initCanvas = function () {
 
     removeStartButton();
     removeUploadButtons();
-    //addGroupList();
+    addGroupList();
 
     addModalityButton();
+
+
     setRegionsActivated();
 
     setThreshold(30);
@@ -461,6 +463,18 @@ var setEdgesColor = function () {
         ]
     ).range(["#edf8fb", "#005824"]);
 
+    var edgeOpacityScale = d3.scale.linear().domain(
+        [
+            d3.min(allDisplayedWeights, function(element){
+                return element;
+            })
+            ,
+            d3.max(allDisplayedWeights, function(element){
+                return element;
+            })
+        ]
+    ).range([0.1,1]);
+
     var edgeDimensionScale = d3.scale.linear().domain(
         [
             d3.min(allDisplayedWeights, function(e){
@@ -481,7 +495,9 @@ var setEdgesColor = function () {
 
         var material = new THREE.LineBasicMaterial(
             {
-                color: edgeColor,
+                opacity: edgeOpacityScale(displayedEdges[i].name),
+                transparent: true,
+                //color: edgeColor,
                 linewidth: 3
             });
 
@@ -514,6 +530,8 @@ var drawEdgesGivenNode = function (indexNode) {
 var drawEdge = function (start,end, opacity) {
 
     var material = new THREE.LineBasicMaterial();
+
+
     var geometry = new THREE.Geometry();
     geometry.vertices.push(
         start,

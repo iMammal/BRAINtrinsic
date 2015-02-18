@@ -483,7 +483,7 @@ removeTopNSlider= function () {
 removeElementsFromEdgePanel = function(){
     removeThresholdSlider();
     removeTopNSlider();
-}
+};
 
 
 removeUploadButtons= function (){
@@ -491,4 +491,55 @@ removeUploadButtons= function (){
     while(menu.hasChildNodes()){
         menu.removeChild(menu.children[0]);
     }
-}
+};
+
+
+addGroupList = function () {
+    var menu = d3.select("#upload");
+
+    menu.append("input")
+        .attr("type", "radio")
+        .attr("name","colorGroup")
+        .attr("id","anatomy")
+        .attr("value","0")
+        .attr("checked","true")
+        .on("change", function () {
+            changeColorGroup(this.value);
+        });
+    menu.append("label")
+        .attr("for","anatomy")
+        .text("Anatomy");
+
+    menu.append("br")
+
+    menu.append("input")
+        .attr("type", "radio")
+        .attr("name","colorGroup")
+        .attr("id","place")
+        .attr("value","1")
+        .on("change", function () {
+            changeColorGroup(this.value);
+        });
+
+
+    menu.append("label")
+        .attr("for","place")
+        .text("Place");
+
+    menu.append("br")
+
+    menu.append("input")
+        .attr("type", "radio")
+        .attr("name","colorGroup")
+        .attr("value","2")
+        .attr("id","richClub")
+        .on("change", function () {
+            changeColorGroup(this.value);
+        });
+
+    menu.append("label")
+        .attr("for","richClub")
+        .text("Rich Club");
+
+    menu.append("br");
+};
