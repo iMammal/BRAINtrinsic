@@ -330,7 +330,7 @@ var drawRegions = function(dataset) {
 
     createCentroidScale(dataset);
 
-    var geometry = new THREE.SphereGeometry(1.0, 10, 10);
+    var geometry;
 
     var xCentroid = d3.mean(dataset, function(d){
         return centroidScale(d.x);
@@ -348,12 +348,24 @@ var drawRegions = function(dataset) {
     for(var i=0; i < l; i++){
         if(isRegionActive(dataset[i].group)) {
             if(visibleNodes[i]){
-                material = new THREE.MeshPhongMaterial({
-                    color: scaleColorGroup(dataset[i].group),
-                    shininess: 15,
-                    transparent: false,
-                    opacity: 0.9
-                });
+                if(nodesSelected.indexOf(i) == -1) {
+                    //if the node is not selected
+                    material = new THREE.MeshPhongMaterial({
+                        color: scaleColorGroup(dataset[i].group),
+                        shininess: 15,
+                        transparent: true,
+                        opacity: 0.5
+                    });
+                    geometry = new THREE.SphereGeometry(1.0, 10, 10);
+
+                } else {
+                    material = new THREE.MeshPhongMaterial({
+                        color: scaleColorGroup(dataset[i].group),
+                        shininess: 15
+                    });
+
+                    geometry = new THREE.SphereGeometry(2.0,10,10);
+                }
 
 
                 spheres[i] = new THREE.Mesh(geometry, material);
