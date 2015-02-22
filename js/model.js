@@ -14,6 +14,8 @@ var activeGroup = 0;
 var connectionMatrix;
 var regionsActivated = [];
 
+var newLookUpTable = [];
+
 
 
 var distanceThreshold;
@@ -88,7 +90,21 @@ getThreshold = function () {
 }
 
 setLookUpTable = function (d) {
+    var i, el;
+
+
     lookUpTable = d.data;
+
+    for(i = 0; i < d.data.length ; i++){
+        el = {"group": d.data[i].group,
+            "place" : d.data[i].place,
+            "rich_club":d.data[i].rich_club,
+            "region_name":d.data[i].region_name
+        };
+
+    newLookUpTable[d.data[i].label] = el;
+    }
+
 };
 
 
@@ -221,6 +237,32 @@ getDataset = function () {
                 row.name = lookUpTable[j].region_name;
             }
         }
+
+        row.group = groups[activeGroup][i];
+
+        result[result.length] = row;
+    }
+    return result;
+};
+
+getNewDataset = function() {
+    var row;
+    var arrayLength = labelKeys.length;
+    //var index;
+    var result = [];
+
+    for (var i = 0; i < arrayLength; i++) {
+        row = {};
+
+        //getting Centroids
+        row.x = centroids[i].x;
+        row.y = centroids[i].y;
+        row.z = centroids[i].z;
+
+
+        var label = labelKeys[i];
+
+        row.name = newLookUpTable[label].region_name;
 
         row.group = groups[activeGroup][i];
 
