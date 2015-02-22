@@ -165,7 +165,13 @@ function onClick( event ){
         if( el == -1 ){
             //if the node is not already selected -> draw edges and add in the nodesSelected Array
             objectIntersected.geometry = new THREE.SphereGeometry(1.5,10,10);
-            drawEdgesGivenNode(nodeIndex);
+
+            if(thresholdModality) {
+                drawEdgesGivenNode(nodeIndex);
+            } else{
+                drawTopNEdgesByNode(nodeIndex, getNumberOfEdges());
+            }
+
             nodesSelected[nodesSelected.length] = nodeIndex;
             pointedObject = null;
 
