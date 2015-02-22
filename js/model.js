@@ -164,53 +164,9 @@ getCentroids = function(){
 /**
  * Get the entire dataset to render the scene
  */
+
 /*
-getDataset = function () {
-    var row;
-    var arrayLength = labelKeys.length;
-    var result =[];
-    var group = [];
-
-    for(var i=0; i < arrayLength; i++ ){
-        row ={};
-        row.x = centroids[i].x;
-        row.y = centroids[i].y;
-        row.z = centroids[i].z;
-        var label = labelKeys[i];
-        var lengthLookUpTable= lookUpTable.length;
-        var index;
-        //Looking for the right element in the lookup table
-
-        for(var j = 0,found = 0; j < lengthLookUpTable && found == 0; j++){
-
-            if(lookUpTable[j].label === label){
-                found == 1;
-                index = j;
-            }
-        }
-        row.group = groups[activeGroup][index];
-
-        //row.name = lookUpTable[index].region_name;
-
-        result[result.length] = row;
-        /*
-        var groupIndex = group.indexOf(row.group);
-
-        if(groupIndex == -1){
-            group [group.length] = row.group;
-        }
-    }
-
-    //groups[groups.length] = group;
-
-    //activeGroup = group;
-
-
-    return result;
-};*/
-
-
-getDataset = function () {
+getOldDataset = function () {
     var row;
     var arrayLength = labelKeys.length;
     //var index;
@@ -244,8 +200,10 @@ getDataset = function () {
     }
     return result;
 };
+*/
 
-getNewDataset = function() {
+
+getDataset = function() {
     var row;
     var arrayLength = labelKeys.length;
     //var index;
