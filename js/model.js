@@ -9,12 +9,11 @@ var spheres;
 var groups = [];
 var labelKeys;
 var centroids;
-var lookUpTable;
 var activeGroup = 0;
 var connectionMatrix;
 var regionsActivated = [];
 
-var newLookUpTable = [];
+var lookUpTable = [];
 
 
 
@@ -92,9 +91,6 @@ getThreshold = function () {
 setLookUpTable = function (d) {
     var i, el;
 
-
-    lookUpTable = d.data;
-
     for(i = 0; i < d.data.length ; i++){
         el = {"group": d.data[i].group,
             "place" : d.data[i].place,
@@ -102,7 +98,7 @@ setLookUpTable = function (d) {
             "region_name":d.data[i].region_name
         };
 
-    newLookUpTable[d.data[i].label] = el;
+    lookUpTable[d.data[i].label] = el;
     }
 
 };
@@ -220,7 +216,7 @@ getDataset = function() {
 
         var label = labelKeys[i];
 
-        row.name = newLookUpTable[label].region_name;
+        row.name = lookUpTable[label].region_name;
 
         row.group = groups[activeGroup][i];
 
@@ -371,7 +367,7 @@ setNumberOfEdges = function(n){
 
 
 
-createGroups = function () {
+createOldGroups = function () {
     var anatomicalGroup = [];
     var richClubGroup = [];
     var placeGroup = [];
@@ -395,20 +391,30 @@ createGroups = function () {
 };
 
 
-getRegionNameByIndex = function(index){
+createGroups = function () {
+    var anatomicalGroup = [];
+    var richClubGroup = [];
+    var placeGroup = [];
 
-    var labelKey = labelKeys[index];
-    var name;
-    for(var i = 0, found = false; i < lookUpTable.length && !found; i++){
-        if(lookUpTable[i].label == labelKey){
-            found = true;
-            name = lookUpTable[i].region_name;
-        }
+    for(var i=0; i < labelKeys.length; i++){
+        var labelKey = labelKeys[i];
+        anatomicalGroup[anatomicalGroup.length] = lookUpTable[labelKey].group;
+        placeGroup[placeGroup.length] = lookUpTable[labelKey].place;
+        richClubGroup[richClubGroup.length] = lookUpTable[labelKey].rich_club;
+
     }
+    groups[groups.length] = anatomicalGroup;
+    groups[groups.length] = placeGroup;
+    groups[groups.length] = richClubGroup;
+};
 
-    return name;
-}
 
+getRegionNameByIndex = function(index){
+    var labelKey = labelKeys[index];
+
+    return lookUpTable[labelKey].region_name;
+
+};
 
 
 
