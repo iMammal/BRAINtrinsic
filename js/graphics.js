@@ -587,7 +587,7 @@ var removeEdgesGivenNode = function (indexNode) {
         var zStart = edge.geometry.vertices[0].z;
 
         //removing only the edges that starts from that node
-        if(x == xStart && y == yStart && z == zStart){
+        if(x == xStart && y == yStart && z == zStart && shortestPathEdges.indexOf(edge) == -1){
             removedEdges[removedEdges.length] = i;
             scene.remove(edge);
         }
