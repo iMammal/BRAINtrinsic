@@ -84,28 +84,29 @@ function Graph(){
 
 setHierarchy = function(root){
     hierarchy = [];
+    var el = [];
     hierarchy[0] = [];
-    hierarchy[0].push(root);
-    var k = 0;
-    var addedElement = true;
+    hierarchy[0].push(parseInt(root));
+    var k;
 
-    while ( addedElement){
-        addedElement = false;
 
+    for(k=0; k < hierarchy.length; k++){
+        console.log("hierarchy " + hierarchy[k]);
+        console.log("hierarchy length " + hierarchy[k].length);
+        el = [];
         for(var i=0; i < hierarchy[k].length; i++) {
-            var el = [];
+
             for (var j in previousMap) {
                 if (previousMap[j] == hierarchy[k][i]) {
-                    console.log("push");
-                    el.push(parseInt(j));
+                    el[el.length] = parseInt(j);
                 }
             }
-            if (el.length > 0) {
-                hierarchy[hierarchy.length] = el;
-                addedElement = true;
-                k++;
-            }
+
         }
+        if (el.length > 0) {
+            hierarchy[hierarchy.length] = el;
+        }
+        console.log(hierarchy);
     }
 };
 

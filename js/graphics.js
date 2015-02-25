@@ -415,8 +415,6 @@ var drawRegions = function(dataset) {
         }
     }
 
-
-
 };
 
 
@@ -762,6 +760,33 @@ changeColorGroup = function (n) {
 setGeometryGivenNode = function(nodeIndex, geometry){
     spheres[nodeIndex].geometry = geometry;
 }
+
+
+drawShortestPathHops = function (hops){
+    shortestPathEdges = [];
+    for(var i = 0; i < hierarchy.length; i++){
+        if( i < hops + 1 ) {
+            //Visible node branch
+            for(var j=0; j < hierarchy[i].length; j++){
+                console.log(hierarchy[i][j]);
+                visibleNodes[hierarchy[i][j]] = true;
+                var prev = spheres[previousMap[hierarchy[i][j]]];
+                if(prev){
+                    var line = drawEdgeWithName(spheres[i].position, prev.position, getConnectionMatrix()[i][previousMap[i]]);
+                    shortestPathEdges[shortestPathEdges.length] = line;
+                }
+            }
+
+        } else{
+            for(var j=0; j < hierarchy[i].length; j++){
+                console.log("false: " + hierarchy[i][j] );
+                visibleNodes[hierarchy[i][j]] = false;
+            }
+        }
+    }
+
+    updateScene();
+};
 
 
 
