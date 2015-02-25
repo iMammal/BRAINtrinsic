@@ -4,7 +4,7 @@
 
 var loadCentroids = function (callback) {
 
-    Papa.parse("data/xyz.csv", {
+    Papa.parse("data/xyzIsomap.csv", {
         download: true,
         delimiter: ",",
         dynamicTyping: true,
@@ -31,7 +31,7 @@ var loadLookUpTable = function (callback) {
 };
 
 var loadLabelKeys = function (callback) {
-    Papa.parse("data/labelKey.csv", {
+    Papa.parse("data/labelKeyIsomap.csv", {
         download: true,
         dynamicTyping: true,
         complete: function (results) {
@@ -42,7 +42,7 @@ var loadLabelKeys = function (callback) {
 };
 
 var loadConnections = function(callback){
-    Papa.parse("data/NW.csv",{
+    Papa.parse("data/NWIsomap.csv",{
         download: true,
         dynamicTyping: true,
         delimiter: ',',

@@ -75,7 +75,7 @@ function Graph(){
         previousMap = previous;
         dist = distances;
         rootNode = start;
-        setHierarchy(root);
+        setHierarchy(rootNode);
         return distances;
     }
 }
@@ -83,6 +83,7 @@ function Graph(){
 
 
 setHierarchy = function(root){
+    hierarchy = [];
     hierarchy[0] = [];
     hierarchy[0].push(root);
     var k = 0;
