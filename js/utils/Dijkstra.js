@@ -1,6 +1,9 @@
 
 
 var previousMap;
+var hierarchy = [];
+var rootNode;
+var dist;
 
 function PriorityQueue () {
     this._nodes = [];
@@ -68,7 +71,50 @@ function Graph(){
             }
         }
 
+
         previousMap = previous;
+        dist = distances;
+        rootNode = start;
+        setHierarchy(root);
         return distances;
     }
 }
+
+
+
+setHierarchy = function(root){
+    hierarchy[0] = [];
+    hierarchy[0].push(root);
+    var k = 0;
+    var addedElement = true;
+
+    while ( addedElement){
+        addedElement = false;
+
+        for(var i=0; i < hierarchy[k].length; i++) {
+            var el = [];
+            for (var j in previousMap) {
+                if (previousMap[j] == hierarchy[k][i]) {
+                    console.log("push");
+                    el.push(parseInt(j));
+                }
+            }
+            if (el.length > 0) {
+                hierarchy[hierarchy.length] = el;
+                addedElement = true;
+                k++;
+            }
+        }
+    }
+};
+
+
+getShortestPathDistances = function(nodeIndex){
+    if(rootNode && rootNode == nodeIndex){
+        return dist;
+    }
+
+    computeShortestPathDistances(nodeIndex);
+
+    return dist;
+};

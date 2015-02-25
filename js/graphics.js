@@ -394,7 +394,6 @@ var drawRegions = function(dataset) {
                 geometry = new THREE.SphereGeometry(2.0,10,10);
             }
 
-            console.log(root);
             if(root && root == i){
                 geometry = new THREE.SphereGeometry(3.0,10,10);
                 material.transparent = false;
@@ -668,8 +667,9 @@ drawShortestPath = function (nodeIndex) {
 
 
     var len = getConnectionMatrixDimension();
-    var dist = computeShortestPathDistances(nodeIndex);
+    //var dist = computeShortestPathDistances(nodeIndex);
 
+    var dist = getShortestPathDistances(nodeIndex);
     distanceArray = [];
     for(var i=0; i < getConnectionMatrixDimension(); i++){
         distanceArray[distanceArray.length] = dist[i];
