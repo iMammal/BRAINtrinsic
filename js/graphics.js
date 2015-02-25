@@ -40,9 +40,6 @@ var thresholdModality = true;
 
 var mouse = new THREE.Vector2();
 
-var raycaster = new THREE.Raycaster();
-
-
 
 
 
@@ -58,7 +55,7 @@ function onDocumentMouseMove( event )
     var intersectedObject = getIntersectedObject();
 
     if ( intersectedObject  && visibleNodes[sphereNodeDictionary[intersectedObject.object.uuid]] && isRegionActive(getRegionByNode(sphereNodeDictionary[intersectedObject.object.uuid]))) {
-       var i = sphereNodeDictionary[intersectedObject.object.uuid];
+        var i = sphereNodeDictionary[intersectedObject.object.uuid];
         var regionName = getRegionNameByIndex(i);
         setNodeInfoPanel(regionName, i);
     }
@@ -87,13 +84,17 @@ function onDocumentMouseMove( event )
             drawEdgesGivenNode(index);
         } else{
             console.log("top " + getNumberOfEdges() + "edges");
-          drawTopNEdgesByNode(index, getNumberOfEdges());
+            drawTopNEdgesByNode(index, getNumberOfEdges());
         }
     } else{
         if(pointedObject){
 
-            pointedObject.geometry = new THREE.SphereGeometry(1,10,10);
-            pointedObject.material.transparent = true;
+            if(sphereNodeDictionary[pointedObject.uuid] == root)
+                pointedObject.geometry = new THREE.SphereGeometry(3,10,10);
+            else {
+                pointedObject.geometry = new THREE.SphereGeometry(1, 10, 10);
+                pointedObject.material.transparent = true;
+            }
 
 
             if(nodesSelected.indexOf(sphereNodeDictionary[pointedObject.uuid]) == -1 ) {
@@ -374,34 +375,41 @@ var drawRegions = function(dataset) {
     var geometry = new THREE.Geometry();
     for(var i=0; i < l; i++){
         if(isRegionActive(dataset[i].group)) {
-                if(nodesSelected.indexOf(i) == -1) {
-                    //if the node is not selected
-                    material = new THREE.MeshPhongMaterial({
-                        color: scaleColorGroup(dataset[i].group),
-                        shininess: 15,
-                        transparent: true,
-                        opacity: 0.7
-                    });
-                    geometry = new THREE.SphereGeometry(1.0, 10, 10);
+            if(nodesSelected.indexOf(i) == -1) {
+                //if the node is not selected
+                material = new THREE.MeshPhongMaterial({
+                    color: scaleColorGroup(dataset[i].group),
+                    shininess: 15,
+                    transparent: true,
+                    opacity: 0.7
+                });
+                geometry = new THREE.SphereGeometry(1.0, 10, 10);
 
-                } else {
-                    material = new THREE.MeshPhongMaterial({
-                        color: scaleColorGroup(dataset[i].group),
-                        shininess: 15
-                    });
+            } else {
+                material = new THREE.MeshPhongMaterial({
+                    color: scaleColorGroup(dataset[i].group),
+                    shininess: 15
+                });
 
-                    geometry = new THREE.SphereGeometry(2.0,10,10);
-                }
+                geometry = new THREE.SphereGeometry(2.0,10,10);
+            }
 
-                spheres[i] = new THREE.Mesh(geometry, material);
+            console.log(root);
+            if(root && root == i){
+                geometry = new THREE.SphereGeometry(3.0,10,10);
+                material.transparent = false;
+            }
 
-                var x = centroidScale(dataset[i].x) - xCentroid;
-                var y = centroidScale(dataset[i].y) - yCentroid;
-                var z = centroidScale(dataset[i].z) - zCentroid;
+            spheres[i] = new THREE.Mesh(geometry, material);
 
-                spheres[i].position.set(x, y, z);
+            var x = centroidScale(dataset[i].x) - xCentroid;
+            var y = centroidScale(dataset[i].y) - yCentroid;
+            var z = centroidScale(dataset[i].z) - zCentroid;
 
-                sphereNodeDictionary[spheres[i].uuid] = i;
+            spheres[i].position.set(x, y, z);
+
+            sphereNodeDictionary[spheres[i].uuid] = i;
+
             if(visibleNodes[i]){
                 scene.add(spheres[i]);
             }
@@ -699,8 +707,6 @@ drawShortestPath = function (nodeIndex) {
 
     setEdgesColor();
     updateScene();
-
-    setGeometryGivenNode(root, new THREE.SphereGeometry(3.0,10,10));
 
 };
 
