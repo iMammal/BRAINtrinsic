@@ -762,7 +762,9 @@ setGeometryGivenNode = function(nodeIndex, geometry){
 }
 
 
-drawShortestPathHops = function (hops){
+drawShortestPathHops = function (rootNode,hops){
+    var hierarchy = getHierarchy(rootNode);
+
     shortestPathEdges = [];
     for(var i = 0; i < hierarchy.length; i++){
         if( i < hops + 1 ) {
@@ -778,7 +780,6 @@ drawShortestPathHops = function (hops){
 
         } else{
             for(var j=0; j < hierarchy[i].length; j++){
-                console.log("false: " + hierarchy[i][j] );
                 visibleNodes[hierarchy[i][j]] = false;
             }
         }

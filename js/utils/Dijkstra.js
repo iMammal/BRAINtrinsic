@@ -113,6 +113,21 @@ getShortestPathDistances = function(nodeIndex){
     }
 
     computeShortestPathDistances(nodeIndex);
+    rootNode = nodeIndex;
 
     return dist;
 };
+
+
+getHierarchy = function(nodeIndex){
+    if(rootNode && rootNode == nodeIndex){
+        return hierarchy;
+    }
+
+
+    computeShortestPathDistances(nodeIndex);
+    rootNode = nodeIndex;
+
+
+    return hierarchy;
+}
