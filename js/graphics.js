@@ -374,7 +374,6 @@ var drawRegions = function(dataset) {
     var geometry = new THREE.Geometry();
     for(var i=0; i < l; i++){
         if(isRegionActive(dataset[i].group)) {
-            if(visibleNodes[i]){
                 if(nodesSelected.indexOf(i) == -1) {
                     //if the node is not selected
                     material = new THREE.MeshPhongMaterial({
@@ -403,7 +402,7 @@ var drawRegions = function(dataset) {
                 spheres[i].position.set(x, y, z);
 
                 sphereNodeDictionary[spheres[i].uuid] = i;
-
+            if(visibleNodes[i]){
                 scene.add(spheres[i]);
             }
         }
@@ -627,10 +626,7 @@ var removeEdgesGivenNode = function (indexNode) {
 
 
 getIntersectedObject = function () {
-//    var raycaster = new THREE.Raycaster();
-    var objectsIntersected = [];
 
-    /*
     var vector = new THREE.Vector3(
         ( event.clientX / window.innerWidth ) * 2 - 1,
         - ( event.clientY / window.innerHeight ) * 2 + 1,
@@ -639,13 +635,13 @@ getIntersectedObject = function () {
     vector = vector.unproject( camera );
 
     var ray = new THREE.Raycaster( camera.position,
-        vector.sub( camera.position ).normalize() );*/
+        vector.sub( camera.position ).normalize() );
 
 
-    raycaster.setFromCamera( mouse, camera );
+    //raycaster.setFromCamera( mouse, camera );
 
-    if(raycaster.intersectObjects)
-        objectsIntersected = raycaster.intersectObjects( spheres );
+
+    var objectsIntersected = ray.intersectObjects( spheres );
 
 
     if(objectsIntersected[0]){
@@ -758,7 +754,7 @@ changeColorGroup = function (n) {
 
 
 setGeometryGivenNode = function(nodeIndex, geometry){
-    spheres[nodeIndex] = geometry;
+    spheres[nodeIndex].geometry = geometry;
 }
 
 
