@@ -768,11 +768,10 @@ drawShortestPathHops = function (hops){
         if( i < hops + 1 ) {
             //Visible node branch
             for(var j=0; j < hierarchy[i].length; j++){
-                console.log(hierarchy[i][j]);
                 visibleNodes[hierarchy[i][j]] = true;
                 var prev = spheres[previousMap[hierarchy[i][j]]];
                 if(prev){
-                    var line = drawEdgeWithName(spheres[i].position, prev.position, getConnectionMatrix()[i][previousMap[i]]);
+                    var line = drawEdgeWithName(spheres[hierarchy[i][j]].position, prev.position, getConnectionMatrix()[hierarchy[i][j]][previousMap[hierarchy[i][j]]]);
                     shortestPathEdges[shortestPathEdges.length] = line;
                 }
             }

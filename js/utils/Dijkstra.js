@@ -91,8 +91,6 @@ setHierarchy = function(root){
 
 
     for(k=0; k < hierarchy.length; k++){
-        console.log("hierarchy " + hierarchy[k]);
-        console.log("hierarchy length " + hierarchy[k].length);
         el = [];
         for(var i=0; i < hierarchy[k].length; i++) {
 
@@ -101,12 +99,10 @@ setHierarchy = function(root){
                     el[el.length] = parseInt(j);
                 }
             }
-
         }
         if (el.length > 0) {
             hierarchy[hierarchy.length] = el;
         }
-        console.log(hierarchy);
     }
 };
 
