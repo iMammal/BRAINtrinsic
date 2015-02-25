@@ -38,6 +38,13 @@ var distanceArray;
 var thresholdModality = true;
 
 
+var mouse = new THREE.Vector2();
+
+var raycaster = new THREE.Raycaster();
+
+
+
+
 
 
 function onDocumentMouseMove( event )
@@ -45,6 +52,8 @@ function onDocumentMouseMove( event )
     // the following line would stop any other event handler from firing
     // (such as the mouse's TrackballControls)
     event.preventDefault();
+    mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1
+    mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1
 
     var intersectedObject = getIntersectedObject();
 
@@ -131,6 +140,8 @@ function onDocumentMouseMove( event )
  }*/
 
 function onDblClick(event){
+    mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+    mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
     event.preventDefault();
 
 
@@ -147,7 +158,9 @@ function onDblClick(event){
 }
 
 function onClick( event ){
-    //TODO: This function does not handle the ways of displaying edges!! FIX IT
+
+    mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1
+    mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1
 
     event.preventDefault();
 
@@ -337,7 +350,7 @@ var createCentroidScale = function(d){
  */
 
 var drawRegions = function(dataset) {
-    //sphereNodeDictionary = {};
+
     var l = dataset.length;
     var material;
 
@@ -381,7 +394,6 @@ var drawRegions = function(dataset) {
                     geometry = new THREE.SphereGeometry(2.0,10,10);
                 }
 
-
                 spheres[i] = new THREE.Mesh(geometry, material);
 
                 var x = centroidScale(dataset[i].x) - xCentroid;
@@ -396,6 +408,8 @@ var drawRegions = function(dataset) {
             }
         }
     }
+
+
 
 };
 
@@ -613,7 +627,10 @@ var removeEdgesGivenNode = function (indexNode) {
 
 
 getIntersectedObject = function () {
+//    var raycaster = new THREE.Raycaster();
+    var objectsIntersected = [];
 
+    /*
     var vector = new THREE.Vector3(
         ( event.clientX / window.innerWidth ) * 2 - 1,
         - ( event.clientY / window.innerHeight ) * 2 + 1,
@@ -622,9 +639,14 @@ getIntersectedObject = function () {
     vector = vector.unproject( camera );
 
     var ray = new THREE.Raycaster( camera.position,
-        vector.sub( camera.position ).normalize() );
+        vector.sub( camera.position ).normalize() );*/
 
-    var objectsIntersected = ray.intersectObjects( spheres );
+
+    raycaster.setFromCamera( mouse, camera );
+
+    if(raycaster.intersectObjects)
+        objectsIntersected = raycaster.intersectObjects( spheres );
+
 
     if(objectsIntersected[0]){
         return objectsIntersected[0];
@@ -682,6 +704,8 @@ drawShortestPath = function (nodeIndex) {
     setEdgesColor();
     updateScene();
 
+    setGeometryGivenNode(root, new THREE.SphereGeometry(3.0,10,10));
+
 };
 
 
@@ -730,6 +754,12 @@ changeColorGroup = function (n) {
     updateScene();
 
 };
+
+
+
+setGeometryGivenNode = function(nodeIndex, geometry){
+    spheres[nodeIndex] = geometry;
+}
 
 
 
