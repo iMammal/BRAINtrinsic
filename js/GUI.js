@@ -543,3 +543,101 @@ addGroupList = function () {
 
     menu.append("br");
 };
+
+
+shortestPathSliderHops = function(){
+    var menu = document.getElementById("edgeInfoPanel");
+    /*while(menu.hasChildNodes()){
+        menu.removeChild(menu.children[0]);
+    }*/
+
+    removeDistanceSlider();
+
+
+    menu =  d3.select('#edgeInfoPanel');
+    if(document.getElementById('numberOfHopsSlider') == null) {
+        menu.append("label")
+            .attr("for", "numberOfHopsSlider")
+            .attr("id", "numberOfHopsSliderLabel")
+            .text("Number of Hops");
+
+        menu.append("input")
+            .attr("type", "range")
+            .attr("value", getNumberOfHops())
+            .attr("id", "numberOfHopsSlider")
+            .attr("min", "0")
+            .attr("max", getMaximumNumberOfHops())
+            .attr("step", 1)
+            .on("change", function () {
+                console.log(this.value);
+                god = this.value;
+                setNumberOfHops(parseInt(this.value));
+                drawShortestPathHops(root, parseInt(this.value));
+            });
+
+        menu.append("output")
+            .attr("for", "numberOfHopsSlider")
+            .attr("id", "numberOfHopsOutput");
+
+
+        d3.select("#sptFilterButtonSPT").remove();
+
+        d3.select("#upload")
+            .append("button")
+            .attr("id", "sptFilterButtonDistance")
+            .text("Distance Filter")
+            .on('click', function () {
+                drawShortestPath(root);
+            });
+
+    }
+};
+
+
+
+shortestPathDistanceUI = function(){
+
+    var btn = d3.select('#changeModalityBtn');
+    if(btn){
+        btn.remove();
+    }
+
+    btn = d3.select("sptFilterButtonDistance");
+    if(btn)
+        btn.remove();
+
+    var menu = d3.select("#upload");
+
+  if(document.getElementById('sptFilterButtonSPT') == undefined) {
+      menu.append('button')
+          .attr("id", "sptFilterButtonSPT")
+          .text("Number of Hops Filter")
+          .on('click', function () {
+              console.log("clicked");
+              setNumberOfHops(2);
+              drawShortestPathHops(rootNode, getNumberOfHops());
+          })
+  }
+
+};
+
+
+removeDistanceSlider = function () {
+    var elem = document.getElementById('distanceThresholdSlider');
+
+    if(elem) {
+        elem.parentNode.removeChild(elem);
+    }
+
+
+    elem = document.getElementById('distanceThresholdOutput');
+    if(elem) {
+        elem.parentNode.removeChild(elem);
+    }
+
+    elem = document.getElementById('distanceThresholdSliderLabel');
+    if(elem) {
+        elem.parentNode.removeChild(elem);
+    }
+
+};

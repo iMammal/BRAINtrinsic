@@ -22,6 +22,8 @@ var threshold;
 var distanceArray;
 var numberOfEdges = 5;
 
+var numberOfHops;
+
 
 
 
@@ -413,8 +415,19 @@ getRegionNameByIndex = function(index){
     var labelKey = labelKeys[index];
 
     return lookUpTable[labelKey].region_name;
-
 };
+
+
+setNumberOfHops = function (hops) {
+    numberOfHops = hops;
+    if(document.getElementById("numberOfHopsOutput")){
+        document.getElementById("numberOfHopsOutput").value = hops;
+    }
+}
+
+getNumberOfHops = function () {
+    return numberOfHops;
+}
 
 
 

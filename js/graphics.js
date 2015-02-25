@@ -680,6 +680,8 @@ drawShortestPath = function (nodeIndex) {
         addDistanceSlider(distanceArray);
     }
 
+    shortestPathDistanceUI();
+
     nodesSelected = [];
     shortestPathEdges = [];
 
@@ -697,7 +699,10 @@ drawShortestPath = function (nodeIndex) {
         if(visibleNodes[i]){
             var prev = spheres[previousMap[i]];
             if(prev) {
-                line = drawEdgeWithName(spheres[i].position, prev.position, getConnectionMatrix()[i][previousMap[i]]);
+                //line = drawEdgeWithName(spheres[i].position, prev.position, getConnectionMatrix()[i][previousMap[i]]);
+                var start = new THREE.Vector3(spheres[i].position.x, spheres[i].position.y, spheres[i].position.z);
+                var end = new THREE.Vector3(prev.position.x, prev.position.y, prev.position.z);
+                line = createLine(start,end,getConnectionMatrix()[i][previousMap[i]] );
                 shortestPathEdges[shortestPathEdges.length] = line;
             }
         }
@@ -765,6 +770,10 @@ setGeometryGivenNode = function(nodeIndex, geometry){
 drawShortestPathHops = function (rootNode,hops){
     var hierarchy = getHierarchy(rootNode);
 
+    console.log(hierarchy);
+
+
+    console.log("number of hops: " + hops);
     shortestPathEdges = [];
     for(var i = 0; i < hierarchy.length; i++){
         if( i < hops + 1 ) {
@@ -773,7 +782,10 @@ drawShortestPathHops = function (rootNode,hops){
                 visibleNodes[hierarchy[i][j]] = true;
                 var prev = spheres[previousMap[hierarchy[i][j]]];
                 if(prev){
-                    var line = drawEdgeWithName(spheres[hierarchy[i][j]].position, prev.position, getConnectionMatrix()[hierarchy[i][j]][previousMap[hierarchy[i][j]]]);
+                    //var line = drawEdgeWithName(spheres[hierarchy[i][j]].position, prev.position, getConnectionMatrix()[hierarchy[i][j]][previousMap[hierarchy[i][j]]]);
+                    var start = new THREE.Vector3(spheres[hierarchy[i][j]].position.x, spheres[hierarchy[i][j]].position.y, spheres[hierarchy[i][j]].position.z);
+                    var end = new THREE.Vector3(prev.position.x, prev.position.y, prev.position.z);
+                    var line = createLine(start, end, getConnectionMatrix()[hierarchy[i][j]][previousMap[hierarchy[i][j]]]);
                     shortestPathEdges[shortestPathEdges.length] = line;
                 }
             }
@@ -785,7 +797,27 @@ drawShortestPathHops = function (rootNode,hops){
         }
     }
 
+    shortestPathSliderHops();
+
     updateScene();
+};
+
+
+createLine = function (start,end, name){
+    var material = new THREE.LineBasicMaterial();
+
+
+    var geometry = new THREE.Geometry();
+    geometry.vertices.push(
+        start,
+        end
+    );
+
+
+    var line  = new THREE.Line(geometry, material);
+    line.name = name;
+
+    return line;
 };
 
 

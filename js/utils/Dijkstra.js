@@ -131,3 +131,12 @@ getHierarchy = function(nodeIndex){
 
     return hierarchy;
 }
+
+
+
+getMaximumNumberOfHops = function(){
+    if(hierarchy)
+        return hierarchy.length;
+
+    return 0;
+}
