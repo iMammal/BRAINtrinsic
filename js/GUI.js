@@ -569,8 +569,6 @@ shortestPathSliderHops = function(){
             .attr("max", getMaximumNumberOfHops())
             .attr("step", 1)
             .on("change", function () {
-                console.log(this.value);
-                god = this.value;
                 setNumberOfHops(parseInt(this.value));
                 drawShortestPathHops(root, parseInt(this.value));
             });
@@ -613,9 +611,9 @@ shortestPathDistanceUI = function(){
           .attr("id", "sptFilterButtonSPT")
           .text("Number of Hops Filter")
           .on('click', function () {
-              console.log("clicked");
               setNumberOfHops(2);
               drawShortestPathHops(rootNode, getNumberOfHops());
+              setNumberOfHops(2);
           })
   }
 

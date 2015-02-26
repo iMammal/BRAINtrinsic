@@ -770,10 +770,6 @@ setGeometryGivenNode = function(nodeIndex, geometry){
 drawShortestPathHops = function (rootNode,hops){
     var hierarchy = getHierarchy(rootNode);
 
-    console.log(hierarchy);
-
-
-    console.log("number of hops: " + hops);
     shortestPathEdges = [];
     for(var i = 0; i < hierarchy.length; i++){
         if( i < hops + 1 ) {
@@ -782,7 +778,6 @@ drawShortestPathHops = function (rootNode,hops){
                 visibleNodes[hierarchy[i][j]] = true;
                 var prev = spheres[previousMap[hierarchy[i][j]]];
                 if(prev){
-                    //var line = drawEdgeWithName(spheres[hierarchy[i][j]].position, prev.position, getConnectionMatrix()[hierarchy[i][j]][previousMap[hierarchy[i][j]]]);
                     var start = new THREE.Vector3(spheres[hierarchy[i][j]].position.x, spheres[hierarchy[i][j]].position.y, spheres[hierarchy[i][j]].position.z);
                     var end = new THREE.Vector3(prev.position.x, prev.position.y, prev.position.z);
                     var line = createLine(start, end, getConnectionMatrix()[hierarchy[i][j]][previousMap[hierarchy[i][j]]]);
