@@ -8,8 +8,9 @@ private variables
 var spheres;
 var groups = [];
 var labelKeys;
-var centroids;
+var centroids = [];
 var activeGroup = 0;
+var activeCentroids = 0;
 var connectionMatrix;
 var regionsActivated = [];
 
@@ -57,14 +58,18 @@ setLabelKeys = function(labels){
 setCentroids = function (d) {
     var data = d.data;
     var len = data.length;
-    centroids = [];
+    var centroidGroup;
+
     for(var i=0; i < len; i++){
         var element = {};
         element.x = data[i][0];
         element.y = data[i][1];
         element.z = data[i][2];
-        centroids[centroids.length] = element;
+        centroids[i] = centroids[i] || [];
+        centroidGroup = centroids[i] || [];
+        centroidGroup[centroidGroup.length] = element;
     }
+    centroids[centroids.length] = centroidGroup;
 };
 
 setDistanceThreshold = function (dt) {
@@ -211,9 +216,9 @@ getDataset = function() {
         row = {};
 
         //getting Centroids
-        row.x = centroids[i].x;
-        row.y = centroids[i].y;
-        row.z = centroids[i].z;
+        row.x = centroids[i][activeCentroids].x;
+        row.y = centroids[i][activeCentroids].y;
+        row.z = centroids[i][activeCentroids].z;
 
 
         var label = labelKeys[i];
