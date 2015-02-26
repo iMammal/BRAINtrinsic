@@ -396,7 +396,7 @@ removeThresholdSlider = function(){
 };
 
 addModalityButton = function () {
-    console.log("modality btn added");
+
     var menu = d3.select("#upload");
 
     menu.append("button")
@@ -662,3 +662,56 @@ removeNumberOfHopsSlider = function(){
         elem.parentNode.removeChild(elem);
     }
 };
+
+
+addGeometryRadioButton = function () {
+    var menu = d3.select("#upload");
+
+    menu.append("br");
+
+    menu.append("input")
+        .attr("type", "radio")
+        .attr("name","geometry")
+        .attr("id","isomap")
+        .attr("value","0")
+        .attr("checked","true")
+        .on("change", function () {
+            console.log("geometry radio button: Isomap");
+        });
+    menu.append("label")
+        .attr("for","isomap")
+        .text("Isomap");
+
+    menu.append("br")
+
+    menu.append("input")
+        .attr("type", "radio")
+        .attr("name","geometry")
+        .attr("id","mds")
+        .attr("value","1")
+        .on("change", function () {
+            console.log("geometry radio button: MDS");
+        });
+
+
+    menu.append("label")
+        .attr("for","mds")
+        .text("MDS");
+
+    menu.append("br")
+
+    menu.append("input")
+        .attr("type", "radio")
+        .attr("name","geometry")
+        .attr("value","2")
+        .attr("id","tsne")
+        .on("change", function () {
+            console.log("geometry radio button TSNE");
+        });
+
+    menu.append("label")
+        .attr("for","tsne")
+        .text("tSNE");
+
+    menu.append("br");
+}

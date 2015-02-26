@@ -213,6 +213,7 @@ initCanvas = function () {
     addGroupList();
 
     addModalityButton();
+    addGeometryRadioButton();
 
 
     setRegionsActivated();
@@ -814,6 +815,9 @@ createLine = function (start,end, name){
 
     return line;
 };
+
+
+
 
 
 
