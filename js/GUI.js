@@ -600,9 +600,12 @@ shortestPathDistanceUI = function(){
         btn.remove();
     }
 
-    btn = d3.select("sptFilterButtonDistance");
+    btn = document.getElementById("sptFilterButtonDistance");
     if(btn)
         btn.remove();
+
+    removeNumberOfHopsSlider();
+
 
     var menu = d3.select("#upload");
 
@@ -638,4 +641,24 @@ removeDistanceSlider = function () {
         elem.parentNode.removeChild(elem);
     }
 
+};
+
+
+removeNumberOfHopsSlider = function(){
+    var elem = document.getElementById('numberOfHopsSlider');
+
+    if(elem) {
+        elem.parentNode.removeChild(elem);
+    }
+
+
+    elem = document.getElementById('numberOfHopsOutput');
+    if(elem) {
+        elem.parentNode.removeChild(elem);
+    }
+
+    elem = document.getElementById('numberOfHopsSliderLabel');
+    if(elem) {
+        elem.parentNode.removeChild(elem);
+    }
 };
