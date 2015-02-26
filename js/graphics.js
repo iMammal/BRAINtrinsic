@@ -67,6 +67,7 @@ function onDocumentMouseMove( event )
 
         if(pointedObject){
             pointedObject.geometry = new THREE.SphereGeometry(1,10,10);
+            //pointedObject.geometry = createNormalGeometryByObject(pointedObject);
         }
 
 
@@ -304,6 +305,9 @@ animate = function () {
 
     requestAnimationFrame(animate);
     controls.update();
+    for(var i = 0; i < spheres.length; i++){
+        spheres[i].lookAt(camera.position);
+    }
 
     //controls.update(  );
     //oculuscontrol.update(  );
@@ -385,7 +389,8 @@ var drawRegions = function(dataset) {
                     opacity: 0.7
                 });
 
-                geometry = new THREE.SphereGeometry(1.0, 10, 10);
+                //geometry = new THREE.SphereGeometry(1.0, 10, 10);
+                geometry = createNormalGeometry(dataset[i].hemisphere);
 
             } else {
                 material = new THREE.MeshPhongMaterial({
@@ -393,11 +398,13 @@ var drawRegions = function(dataset) {
                     shininess: 15
                 });
 
-                geometry = new THREE.SphereGeometry(2.0,10,10);
+                //geometry = new THREE.SphereGeometry(2.0,10,10);
+                geometry = createSelectedGeometry(dataset[i].hemisphere);
             }
 
             if(root && root == i){
-                geometry = new THREE.SphereGeometry(3.0,10,10);
+                //geometry = new THREE.SphereGeometry(3.0,10,10);
+                geometry = createRootGeometry(dataset[i].hemisphere);
                 material.transparent = false;
             }
 
@@ -412,6 +419,7 @@ var drawRegions = function(dataset) {
             sphereNodeDictionary[spheres[i].uuid] = i;
 
             if(visibleNodes[i]){
+                //spheres[i].lookAt( camera.position);
                 scene.add(spheres[i]);
             }
         }
