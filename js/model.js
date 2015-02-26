@@ -102,7 +102,8 @@ setLookUpTable = function (d) {
         el = {"group": d.data[i].group,
             "place" : d.data[i].place,
             "rich_club":d.data[i].rich_club,
-            "region_name":d.data[i].region_name
+            "region_name":d.data[i].region_name,
+            "hemisphere": d.data[i].hemisphere
         };
 
     lookUpTable[d.data[i].label] = el;
@@ -227,6 +228,7 @@ getDataset = function() {
 
         row.group = groups[activeGroup][i];
 
+        row.hemisphere = lookUpTable[label].hemisphere;
         result[result.length] = row;
     }
     return result;

@@ -384,6 +384,7 @@ var drawRegions = function(dataset) {
                     transparent: true,
                     opacity: 0.7
                 });
+
                 geometry = new THREE.SphereGeometry(1.0, 10, 10);
 
             } else {
