@@ -66,15 +66,17 @@ function onDocumentMouseMove( event )
 
 
         if(pointedObject){
-            pointedObject.geometry = new THREE.SphereGeometry(1,10,10);
-            //pointedObject.geometry = createNormalGeometryByObject(pointedObject);
+            //pointedObject.geometry = new THREE.SphereGeometry(1,10,10);
+            pointedObject.geometry = createNormalGeometryByObject(pointedObject);
         }
 
 
 
         pointedObject = intersectedObject.object;
 
-        pointedObject.geometry = new THREE.SphereGeometry(2,10,10);
+        //pointedObject.geometry = new THREE.SphereGeometry(2,10,10);
+        pointedObject.geometry = createSelectedGeometryByObject(pointedObject);
+
         pointedObject.material.transparent = false;
 
 
@@ -91,9 +93,11 @@ function onDocumentMouseMove( event )
         if(pointedObject){
 
             if(sphereNodeDictionary[pointedObject.uuid] == root)
-                pointedObject.geometry = new THREE.SphereGeometry(3,10,10);
+                //pointedObject.geometry = new THREE.SphereGeometry(3,10,10);
+                pointedObject.geometry = createRootGeometryByObject(pointedObject);
             else {
-                pointedObject.geometry = new THREE.SphereGeometry(1, 10, 10);
+                //pointedObject.geometry = new THREE.SphereGeometry(1, 10, 10);
+                pointedObject.geometry = createNormalGeometryByObject(pointedObject);
                 pointedObject.material.transparent = true;
             }
 
@@ -179,8 +183,9 @@ function onClick( event ){
 
         if( el == -1 ){
             //if the node is not already selected -> draw edges and add in the nodesSelected Array
-            objectIntersected.geometry = new THREE.SphereGeometry(1.5,10,10);
+            //objectIntersected.geometry = new THREE.SphereGeometry(1.5,10,10);
 
+            objectIntersected.geometry = createSelectedGeometryByObject(objectIntersected.object);
             if(thresholdModality) {
                 drawEdgesGivenNode(nodeIndex);
             } else{
@@ -194,7 +199,10 @@ function onClick( event ){
         { //if the nodes is already selected, remove edges and remove from the nodeSelected Array
 
             objectIntersected.object.material.color = new THREE.Color(scaleColorGroup(getRegionByNode(nodeIndex)));
-            objectIntersected.object.geometry = new THREE.SphereGeometry(1.0,10,10);
+            //objectIntersected.object.geometry = new THREE.SphereGeometry(1.0,10,10);
+
+            objectIntersected.object.geometry = createNormalGeometryByObject(objectIntersected.object);
+
 
             nodesSelected.splice(el, 1);
             removeEdgesGivenNode(nodeIndex);
@@ -409,6 +417,8 @@ var drawRegions = function(dataset) {
             }
 
             spheres[i] = new THREE.Mesh(geometry, material);
+            spheres[i].userData.hemisphere = dataset[i].hemisphere;
+
 
             var x = centroidScale(dataset[i].x) - xCentroid;
             var y = centroidScale(dataset[i].y) - yCentroid;
@@ -423,6 +433,7 @@ var drawRegions = function(dataset) {
                 scene.add(spheres[i]);
             }
         }
+        spheres[i].userData.hemisphere = dataset[i].hemisphere;
     }
 
 };
