@@ -10,7 +10,7 @@ var groups = [];
 var labelKeys;
 var centroids = [];
 var activeGroup = 0;
-var activeCentroids = 0;
+var activeCentroids = "isomap";
 var connectionMatrix;
 var regionsActivated = [];
 
@@ -55,7 +55,7 @@ setLabelKeys = function(labels){
  */
 
 
-setCentroids = function (d) {
+setCentroids = function (d, technique) {
     var data = d.data;
     var len = data.length;
     var centroidGroup;
@@ -65,11 +65,10 @@ setCentroids = function (d) {
         element.x = data[i][0];
         element.y = data[i][1];
         element.z = data[i][2];
-        centroids[i] = centroids[i] || [];
-        centroidGroup = centroids[i] || [];
-        centroidGroup[centroidGroup.length] = element;
+        centroids[i] = centroids[i] || {};
+        centroids[i][technique] = element;
+
     }
-    centroids[centroids.length] = centroidGroup;
 };
 
 setDistanceThreshold = function (dt) {

@@ -191,7 +191,6 @@ function onClick( event ){
             } else{
                 drawTopNEdgesByNode(nodeIndex, getNumberOfEdges());
             }
-
             nodesSelected[nodesSelected.length] = nodeIndex;
             pointedObject = null;
 

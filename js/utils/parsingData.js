@@ -9,7 +9,7 @@ var loadCentroidsMDS = function (callback) {
         delimiter: ",",
         dynamicTyping: true,
         complete: function (results) {
-            setCentroids(results);
+            setCentroids(results, "MDS");
             callback(null, null);
         }
     });
@@ -23,7 +23,7 @@ var loadCentroidsIsomap = function (callback) {
         delimiter: ",",
         dynamicTyping: true,
         complete: function (results) {
-            setCentroids(results);
+            setCentroids(results, "isomap");
             callback(null, null);
         }
     });
@@ -37,7 +37,7 @@ var loadCentroidstSNE = function (callback) {
         delimiter: ",",
         dynamicTyping: true,
         complete: function (results) {
-            setCentroids(results);
+            setCentroids(results, "tsne");
             callback(null, null);
         }
     });
