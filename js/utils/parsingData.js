@@ -2,9 +2,37 @@
  * Created by giorgioconte on 31/01/15.
  */
 
-var loadCentroids = function (callback) {
+var loadCentroidsMDS = function (callback) {
 
-    Papa.parse("data/xyzIsomap.csv", {
+    Papa.parse("data/MDSxyz.csv", {
+        download: true,
+        delimiter: ",",
+        dynamicTyping: true,
+        complete: function (results) {
+            setCentroids(results);
+            callback(null, null);
+        }
+    });
+
+};
+
+var loadCentroidsIsomap = function (callback) {
+
+    Papa.parse("data/Isomapxyz.csv", {
+        download: true,
+        delimiter: ",",
+        dynamicTyping: true,
+        complete: function (results) {
+            setCentroids(results);
+            callback(null, null);
+        }
+    });
+
+};
+
+var loadCentroidstSNE = function (callback) {
+
+    Papa.parse("data/tSNExyz.csv", {
         download: true,
         delimiter: ",",
         dynamicTyping: true,
@@ -31,7 +59,7 @@ var loadLookUpTable = function (callback) {
 };
 
 var loadLabelKeys = function (callback) {
-    Papa.parse("data/labelKeyIsomap.csv", {
+    Papa.parse("data/labelKey.csv", {
         download: true,
         dynamicTyping: true,
         complete: function (results) {
@@ -42,7 +70,7 @@ var loadLabelKeys = function (callback) {
 };
 
 var loadConnections = function(callback){
-    Papa.parse("data/NWIsomap.csv",{
+    Papa.parse("data/NW.csv",{
         download: true,
         dynamicTyping: true,
         delimiter: ',',

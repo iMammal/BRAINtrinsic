@@ -4,7 +4,9 @@
 
 
 queue()
-    .defer(loadCentroids)
+    .defer(loadCentroidsIsomap)
+    .defer(loadCentroidsMDS)
+    .defer(loadCentroidstSNE)
     .defer(loadLabelKeys)
     .defer(loadLookUpTable)
     .defer(loadConnections)
