@@ -762,6 +762,20 @@ changeColorGroup = function (n) {
 };
 
 
+changeActiveGeometry = function(n){
+    activeCentroids = n;
+
+    //setRegionsActivated();
+    //setColorGroupScale();
+
+    for(var i=0; i < spheres.length; i++){
+        scene.remove(spheres[i]);
+    }
+    spheres = [];
+    updateScene();
+};
+
+
 
 setGeometryGivenNode = function(nodeIndex, geometry){
     spheres[nodeIndex].geometry = geometry;

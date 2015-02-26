@@ -677,6 +677,7 @@ addGeometryRadioButton = function () {
         .attr("checked","true")
         .on("change", function () {
             console.log("geometry radio button: Isomap");
+            changeActiveGeometry(this.value);
         });
     menu.append("label")
         .attr("for","isomap")
@@ -691,6 +692,7 @@ addGeometryRadioButton = function () {
         .attr("value","1")
         .on("change", function () {
             console.log("geometry radio button: MDS");
+            changeActiveGeometry(this.value);
         });
 
 
@@ -707,6 +709,7 @@ addGeometryRadioButton = function () {
         .attr("id","tsne")
         .on("change", function () {
             console.log("geometry radio button TSNE");
+            changeActiveGeometry(this.value);
         });
 
     menu.append("label")
