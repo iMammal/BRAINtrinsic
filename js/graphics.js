@@ -312,6 +312,7 @@ animate = function () {
 
     requestAnimationFrame(animate);
     controls.update();
+
     for(var i = 0; i < spheres.length; i++){
         spheres[i].lookAt(camera.position);
     }
@@ -384,7 +385,7 @@ var drawRegions = function(dataset) {
         return centroidScale(d.z);
     });
 
-    var geometry = new THREE.Geometry();
+    var geometry = new THREE.CircleGeometry( 1.0, 10);
     for(var i=0; i < l; i++){
         if(isRegionActive(dataset[i].group)) {
             if(nodesSelected.indexOf(i) == -1) {
@@ -791,6 +792,7 @@ changeActiveGeometry = function(n){
         scene.remove(spheres[i]);
     }
     spheres = [];
+    //TODO: switch according to spt
     updateScene();
 };
 

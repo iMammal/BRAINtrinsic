@@ -708,7 +708,7 @@ addGeometryRadioButton = function () {
         .attr("value","tsne")
         .attr("id","tsne")
         .on("change", function () {
-            console.log("geometry radio button TSNE");
+
             changeActiveGeometry(this.value);
         });
 
