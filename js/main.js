@@ -10,6 +10,7 @@ queue()
     .defer(loadLabelKeys)
     .defer(loadLookUpTable)
     .defer(loadConnections)
+    .defer(loadConnectionsIsomap)
     //.defer(loadColorMap)
     .awaitAll( function() {
         init();

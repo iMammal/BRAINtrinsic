@@ -227,6 +227,7 @@ initCanvas = function () {
     setRegionsActivated();
 
     setThreshold(30);
+    computeDistanceMatrix();
     var light;
 
     //projector = new THREE.Projector();
@@ -784,6 +785,13 @@ changeColorGroup = function (n) {
 
 changeActiveGeometry = function(n){
     activeCentroids = n;
+    if(n == 'isomap'){
+        activeMatrix = this.n;
+    }else{
+        activeMatrix = 'normal'
+    }
+
+    computeDistanceMatrix();
 
     //setRegionsActivated();
     //setColorGroupScale();

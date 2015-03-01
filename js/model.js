@@ -11,8 +11,10 @@ var labelKeys;
 var centroids = [];
 var activeGroup = 0;
 var activeCentroids = "isomap";
-var connectionMatrix;
+var connectionMatrix = [];
 var regionsActivated = [];
+
+var activeMatrix = 'isomap';
 
 var lookUpTable = [];
 
@@ -111,9 +113,13 @@ setLookUpTable = function (d) {
 };
 
 
-setConnectionMatrix = function(d){
-    connectionMatrix = d.data;
+setConnectionMatrix = function(d, name){
+    connectionMatrix[name] = d.data;
 };
+
+
+
+
 
 /**
  * Setter for group
@@ -279,14 +285,16 @@ getConnectionMatrix = function () {
     }
 
     return clone;*/
-    return connectionMatrix;
+    return connectionMatrix[activeMatrix];
+    //return connectionMatrix;
 };
 
 
 getConnectionMatrixRow = function(index){
+
     var row = [];
-    for(var i=0; i < connectionMatrix.length; i++){
-        row[row.length] = connectionMatrix[index][i]
+    for(var i=0; i < connectionMatrix[activeMatrix].length; i++){
+        row[row.length] = connectionMatrix[activeMatrix][index][i];
     }
     return row;
 };
@@ -332,7 +340,7 @@ setRegionsActivated = function (){
 
 
 getConnectionMatrixDimension = function(){
-    return connectionMatrix.length;
+    return connectionMatrix['isomap'].length;
 }
 
 

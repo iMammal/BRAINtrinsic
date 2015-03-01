@@ -2,9 +2,11 @@
  * Created by giorgioconte on 31/01/15.
  */
 
+    var folder = 'Cluster';
+
 var loadCentroidsMDS = function (callback) {
 
-    Papa.parse("data/MDSxyz.csv", {
+    Papa.parse("data/"+ folder + "/MDSxyz.csv", {
         download: true,
         delimiter: ",",
         dynamicTyping: true,
@@ -18,7 +20,7 @@ var loadCentroidsMDS = function (callback) {
 
 var loadCentroidsIsomap = function (callback) {
 
-    Papa.parse("data/Isomapxyz.csv", {
+    Papa.parse("data/"+ folder +"/isomapxyz.csv", {
         download: true,
         delimiter: ",",
         dynamicTyping: true,
@@ -32,7 +34,7 @@ var loadCentroidsIsomap = function (callback) {
 
 var loadCentroidstSNE = function (callback) {
 
-    Papa.parse("data/tSNExyz.csv", {
+    Papa.parse("data/"+folder + "/tSNExyz.csv", {
         download: true,
         delimiter: ",",
         dynamicTyping: true,
@@ -59,7 +61,7 @@ var loadLookUpTable = function (callback) {
 };
 
 var loadLabelKeys = function (callback) {
-    Papa.parse("data/labelKey.csv", {
+    Papa.parse("data/"+folder+"/labelKey.csv", {
         download: true,
         dynamicTyping: true,
         complete: function (results) {
@@ -70,14 +72,28 @@ var loadLabelKeys = function (callback) {
 };
 
 var loadConnections = function(callback){
-    Papa.parse("data/NW.csv",{
+    Papa.parse("data/"+folder+"/NW.csv",{
         download: true,
         dynamicTyping: true,
         delimiter: ',',
         header: false,
         complete: function(results){
-            setConnectionMatrix(results);
-            computeDistanceMatrix();
+            setConnectionMatrix(results, 'normal');
+            //computeDistanceMatrix();
+            callback(null,null);
+        }
+    })
+};
+
+var loadConnectionsIsomap = function(callback){
+    Papa.parse("data/"+folder+"/isomapNW.csv",{
+        download: true,
+        dynamicTyping: true,
+        delimiter: ',',
+        header: false,
+        complete: function(results){
+            setConnectionMatrix(results, 'isomap');
+            //computeDistanceMatrix();
             callback(null,null);
         }
     })
