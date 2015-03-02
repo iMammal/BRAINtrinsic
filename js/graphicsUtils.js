@@ -38,8 +38,8 @@ createRootGeometry = function(hemisphere){
 
 
 createRootGeometryByObject = function (obj) {
-    //console.log(obj);
-    createRootGeometry(obj.userData.hemisphere);
+
+    return createRootGeometry(obj.userData.hemisphere);
 }
 
 

@@ -92,9 +92,11 @@ function onDocumentMouseMove( event )
     } else{
         if(pointedObject){
 
-            if(sphereNodeDictionary[pointedObject.uuid] == root)
+            if(sphereNodeDictionary[pointedObject.uuid] == root) {
                 //pointedObject.geometry = new THREE.SphereGeometry(3,10,10);
+                console.log("root creation");
                 pointedObject.geometry = createRootGeometryByObject(pointedObject);
+            }
             else {
                 //pointedObject.geometry = new THREE.SphereGeometry(1, 10, 10);
                 pointedObject.geometry = createNormalGeometryByObject(pointedObject);
