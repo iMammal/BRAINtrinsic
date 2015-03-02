@@ -32,7 +32,7 @@ var computeDistanceMatrix = function(){
 };
 
 var computeShortestPathDistances = function(rootNode) {
-
+    console.log("computing spt");
     return graph.shortestPath(String(rootNode));
 };
 

@@ -44,15 +44,11 @@ createRootGeometryByObject = function (obj) {
 
 
 createNormalGeometryByObject = function(obj){
-    //console.log("normal" + obj);
-    debug2 = obj;
     if(obj)
         return createNormalGeometry(obj.userData.hemisphere);
 };
 
 
 createSelectedGeometryByObject = function (obj) {
-    //console.log(obj);
-    debug3 = obj;
     return createSelectedGeometry(obj.userData.hemisphere);
 }

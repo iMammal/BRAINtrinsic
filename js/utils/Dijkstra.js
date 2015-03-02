@@ -4,6 +4,7 @@ var previousMap;
 var hierarchy = [];
 var rootNode;
 var dist;
+var updateNeeded = true;
 
 function PriorityQueue () {
     this._nodes = [];
@@ -108,12 +109,18 @@ setHierarchy = function(root){
 
 
 getShortestPathDistances = function(nodeIndex){
-    if(rootNode && rootNode == nodeIndex){
+
+    if(updateNeeded){
+        console.log("branch non preso");
+        computeShortestPathDistances(nodeIndex);
+        rootNode = nodeIndex;
+        updateNeeded = false;
+       return dist;
+    }else{
+        console.log("branch preso");
         return dist;
     }
 
-    computeShortestPathDistances(nodeIndex);
-    rootNode = nodeIndex;
 
     return dist;
 };

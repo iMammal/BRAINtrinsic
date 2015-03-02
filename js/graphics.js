@@ -40,6 +40,8 @@ var thresholdModality = true;
 
 var mouse = new THREE.Vector2();
 
+var spt = false;
+
 
 
 
@@ -161,7 +163,9 @@ function onDblClick(event){
     if(intersectedObject) {
         var nodeIndex = sphereNodeDictionary[intersectedObject.object.uuid];
 
+        spt = true;
         drawShortestPath(nodeIndex);
+
     }
 }
 
@@ -234,7 +238,7 @@ initCanvas = function () {
 
     //projector = new THREE.Projector();
     scene = new THREE.Scene();
-    camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1500);
 
     //camera = new THREE.OrthographicCamera(window.innerWidth / - 2, window.innerWidth/ 2, window.innerHeight / 2, window.innerHeight/ - 2, 1, 1000 );
     camera.position.z = 50;
@@ -264,6 +268,7 @@ initCanvas = function () {
 
     //oculuscontrol.connect();
 
+
     var len = getConnectionMatrixDimension();
 
     for(var i =0; i < len; i++){
@@ -281,6 +286,8 @@ initCanvas = function () {
     scene.add(light);
 
     createLegend();
+
+    addSkybox();
     animate();
 
 };
@@ -788,21 +795,24 @@ changeColorGroup = function (n) {
 changeActiveGeometry = function(n){
     activeCentroids = n;
     if(n == 'isomap'){
-        activeMatrix = this.n;
+        activeMatrix = 'isomap';
     }else{
-        activeMatrix = 'normal'
+        activeMatrix = 'normal';
     }
 
+    updateNeeded = true;
     computeDistanceMatrix();
 
-    //setRegionsActivated();
-    //setColorGroupScale();
 
     for(var i=0; i < spheres.length; i++){
         scene.remove(spheres[i]);
     }
     spheres = [];
     //TODO: switch according to spt
+
+    if(spt) {
+        drawShortestPath(root);
+    }
     updateScene();
 };
 
@@ -861,6 +871,42 @@ createLine = function (start,end, name){
     return line;
 };
 
+
+addSkybox = function(){
+    var folder = 'darkgrid';
+   var images = [
+        'images/'+folder+'/negx.png',
+        'images/'+folder+'/negy.png',
+        'images/'+folder+'/negz.png',
+        'images/'+folder+'/posx.png',
+        'images/'+folder+'/posy.png',
+        'images/'+folder+'/posz.png'
+    ];
+
+
+    var cubemap = THREE.ImageUtils.loadTextureCube(images); // load textures
+    cubemap.format = THREE.RGBFormat;
+
+    var shader = THREE.ShaderLib['cube']; // init cube shader from built-in lib
+    shader.uniforms['tCube'].value = cubemap; // apply textures to shader
+
+// create shader material
+    var skyBoxMaterial = new THREE.ShaderMaterial( {
+        fragmentShader: shader.fragmentShader,
+        vertexShader: shader.vertexShader,
+        uniforms: shader.uniforms,
+        depthWrite: false,
+        side: THREE.BackSide
+    });
+
+// create skybox mesh
+    var skybox = new THREE.Mesh(
+        new THREE.CubeGeometry(800, 800, 800),
+        skyBoxMaterial
+    );
+
+    scene.add(skybox);
+};
 
 
 

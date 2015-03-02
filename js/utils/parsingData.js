@@ -2,7 +2,7 @@
  * Created by giorgioconte on 31/01/15.
  */
 
-    var folder = 'Embeddedness';
+    var folder = 'NodalPL';
 
 var loadCentroidsMDS = function (callback) {
 
