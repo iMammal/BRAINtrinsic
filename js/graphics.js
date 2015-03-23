@@ -246,7 +246,7 @@ initCanvas = function () {
 
     canvas = document.getElementById('canvas');
 
-    renderer = new THREE.WebGLRenderer();
+    renderer = new THREE.WebGLRenderer({antialias: true});
     renderer.setSize(window.innerWidth, window.innerHeight);
 
     canvas.addEventListener('dblclick', onDblClick , true);
@@ -534,6 +534,8 @@ var setEdgesColor = function () {
         ]
     ).range(["#edf8fb", "#005824"]);
 
+
+
     var edgeOpacityScale = d3.scale.linear().domain(
         [
             d3.min(allDisplayedWeights, function(element){
@@ -545,6 +547,19 @@ var setEdgesColor = function () {
             })
         ]
     ).range([0.1,1]);
+
+    /*
+    var edgeOpacityScale = d3.quantile().domain(
+        [
+            d3.min(allDisplayedWeights, function(element){
+                return element;
+            })
+            ,
+            d3.max(allDisplayedWeights, function(element){
+                return element;
+            })
+        ]
+    ).range([0.2,0.4,0.6,0.8,1.0]);*/
 
     var edgeDimensionScale = d3.scale.linear().domain(
         [
@@ -905,7 +920,7 @@ addSkybox = function(){
         skyBoxMaterial
     );
 
-    scene.add(skybox);
+    //scene.add(skybox);
 };
 
 

@@ -2,7 +2,7 @@
  * Created by giorgioconte on 31/01/15.
  */
 
-    var folder = 'NodalPL';
+    var folder = 'RandomRemoval';
 
 var loadCentroidsMDS = function (callback) {
 
