@@ -33,6 +33,7 @@ var distanceArray;
 
 var thresholdModality = true;
 
+var stats, frame, controller;
 
 var mouse = new THREE.Vector2();
 
@@ -40,9 +41,9 @@ var spt = false;
 
 var click = true;
 
+var ballRot = false;
 
-
-
+var ballScaLen = 0;
 
 
 function onDocumentMouseMove( event )
@@ -219,6 +220,75 @@ function onClick( event ){
     }
 }
 
+updatePinchPoint = function (){
+    if( frame.tools.length > 0 ){
+
+        console.log("tool: ",frame.tools[0].tipPosition);
+
+    }
+
+    if( frame.hands ){
+	switch (frame.hands.length){
+		case 0:
+			break;
+		case 1:
+			if(Math.random()<0.01)console.log("hand: ",frame.hands[0].palmPosition,frame.hands[0].pinchStrength);
+		        var hand = frame.hands[0];
+			break;
+		case 2:
+			if(Math.random()<0.1){
+				console.log("hand1: ",frame.hands[0].palmPosition,frame.hands[0].pinchStrength);
+				console.log("hand2: ",frame.hands[1].palmPosition,frame.hands[1].pinchStrength);
+			}
+		        var hand = frame.hands[0];
+		        var hand2 = frame.hands[1];
+
+        var hand1Pos = new THREE.Vector3(0,0,0);
+        var hand2Pos = new THREE.Vector3(0,0,0);
+        hand1Pos.fromArray(hand.palmPosition);
+        hand2Pos.fromArray(hand2.palmPosition);
+
+        var handvec = new THREE.Vector3(1.0,0.0,0.0);
+        handvec.subVectors(hand2Pos, hand1Pos);
+
+        var handvecLen = handvec.length();
+        //var halfHandvecLen = handvec.multiplyScalar(0.5);
+      pinchStrength = (hand.pinchStrength + hand2.pinchStrength) / 2;
+      if (pinchStrength > 0.8) {
+
+         if (!ballRot) {
+            //ballRotAngle.copy(handvec);
+            //ballRotCam.copy(camera.rotation);
+            ballScaLen = handvecLen;
+            //ballScaCam.copy(camera.scale);
+            ballRot = true;
+          } else {
+
+	    var diffBallScale;
+            if (ballScaLen != 0) diffBallScale = handvecLen - ballScaLen;
+
+            if (diffBallScale != 0) {
+
+              var zoomdir = new THREE.Vector3(0,0,100.0);
+              zoomdir.applyQuaternion(camera.quaternion);
+              zoomdir.multiplyScalar(diffBallScale);
+              camera.position.sub(zoomdir);
+              camera.matrixWorldNeedsUpdate = true;
+		console.log("zoom: ",zoomdir,camera.position,diffBallScale);
+            }
+
+	  } // if (!ballRot) 
+
+	}
+	else {
+		ballrot = false;
+        } // if (pinchStrength
+	
+      } // switch
+
+
+    }
+}
 
 /**
  * This method should be called to init th canvas where we render the brain
@@ -289,7 +359,7 @@ initCanvas = function () {
 
 
     // Connect to localhost and start getting frames
-    Leap.loop();
+    controller = Leap.loop();
 
     // Docs: http://leapmotion.github.io/leapjs-plugins/main/transform/
     Leap.loopController.use('transform', {
@@ -377,14 +447,35 @@ initCanvas = function () {
   //        // Moves (translates and rotates) the camera
   //
         oculuscontrol = new THREE.VRControls(camera, function(message){
-    		console.log(message);
+    		console.log("VRControls:",message);
   	});
 
   	effect = new THREE.VREffect(renderer, function(message){
-      		console.log(message);
+      		console.log("VREffect",message);
     	});
 
 	effect.setSize(window.innerWidth, window.innerHeight);
+
+
+  var onkey = function(event) {
+    if (event.key === 'z' || event.keyCode === 122) {
+      oculuscontrol.zeroSensor();
+    }
+    if (event.key === 'f' || event.keyCode === 102) {
+      console.log('f');
+      return effect.setFullScreen(true);
+    }
+    if (event.key === 'a' || event.keyCode === 97) {
+	console.log('a:',camera.position);
+	var movedir = new THREE.Vector3(0,0,0.1);
+	camera.position.sub(movedir);
+	camera.matrixWorldNeedsUpdate = true;
+    }
+  };
+
+  window.addEventListener("keypress", onkey, true);
+
+
 
     }
 
@@ -414,6 +505,37 @@ initCanvas = function () {
     animate();
 
 };
+
+ //
+ /// Add a debug message Real quick
+ // Prints out when receiving oculus data.
+ //      //
+ //        //
+ 
+  var receivingPositionalData = false;
+  var receivingOrientationData = false;
+
+  var timerID = setInterval(function(){
+
+    if (camera.position.x !== 0 && !receivingPositionalData){
+      receivingPositionalData = true;
+      console.log("receiving positional data");
+    }
+
+    if (camera.quaternion.x !== 0 && !receivingOrientationData){
+      receivingOrientationData = true;
+      console.log("receiving orientation data");
+    }
+
+    if (receivingOrientationData && receivingPositionalData){
+      clearInterval(timerID);
+    }
+
+  }, 12000);
+
+
+
+
 
 /**
  * This method should be called when a new model is uploaded in the system
@@ -453,6 +575,9 @@ animate = function () {
     //controls.update(  );
     if(vr > 0 ) {
         oculuscontrol.update();
+	frame = controller.frame();
+	updatePinchPoint();
+
     }
     render();
 
