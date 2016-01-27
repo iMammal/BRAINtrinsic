@@ -189,11 +189,11 @@ addDimensionFactorSlider = function() {
 
     panel.append("input")
         .attr("type", "range")
-        .attr("value", "1")
+        .attr("value", "0.0231")
         .attr("id", "dimensionSlider")
         .attr("min","0")
-        .attr("max", "3")
-        .attr("step","0.01")
+        .attr("max", "0.1")
+        .attr("step","0.0001")
         .on("change", function () {
             setDimensionFactor(this.value);
             updateScene();

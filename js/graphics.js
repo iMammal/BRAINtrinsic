@@ -253,7 +253,7 @@ initCanvas = function () {
 
     canvas = document.getElementById('canvas');
 
-    renderer = new THREE.WebGLRenderer({antialias: true});
+    renderer = new THREE.WebGLRenderer({antialias: true}); //, canvas: canvas});
     renderer.setSize(window.innerWidth, window.innerHeight);
 
     canvas.addEventListener('dblclick', onDblClick , true);
@@ -287,8 +287,47 @@ initCanvas = function () {
     controls.rotateSpeed = 0.5;
 
 
-    effect = new THREE.OculusRiftEffect( renderer, { worldScale: 1 } );
-    effect.setSize( window.innerWidth, window.innerHeight );
+
+    // Connect to localhost and start getting frames
+    Leap.loop();
+
+    // Docs: http://leapmotion.github.io/leapjs-plugins/main/transform/
+    Leap.loopController.use('transform', {
+
+      // This matrix flips the x, y, and z axis, scales to meters, and offsets the hands by -8cm.
+      vr: true,
+
+      // This causes the camera's matrix transforms (position, rotation, scale) to be applied to the hands themselves
+      // The parent of the bones remain the scene, allowing the data to remain in easy-to-work-with world space.
+      // (As the hands will usually interact with multiple objects in the scene.)
+      effectiveParent: camera
+
+    });
+
+    // Docs: http://leapmotion.github.io/leapjs-plugins/main/bone-hand/
+    Leap.loopController.use('boneHand', {
+
+      // If you already have a scene or want to create it yourself, you can pass it in here
+      // Alternatively, you can pass it in whenever you want by doing
+      // Leap.loopController.plugins.boneHand.scene = myScene.
+      scene: scene,
+
+      // Display the arm
+      arm: true
+
+    });
+         
+
+
+    //effect = new THREE.OculusRiftEffect( renderer, { worldScale: 1 } );
+    //effect.setSize( window.innerWidth, window.innerHeight );
+
+    effect = new THREE.VREffect(renderer, function(message){
+    	console.log(message);
+    });
+
+    effect.setSize(window.innerWidth, window.innerHeight);
+      
 
     var HDM;
     vr = parseInt(vr);
@@ -324,11 +363,29 @@ initCanvas = function () {
 
     }
     if (vr > 0) {
-        oculuscontrol = new THREE.OculusControls(camera);
+        //oculuscontrol = new THREE.OculusControls(camera);
 
-        oculuscontrol.connect();
-        effect.setHMD(HDM);
-        effect.setSize(window.innerWidth, window.innerHeight);
+        //oculuscontrol.connect();
+        //effect.setHMD(HDM);
+        //effect.setSize(window.innerWidth, window.innerHeight);
+        //
+  //
+  //  // ADD VIRTUAL REALITY
+  //    //
+  //      //
+  //
+  //        // Moves (translates and rotates) the camera
+  //
+        oculuscontrol = new THREE.VRControls(camera, function(message){
+    		console.log(message);
+  	});
+
+  	effect = new THREE.VREffect(renderer, function(message){
+      		console.log(message);
+    	});
+
+	effect.setSize(window.innerWidth, window.innerHeight);
+
     }
 
 
