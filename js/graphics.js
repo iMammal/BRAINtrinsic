@@ -6,7 +6,10 @@
  * 0.2 Add Leap Hands
  * 0.3 Add Leap taffy pull movement gesture and movement keys
  * 0.4 Add Leap Hand centroid selection  6/1/16
- */
+ * 0.4.2 Not sure what was added here. Maybe Leap centroid selection in non-VR
+ * 0.4.3 Camera position selects centroid if no hand or mouse
+ * 0.4.4 Cleaned up Leap hand centroid selection when not in VR mode (no HMD)
+ *   */
 
 //var threshold = 30;
 
@@ -279,6 +282,12 @@ function onClick( event ){
     }
 }
 
+/*//////////////////////////////////////
+ * updatePinchPoint: Implement Leap Motion hands
+ * for taffy pull gesture for movement in VR space
+ * Written by Morris CHukhman 6/1/16
+*///////////////////////////////////////
+
 updatePinchPoint = function (){
     if( frame.tools.length > 0 ){
 
@@ -293,7 +302,8 @@ updatePinchPoint = function (){
 		case 1:
 			if(Math.random()<0.01)console.log("hand: ",frame.hands[0].palmPosition,frame.hands[0].pinchStrength);
 		        var hand = frame.hands[0];
-			break;
+			return hand.position;
+			//break;
 		case 2:
 			if(Math.random()<0.1){
 				console.log("hand1: ",frame.hands[0].palmPosition,frame.hands[0].pinchStrength);
