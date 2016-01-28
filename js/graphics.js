@@ -7,6 +7,7 @@
  * 0.3 Add Leap taffy pull movement gesture and movement keys
  * 0.4 Add Leap Hand centroid selection  6/1/16
  * 0.4.5 Add keyboard controls for root, neighbors, and spanning tree expansion 6/20/16
+ * 0.4.7 Add gestures for root, neighbots and spanning tree. ToDo: more stable gesture recognition
  */
 
 //var threshold = 30;
@@ -300,10 +301,10 @@ function onClick( event ){
 // Poke or 'n' key shows selected node's neighbors
 function onPoke(  ){
 
-    event.preventDefault();
+    //event.preventDefault();
 
 
-    var objectIntersected = getIntersectedObject();
+    //var objectIntersected = getIntersectedObject();
 
 
     //if (objectIntersected && visibleNodes[sphereNodeDictionary[objectIntersected.object.uuid]]) {
@@ -346,6 +347,31 @@ function onPoke(  ){
             getShortestPathBetweenNodes(root,nodeIndex);
         }
     }
+}
+
+
+var GESTUREDEBUG = true;
+
+function onGesture(gesture,frame)
+{
+
+   if (GESTUREDEBUG) console.log(gesture.type + " with ID " + gesture.id + " in frame " + frame.id);
+
+   if ( true || (gesture.type == "screenTap") || (gesture.type == "keyTap") ){
+     //console.log("screenTap:"+indexPoint.position.distanceTo(middlePoint) );
+     //console.log(pointedObject);
+     //if(indexPoint && indexPoint.position && middlePoint && (indexPoint.position.distanceTo(middlePoint) < 0.025)) {
+        onPoke();
+     //} else {
+     //   onPoke();
+     //}
+   }
+   if (gesture.type == "circle") {
+     console.log("circle:");
+     console.log(pointedObject);
+	onCircle()
+   
+   }
 }
 
 /*//////////////////////////////////////
@@ -529,6 +555,7 @@ initCanvas = function () {
     });
          
 
+    controller.on('gesture', onGesture);
 
     //effect = new THREE.OculusRiftEffect( renderer, { worldScale: 1 } );
     //effect.setSize( window.innerWidth, window.innerHeight );
