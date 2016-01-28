@@ -310,6 +310,7 @@ initCanvas = function () {
     addFslRadioButton();
     addSearchPanel();
 
+    setDimensionFactor(0.0231);
 
     setRegionsActivated();
 
@@ -526,9 +527,9 @@ initCanvas = function () {
 
   window.addEventListener("keypress", onkey, true);
 
+    }  // if (vr
 
 
-    }
 
 
     var len = getConnectionMatrixDimension();
@@ -674,7 +675,8 @@ var createCentroidScale = function(d){
                 return element;
             })
         ]
-    ).range([-500,+500]);
+    ).range([-5.0,+5.0]);
+    //).range([-500,+500]);
 };
 
 /*
@@ -704,6 +706,7 @@ var drawRegions = function(dataset) {
     });
 
     var geometry = new THREE.CircleGeometry( 1.0, 10);
+    //var geometry = new THREE.CircleGeometry( .1, 10);
     for(var i=0; i < l; i++){
         spheres[i] = new THREE.Mesh(geometry, new THREE.MeshBasicMaterial());
         if(shouldDrawRegion(dataset[i])) {
