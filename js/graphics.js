@@ -45,6 +45,7 @@ var ballRot = false;
 
 var ballScaLen = 0;
 
+var HMDOffset = new THREE.Vector3(0,0,0);
 
 function onDocumentMouseMove( event )
 {
@@ -269,12 +270,14 @@ updatePinchPoint = function (){
 
             if (diffBallScale != 0) {
 
-              var zoomdir = new THREE.Vector3(0,0,100.0);
+              var zoomdir = new THREE.Vector3(0,0,1.0);
               zoomdir.applyQuaternion(camera.quaternion);
               zoomdir.multiplyScalar(diffBallScale);
-              camera.position.sub(zoomdir);
-              camera.matrixWorldNeedsUpdate = true;
-		console.log("zoom: ",zoomdir,camera.position,diffBallScale);
+              //camera.position.sub(zoomdir);
+              HMDOffset.sub(zoomdir);
+              //camera.matrixWorldNeedsUpdate = true;
+		//console.log("zoom: ",zoomdir,camera.position,diffBallScale);
+		console.log("zoom: ",zoomdir,HMDOffset,diffBallScale);
             }
 
 	  } // if (!ballRot) 
@@ -467,9 +470,57 @@ initCanvas = function () {
     }
     if (event.key === 'a' || event.keyCode === 97) {
 	console.log('a:',camera.position);
-	var movedir = new THREE.Vector3(0,0,0.1);
-	camera.position.sub(movedir);
-	camera.matrixWorldNeedsUpdate = true;
+	var movedir = new THREE.Vector3(0,0,1);
+	//camera.position.sub(movedir);
+	//camera.matrixWorldNeedsUpdate = true;
+	HMDOffset.sub(movedir);
+    }
+    if (event.key === 'd' || event.keyCode === 100) {
+	console.log('d:',camera.position);
+	var movedir = new THREE.Vector3(0,0,-1);
+	//camera.position.sub(movedir);
+	//camera.matrixWorldNeedsUpdate = true;
+	HMDOffset.sub(movedir);
+    }
+    if (event.key === 'w' || event.keyCode === 119) {
+	console.log('w:',camera.position);
+	var movedir = new THREE.Vector3(0,1,0);
+	//camera.position.sub(movedir);
+	//camera.matrixWorldNeedsUpdate = true;
+	HMDOffset.sub(movedir);
+    }
+    if (event.key === 'x' || event.keyCode === 120) {
+	console.log('x:',camera.position);
+	var movedir = new THREE.Vector3(0,-1.0,0);
+	//camera.position.sub(movedir);
+	//camera.matrixWorldNeedsUpdate = true;
+	HMDOffset.sub(movedir);
+    }
+    if (event.key === 'e' || event.keyCode === 101) {
+	console.log('e:',camera.position);
+	var movedir = new THREE.Vector3(1.0,0,0);
+	//camera.position.sub(movedir);
+	//camera.matrixWorldNeedsUpdate = true;
+	HMDOffset.sub(movedir);
+    }
+    if (event.key === 'c' || event.keyCode === 99) {
+	console.log('c:',camera.position);
+	var movedir = new THREE.Vector3(-1.0,0,0);
+	//camera.position.sub(movedir);
+	//camera.matrixWorldNeedsUpdate = true;
+	HMDOffset.sub(movedir);
+    }
+    if (event.key === 's' || event.keyCode === 115) {
+	console.log('s:',camera.position);
+	//var movedir = new THREE.Vector3(0,0,0.1);
+              var zoomdir = new THREE.Vector3(0,0,1.0);
+              zoomdir.applyQuaternion(camera.quaternion);
+              //zoomdir.multiplyScalar(diffBallScale);
+              //camera.position.sub(zoomdir);
+              HMDOffset.sub(zoomdir);
+	//camera.position.sub(movedir);
+	//camera.matrixWorldNeedsUpdate = true;
+	//HMDOffset.sub(movedir);
     }
   };
 
@@ -577,6 +628,9 @@ animate = function () {
         oculuscontrol.update();
 	frame = controller.frame();
 	updatePinchPoint();
+	camera.position.add(HMDOffset);
+
+	camera.matrixWorldNeedsUpdate = true;
 
     }
     render();
