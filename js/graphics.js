@@ -1,5 +1,11 @@
 /**
  * Created by giorgioconte on 31/01/15.
+ *
+ * Morris Chukhman Changelog:
+ * 0.1 Change VR controls to WebVR
+ * 0.2 Add Leap Hands
+ * 0.3 Add Leap taffy pull movement gesture and movement keys
+ * 0.4 Add Leap Hand centroid selection  6/1/16
  */
 
 //var threshold = 30;
@@ -24,6 +30,7 @@ var visibleNodes =[];
 var displayedEdges = [];
 
 var pointedObject;
+var touchedSphere, touchedSphereIndex,touchedSphereDistance;
 
 var root;
 
@@ -116,6 +123,57 @@ function onDocumentMouseMove( event )
 
 }
 
+function onTouch( index, object ) {
+        //var index = sphereNodeDictionary[intersectedObject.object.uuid];
+    if (index && object) {
+
+        if(pointedObject){
+            //pointedObject.geometry = new THREE.SphereGeometry(1,10,10);
+            pointedObject.geometry = createNormalGeometryByObject(pointedObject);
+        }
+
+
+
+        pointedObject = object; //intersectedObject.object;
+
+        //pointedObject.geometry = new THREE.SphereGeometry(2,10,10);
+        pointedObject.geometry = createSelectedGeometryByObject(pointedObject);
+
+        //pointedObject.material.transparent = false;
+
+
+        var regionName = getRegionNameByIndex(index);
+        setNodeInfoPanel(regionName, index);
+
+        if(thresholdModality) {
+            drawEdgesGivenNode(index);
+        } else{
+            console.log("top " + getNumberOfEdges() + "edges");
+            drawTopNEdgesByNode(index, getNumberOfEdges());
+        }
+    } else{
+        if(pointedObject){
+
+            if(sphereNodeDictionary[pointedObject.uuid] == root) {
+                //pointedObject.geometry = new THREE.SphereGeometry(3,10,10);
+                console.log("root creation");
+                pointedObject.geometry = createRootGeometryByObject(pointedObject);
+            }
+            else {
+                //pointedObject.geometry = new THREE.SphereGeometry(1, 10, 10);
+                pointedObject.geometry = createNormalGeometryByObject(pointedObject);
+                //pointedObject.material.transparent = false;
+            }
+
+
+            if(nodesSelected.indexOf(sphereNodeDictionary[pointedObject.uuid]) == -1 ) {
+                removeEdgesGivenNode(sphereNodeDictionary[pointedObject.uuid]);
+            }
+            pointedObject = null;
+        }
+    }
+
+}
 
 /*
  * This method is used to interact with objects in scene.
@@ -620,20 +678,62 @@ animate = function () {
     requestAnimationFrame(animate);
     controls.update();
 
-    for(var i = 0; i < spheres.length; i++){
-        spheres[i].lookAt(camera.position);
-    }
-
     //controls.update(  );
     if(vr > 0 ) {
         oculuscontrol.update();
 	frame = controller.frame();
-	updatePinchPoint();
+	var handposition = updatePinchPoint();
 	camera.position.add(HMDOffset);
 
 	camera.matrixWorldNeedsUpdate = true;
 
+    //}
+
+    var tempDist,nearestSphereIndex,nearestSphere,nearestSphereDist = 18.0;
+
+    if (!handposition) handposition = camera.position;
+ 
+    for(var i = 0; i < spheres.length; i++){
+        if (spheres[i].visible) {
+		spheres[i].lookAt(camera.position);
+		if ( //(vr > 0) && 
+		    ((tempDist = spheres[i].position.distanceTo(handposition)) <  nearestSphereDist) ) {
+			nearestSphereDist = tempDist;
+			nearestSphere = spheres[i];
+			nearestSphereIndex = i;
+		}
+	}
+    } 
+
+    
+    if ( nearestSphereDist < 0.333 ) {
+	// select this one
+		touchedSphere = nearestSphere;
+		touchedSphereDist = nearestSphereDist;
+	if (nearestSphereIndex != touchedSphereIndex) {
+	//} else { // the touched SPhere has changed
+
+		touchedSphereIndex = nearestSphereIndex;
+		onTouch (touchedSphereIndex,touchedSphere);
+	}
+    } else {  
+	if ( (touchedSphere != null) || (touchedSphereIndex != null) ) {
+			nearestSphere = nearestSphereIndex = null;
+			nearestSphereDist = 18;
+			touchedSphereIndex = touchedSphere = null; // spheres[i];
+			touchedSphereDist = 18;
+			onTouch(null, null);	
+	}
     }
+  } else {
+    for(var i = 0; i < spheres.length; i++){
+        if (spheres[i].visible) {
+		spheres[i].lookAt(camera.position);
+	}
+    }	
+  } // if (vr			
+    
+
     render();
 
 };
@@ -675,7 +775,7 @@ var createCentroidScale = function(d){
                 return element;
             })
         ]
-    ).range([-5.0,+5.0]);
+    ).range([-5.0,+5.0]);   // MC 6/1/16
     //).range([-500,+500]);
 };
 
