@@ -6,6 +6,7 @@
  * 0.2 Add Leap Hands
  * 0.3 Add Leap taffy pull movement gesture and movement keys
  * 0.4 Add Leap Hand centroid selection  6/1/16
+ * 0.4.5 Add keyboard controls for root, neighbors, and spanning tree expansion 6/20/16
  */
 
 //var threshold = 30;
@@ -229,6 +230,21 @@ function onDblClick(event){
     }
 }
 
+function onCircle(){
+
+
+
+
+    if(touchedSphere) {
+        removeElementsFromEdgePanel();
+        var nodeIndex = touchedSphereIndex; //sphereNodeDictionary[touchedSphere.uuid];
+
+        spt = true;
+        drawShortestPath(nodeIndex);
+
+    }
+}
+
 function onClick( event ){
 
     mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
@@ -276,6 +292,57 @@ function onClick( event ){
             }
         } else{
             nodeIndex = sphereNodeDictionary[objectIntersected.object.uuid];
+            getShortestPathBetweenNodes(root,nodeIndex);
+        }
+    }
+}
+
+// Poke or 'n' key shows selected node's neighbors
+function onPoke(  ){
+
+    event.preventDefault();
+
+
+    var objectIntersected = getIntersectedObject();
+
+
+    //if (objectIntersected && visibleNodes[sphereNodeDictionary[objectIntersected.object.uuid]]) {
+    if ( (touchedSphere != null) || (touchedSphereIndex != null) ) {
+
+        if(!spt) {
+            var nodeIndex = touchedSphereIndex; //sphereNodeDictionary[objectIntersected.object.uuid];
+
+            var el = nodesSelected.indexOf(nodeIndex);
+
+            if (el == -1) {
+                //if the node is not already selected -> draw edges and add in the nodesSelected Array
+                /*
+
+                objectIntersected.geometry = createSelectedGeometryByObject(objectIntersected.object);
+                if (thresholdModality) {
+                    drawEdgesGivenNode(nodeIndex);
+                } else {
+                    drawTopNEdgesByNode(nodeIndex, getNumberOfEdges());
+                }
+                nodesSelected[nodesSelected.length] = nodeIndex; */
+
+                touchedSphere.geometry = drawSelectedNode(nodeIndex,touchedSphere);
+                
+                pointedObject = null;
+
+            } else { //if the nodes is already selected, remove edges and remove from the nodeSelected Array
+
+                touchedSphere.material.color = new THREE.Color(scaleColorGroup(getRegionByNode(nodeIndex),nodeIndex));
+                //objectIntersected.object.geometry = new THREE.SphereGeometry(1.0,10,10);
+
+                touchedSphere.geometry = createNormalGeometryByObject(touchedSphere);
+
+
+                nodesSelected.splice(el, 1);
+                removeEdgesGivenNode(nodeIndex);
+            }
+        } else{
+            nodeIndex = sphereNodeDictionary[touchedSphere.uuid];
             getShortestPathBetweenNodes(root,nodeIndex);
         }
     }
@@ -506,7 +573,7 @@ initCanvas = function () {
 
 
     }
-    if (vr > 0) {
+    if (true) { //(vr > 0) {
         //oculuscontrol = new THREE.OculusControls(camera);
 
         //oculuscontrol.connect();
@@ -593,6 +660,18 @@ initCanvas = function () {
 	//camera.matrixWorldNeedsUpdate = true;
 	//HMDOffset.sub(movedir);
     }
+    if (event.key === 'n' || event.keyCode === 110) {
+	console.log('n:',camera.position);
+	onPoke();	
+    }
+    if (event.key === 'm' || event.keyCode === 109) {
+	console.log('m:',camera.position);
+	onCircle();
+    }
+    if (event.key === 'b' || event.keyCode === 98) {
+	console.log('b:',camera.position);
+    }
+
   };
 
   window.addEventListener("keypress", onkey, true);
