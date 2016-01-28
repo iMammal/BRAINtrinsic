@@ -9,7 +9,7 @@
  * 0.4.2 Not sure what was added here. Maybe Leap centroid selection in non-VR
  * 0.4.3 Camera position selects centroid if no hand or mouse
  * 0.4.4 Cleaned up Leap hand centroid selection when not in VR mode (no HMD)
- *   */
+ */
 
 //var threshold = 30;
 
@@ -302,7 +302,7 @@ updatePinchPoint = function (){
 		case 1:
 			if(Math.random()<0.01)console.log("hand: ",frame.hands[0].palmPosition,frame.hands[0].pinchStrength);
 		        var hand = frame.hands[0];
-			return hand.position;
+			return hand.palmPosition;
 			//break;
 		case 2:
 			if(Math.random()<0.1){
@@ -701,8 +701,10 @@ animate = function () {
 
     var tempDist,nearestSphereIndex,nearestSphere,nearestSphereDist = 18.0;
 
-    if (!handposition) handposition = camera.position;
- 
+    if (!handposition) {
+	handposition = camera.position;
+    }
+
     for(var i = 0; i < spheres.length; i++){
         if (spheres[i].visible) {
 		spheres[i].lookAt(camera.position);
