@@ -6,9 +6,6 @@
  * 0.2 Add Leap Hands
  * 0.3 Add Leap taffy pull movement gesture and movement keys
  * 0.4 Add Leap Hand centroid selection  6/1/16
- * 0.4.2 Not sure what was added here. Maybe Leap centroid selection in non-VR
- * 0.4.3 Camera position selects centroid if no hand or mouse
- * 0.4.4 Cleaned up Leap hand centroid selection when not in VR mode (no HMD)
  */
 
 //var threshold = 30;
@@ -56,6 +53,8 @@ var ballRot = false;
 var ballScaLen = 0;
 
 var HMDOffset = new THREE.Vector3(0,0,0);
+
+var vr = 0;
 
 function onDocumentMouseMove( event )
 {
@@ -341,11 +340,14 @@ updatePinchPoint = function (){
               var zoomdir = new THREE.Vector3(0,0,1.0);
               zoomdir.applyQuaternion(camera.quaternion);
               zoomdir.multiplyScalar(diffBallScale);
-              //camera.position.sub(zoomdir);
-              HMDOffset.sub(zoomdir);
-              //camera.matrixWorldNeedsUpdate = true;
-		//console.log("zoom: ",zoomdir,camera.position,diffBallScale);
-		console.log("zoom: ",zoomdir,HMDOffset,diffBallScale);
+              if (vr == 0) {
+                camera.position.sub(zoomdir);
+                camera.matrixWorldNeedsUpdate = true;
+                console.log("zoom: ",zoomdir,camera.position,diffBallScale);
+	      } else {
+                HMDOffset.sub(zoomdir);
+                console.log("zoom: ",zoomdir,HMDOffset,diffBallScale);
+	      }
             }
 
 	  } // if (!ballRot) 
@@ -688,22 +690,29 @@ animate = function () {
     requestAnimationFrame(animate);
     controls.update();
 
+  if (true) {
     //controls.update(  );
     if(vr > 0 ) {
         oculuscontrol.update();
-	frame = controller.frame();
-	var handposition = updatePinchPoint();
+    }
+    frame = controller.frame();
+    var handpositionArray = 0;
+    handpositionArray = updatePinchPoint();
+    if(vr > 0 ) {
 	camera.position.add(HMDOffset);
 
 	camera.matrixWorldNeedsUpdate = true;
+    }
+    
 
-    //}
-
+    var handposition = new THREE.Vector3(0,0,0);
     var tempDist,nearestSphereIndex,nearestSphere,nearestSphereDist = 18.0;
 
-    if (!handposition) {
+    if (!handpositionArray) {
 	handposition = camera.position;
-    }
+    } else {
+	handposition.fromArray(handpositionArray);
+    } 
 
     for(var i = 0; i < spheres.length; i++){
         if (spheres[i].visible) {
@@ -743,7 +752,7 @@ animate = function () {
 		spheres[i].lookAt(camera.position);
 	}
     }	
-  } // if (vr			
+  } // if (true			
     
 
     render();
