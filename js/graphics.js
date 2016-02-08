@@ -8,6 +8,8 @@
  * 0.4 Add Leap Hand centroid selection  6/1/16
  * 0.4.5 Add keyboard controls for root, neighbors, and spanning tree expansion 6/20/16
  * 0.4.7 Add gestures for root, neighbots and spanning tree. ToDo: more stable gesture recognition
+ * 0.4.8 Add rotation with one-hand fist grab and rotate
+ *
  */
 
 //var threshold = 30;
@@ -57,6 +59,8 @@ var ballScaLen = 0;
 var HMDOffset = new THREE.Vector3(0,0,0);
 
 var vr = 0;
+
+var vGrabCamPos,grabScene,vGrabScenePoint;
 
 function onDocumentMouseMove( event )
 {
@@ -361,16 +365,26 @@ function onGesture(gesture,frame)
      //console.log("screenTap:"+indexPoint.position.distanceTo(middlePoint) );
      //console.log(pointedObject);
      //if(indexPoint && indexPoint.position && middlePoint && (indexPoint.position.distanceTo(middlePoint) < 0.025)) {
+     console.log("poke:");
+     if (pointedObject) {
+	console.log(pointedObject);
+	//onCircle();
         onPoke();
+     } else {
+        console.log("Poke:NULL");
+     }
      //} else {
      //   onPoke();
      //}
    }
    if (gesture.type == "circle") {
      console.log("circle:");
-     console.log(pointedObject);
-	onCircle()
-   
+     if (pointedObject) {
+	console.log(pointedObject);
+	onCircle();
+     } else {
+        console.log("Circle:NULL");
+     }
    }
 }
 
@@ -380,6 +394,8 @@ function onGesture(gesture,frame)
  * Written by Morris CHukhman 6/1/16
 *///////////////////////////////////////
 
+var ONEHANDCONTROL = true;
+
 updatePinchPoint = function (){
     if( frame.tools.length > 0 ){
 
@@ -387,14 +403,69 @@ updatePinchPoint = function (){
 
     }
 
+		          var origin = new THREE.Vector3(0,0,0);
     if( frame.hands ){
 	switch (frame.hands.length){
 		case 0:
 			break;
 		case 1:
-			if(Math.random()<0.01)console.log("hand: ",frame.hands[0].palmPosition,frame.hands[0].pinchStrength);
+			if((Math.random()<0.01)&&(frame.hands))console.log("hand: ",frame.hands[0].palmPosition,frame.hands[0].pinchStrength);
 		        var hand = frame.hands[0];
-			return hand.palmPosition;
+			var vHandPosition = new THREE.Vector3 (0,0,0);
+			if(hand && hand.palmPosition) {
+				vHandPosition.fromArray(hand.palmPosition);
+                                console.log("hand position:",vHandPosition);
+			} else {
+                		console.log("hand but no palmPosition:");
+			}
+    //if ( (touchedSphere != null) || (touchedSphereIndex != null) ) {
+			
+            		if (hand && grabScene && vGrabScenePoint) {
+			  // if(ONEHANDMOVE) {
+		          //  var vGrabSceneDifference = new THREE.Vector3(0,0,0);
+
+		          //  vGrabSceneDifference.subVectors(vHandPosition, vGrabScenePoint );
+        		  //  vGrabSceneDifference.multiplyScalar(speed);
+			  //}
+		          var _rotateStart = vGrabScenePoint;
+		          var _rotateEnd = vHandPosition;
+		          var angle = Math.acos( _rotateStart.dot( _rotateEnd ) / _rotateStart.length() / _rotateEnd.length() );
+
+                	  if ( angle > 0.000) {
+
+                          	var axis = ( new THREE.Vector3() ).crossVectors( _rotateStart, _rotateEnd ).normalize(),
+                                quaternion = new THREE.Quaternion();
+	                        angle *= controls.rotateSpeed * 0.81;
+        	                quaternion.setFromAxisAngle( axis, -angle );
+	                        if(0) {
+					HMDOffset.copy(vGrabCamPos.applyQuaternion(quaternion));
+				} else {
+					camera.position.copy(vGrabCamPos.applyQuaternion(quaternion));
+				}
+
+	                        //camera.lookAt( origin );
+			  }
+
+
+
+
+			} else {
+			    if (hand && ONEHANDCONTROL && (!touchedSphere)  && (hand.pinchStrength > 0.5) ) {
+                		grabScene = true;
+
+                		vGrabCamPos = new THREE.Vector3( 0,0,0 );
+                		vGrabCamPos.copy( 0?HMDOffset:camera.position ) ;
+                		vGrabScenePoint = new THREE.Vector3 ( 0,0,0 );
+                		vGrabScenePoint.copy( vHandPosition );
+                		console.log("grabScenePoint:");
+                		console.log(vGrabScenePoint);
+                		console.log("grabCamPos:");
+                		console.log(vGrabCamPos);
+			    }
+            		}
+	
+			if (hand && hand.pinchStrength < 0.5) grabScene = false;
+			return hand?hand.palmPosition:0;
 			//break;
 		case 2:
 			if(Math.random()<0.1){
@@ -428,7 +499,7 @@ updatePinchPoint = function (){
 	    var diffBallScale;
             if (ballScaLen != 0) diffBallScale = handvecLen - ballScaLen;
 
-            if (diffBallScale != 0) {
+            if (( diffBallScale != 0) && (camera.position.distanceTo(origin)>0.3)) {
 
               var zoomdir = new THREE.Vector3(0,0,1.0);
               zoomdir.applyQuaternion(camera.quaternion);
@@ -804,9 +875,10 @@ animate = function () {
     frame = controller.frame();
     var handpositionArray = 0;
     handpositionArray = updatePinchPoint();
+    var handposition = new THREE.Vector3(0,0,0);
     if(vr > 0 ) {
 	camera.position.add(HMDOffset);
-
+	HMDOffset.copy(handposition);
 	camera.matrixWorldNeedsUpdate = true;
     }
     
@@ -814,6 +886,7 @@ animate = function () {
     var handposition = new THREE.Vector3(0,0,0);
     var tempDist,nearestSphereIndex,nearestSphere,nearestSphereDist = 18.0;
 
+    // If no hands are in the scene use camera position as selection cursor
     if (!handpositionArray) {
 	handposition = camera.position;
     } else {
