@@ -13,7 +13,7 @@
  * 0.4.11 Got the camera on a dolly and made some of the 1-hand rotation control dolly instead of camera
  * 0.4.12 Got the rest of the  1-hand rotation to control dolly instead of camera 
  * 0.4.13 Got the two hand taffy pull to move the dolly rather than the camera
-
+ * 0.4.15 Text overlap displaying dolly position or region+index
 *
  */
 
@@ -21,6 +21,7 @@
 
 var camera;
 var canvas;
+var amap,sp,spcanvas;
 var renderer;
 var controls;
 var scene;
@@ -173,6 +174,7 @@ function onTouch( index, object ) {
 
         var regionName = getRegionNameByIndex(index);
         setNodeInfoPanel(regionName, index);
+	updateTextbox(regionName+index.toString());
 
         if(thresholdModality) {
             drawEdgesGivenNode(index);
@@ -522,10 +524,10 @@ updatePinchPoint = function (){
 	    var diffBallScale;
             if (ballScaLen != 0) diffBallScale = handvecLen - ballScaLen;
 
-            if (( diffBallScale != 0) && (camera.position.distanceTo(origin)>0.3)) {
+            if (( diffBallScale != 0) && (dolly.position.distanceTo(origin)>0.3)) {
 
               var zoomdir = new THREE.Vector3(0,0,1.0);
-              zoomdir.applyQuaternion(camera.quaternion);
+              zoomdir.applyQuaternion(dolly.quaternion);
               zoomdir.multiplyScalar(diffBallScale);
               if (vr == 0) {
                 camera.position.sub(zoomdir);
@@ -818,6 +820,10 @@ initCanvas = function () {
 	//dolly.position.sub(movedir);
 	//dolly.matrixWorldNeedsUpdate = true;
 	HMDOffset.sub(movedir);
+	updateTextbox('x:'+dolly.position.x.toString(), 
+			"y:"+dolly.position.y.toString(),
+			"z:"+dolly.position.z.toString(),
+			"a = 0,0,1",movedir);
     }
     if (event.key === 'd' || event.keyCode === 100) {
 	console.log('d:',dolly.position);
@@ -825,6 +831,10 @@ initCanvas = function () {
 	//dolly.position.sub(movedir);
 	//dolly.matrixWorldNeedsUpdate = true;
 	HMDOffset.sub(movedir);
+	updateTextbox('x:'+dolly.position.x.toString(), 
+			"y:"+dolly.position.y.toString(),
+			"z:"+dolly.position.z.toString(),
+			"d = 0,0,-1",movedir);
     }
     if (event.key === 'w' || event.keyCode === 119) {
 	console.log('w:',dolly.position);
@@ -832,6 +842,10 @@ initCanvas = function () {
 	//dolly.position.sub(movedir);
 	//dolly.matrixWorldNeedsUpdate = true;
 	HMDOffset.sub(movedir);
+	updateTextbox('x:'+dolly.position.x.toString(), 
+			"y:"+dolly.position.y.toString(),
+			"z:"+dolly.position.z.toString(),
+			"w = 0,1,0",movedir);
     }
     if (event.key === 'x' || event.keyCode === 120) {
 	console.log('x:',dolly.position);
@@ -839,6 +853,10 @@ initCanvas = function () {
 	//dolly.position.sub(movedir);
 	//dolly.matrixWorldNeedsUpdate = true;
 	HMDOffset.sub(movedir);
+	updateTextbox('x:'+dolly.position.x.toString(), 
+			"y:"+dolly.position.y.toString(),
+			"z:"+dolly.position.z.toString(),
+			"x = 0,-1,0",movedir);
     }
     if (event.key === 'e' || event.keyCode === 101) {
 	console.log('e:',dolly.position);
@@ -846,6 +864,10 @@ initCanvas = function () {
 	//dolly.position.sub(movedir);
 	//dolly.matrixWorldNeedsUpdate = true;
 	HMDOffset.sub(movedir);
+	updateTextbox('x:'+dolly.position.x.toString(), 
+			"y:"+dolly.position.y.toString(),
+			"z:"+dolly.position.z.toString(),
+			"e = 1,0,0",movedir);
     }
     if (event.key === 'c' || event.keyCode === 99) {
 	console.log('c:',dolly.position);
@@ -853,15 +875,41 @@ initCanvas = function () {
 	//dolly.position.sub(movedir);
 	//dolly.matrixWorldNeedsUpdate = true;
 	HMDOffset.sub(movedir);
+	updateTextbox('x:'+dolly.position.x.toString(), 
+			"y:"+dolly.position.y.toString(),
+			"z:"+dolly.position.z.toString(),
+			"c = -1,0,0",movedir);
     }
     if (event.key === 's' || event.keyCode === 115) {
 	console.log('s:',dolly.position);
 	//var movedir = new THREE.Vector3(0,0,0.1);
               var zoomdir = new THREE.Vector3(0,0,1.0);
-              zoomdir.applyQuaternion(camera.quaternion);
+              //zoomdir.applyQuaternion(camera.quaternion);
+              zoomdir.applyQuaternion(dolly.quaternion);
               //zoomdir.multiplyScalar(diffBallScale);
               //dolly.position.sub(zoomdir);
               HMDOffset.sub(zoomdir);
+	updateTextbox('x:'+dolly.position.x.toString(), 
+			"y:"+dolly.position.y.toString(),
+			"z:"+dolly.position.z.toString(),
+			"s = quat:0,0,1");
+	//dolly.position.sub(movedir);
+	//dolly.matrixWorldNeedsUpdate = true;
+	//HMDOffset.sub(movedir);
+    }
+    if (event.key === 'q' || event.keyCode === 113) {
+	console.log('q:',dolly.position);
+	//var movedir = new THREE.Vector3(0,0,0.1);
+              var zoomdir = new THREE.Vector3(0,0,-1.0);
+              //zoomdir.applyQuaternion(camera.quaternion);
+              zoomdir.applyQuaternion(dolly.quaternion);
+              //zoomdir.multiplyScalar(diffBallScale);
+              //dolly.position.sub(zoomdir);
+              HMDOffset.sub(zoomdir);
+	updateTextbox('x:'+dolly.position.x.toString(), 
+			"y:"+dolly.position.y.toString(),
+			"z:"+dolly.position.z.toString(),
+			"q = quat:0,0,-1");
 	//dolly.position.sub(movedir);
 	//dolly.matrixWorldNeedsUpdate = true;
 	//HMDOffset.sub(movedir);
@@ -912,6 +960,8 @@ initCanvas = function () {
 
     createLegend(activeGroup);
 
+    
+    addTextbox();
     addSkybox();
     animate();
 
@@ -1606,6 +1656,51 @@ createLine = function (start,end, name){
     return line;
 };
 
+updateTextbox = function(text1,text2,text3,text4,movedir) {
+        var context = spcanvas.getContext('2d');
+        //context.fillStyle = '#ff0000'; // CHANGED
+        context.textAlign = 'left'; //'center';
+        //context.font = '24px Arial';
+	context.clearRect(0,0,500,500);
+        if(text1)context.fillText(text1, 10, 20);
+        if(text2)context.fillText(text2, 10, 50);
+        if(text3)context.fillText(text3, 10, 80);
+        if(text4)context.fillText(text4, 10, 110);
+        amap.needsUpdate = true;
+	//if(movedir)sp.position.set(movedir.x,movedir.y,movedir.z);
+        sp.needsUpdate = true;
+
+}
+
+addTextbox = function() {
+
+	spcanvas = document.createElement('canvas');
+	var size = 256; // CHANGED
+	spcanvas.width = size*2;
+	spcanvas.height = size;
+	var context = spcanvas.getContext('2d');
+	context.fillStyle = '#ff0000'; // CHANGED
+	context.textAlign = 'center';
+	context.font = '24px Arial';
+	context.fillText("some text", size / 2, size / 2);
+
+	amap = new THREE.Texture(spcanvas);
+	amap.needsUpdate = true;
+
+	var mat = new THREE.SpriteMaterial({
+	    map: amap,
+	    transparent: false,
+	    useScreenCoordinates: false,
+	    color: 0xffffff // CHANGED
+	});
+
+	sp = new THREE.Sprite(mat);
+	sp.scale.set( 3, 3, 1 ); // CHANGED
+	sp.position.set( 0, -2, 2 ); // CHANGED
+	//scene.add(sp);   
+	dolly.add(sp);   
+
+}
 
 addSkybox = function(){
     var folder = 'darkgrid';
