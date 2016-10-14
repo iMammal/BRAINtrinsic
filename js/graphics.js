@@ -13,8 +13,11 @@
  * 0.4.11 Got the camera on a dolly and made some of the 1-hand rotation control dolly instead of camera
  * 0.4.12 Got the rest of the  1-hand rotation to control dolly instead of camera 
  * 0.4.13 Got the two hand taffy pull to move the dolly rather than the camera
- * 0.4.15 Text overlap displaying dolly position or region+index
-*
+ * 0.4.15 Text overlay displaying dolly position or region+index
+*  0.4.16 Begin Cleanup
+*  0.4.17 Enable toggling 10 strongest connections onTouch and onPoke; onPoke Feedback; Reverse taffy zoom
+*  
+*  
  */
 
 //var threshold = 30;
@@ -49,7 +52,7 @@ var shortestPathEdges = [];
 
 var distanceArray;
 
-var thresholdModality = true;
+var thresholdModality = false; //true;
 
 var stats, frame, controller;
 
@@ -93,7 +96,7 @@ function onDocumentMouseMove( event )
     mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1
     mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1
 
-    var intersectedObject = getIntersectedObject();
+    var intersectedObject = getIntersectedObject(event);
 
     if ( intersectedObject  && visibleNodes[sphereNodeDictionary[intersectedObject.object.uuid]] && isRegionActive(getRegionByNode(sphereNodeDictionary[intersectedObject.object.uuid]))) {
         var i = sphereNodeDictionary[intersectedObject.object.uuid];
@@ -177,7 +180,7 @@ function onTouch( index, object ) {
         setNodeInfoPanel(regionName, index);
 	updateNodeLabel(regionName+index.toString(),spheres[index].position);
 
-        if(thresholdModality) {
+        if( thresholdModality) {
             drawEdgesGivenNode(index);
         } else{
             console.log("top " + getNumberOfEdges() + "edges");
@@ -246,7 +249,7 @@ function onDblClick(event){
     event.preventDefault();
 
 
-    var intersectedObject = getIntersectedObject();
+    var intersectedObject = getIntersectedObject(event);
 
 
     if(intersectedObject) {
@@ -282,7 +285,7 @@ function onClick( event ){
     event.preventDefault();
 
 
-    var objectIntersected = getIntersectedObject();
+    var objectIntersected = getIntersectedObject(event);
 
 
     if (objectIntersected && visibleNodes[sphereNodeDictionary[objectIntersected.object.uuid]]) {
@@ -342,6 +345,9 @@ function onPoke(  ){
             var nodeIndex = touchedSphereIndex; //sphereNodeDictionary[objectIntersected.object.uuid];
 
             var el = nodesSelected.indexOf(nodeIndex);
+
+	    //updateNodeLabel(regionName+index.toString()+"POKEL"+el.toString(),spheres[nodeIndex].position);
+	    updateNodeLabel(nodeIndex.toString()+"POKE!"+el.toString(),spheres[nodeIndex].position);
 
             if (el == -1) {
                 //if the node is not already selected -> draw edges and add in the nodesSelected Array
@@ -542,7 +548,7 @@ updatePinchPoint = function (){
 
             if (( diffBallScale != 0) && (dolly.position.distanceTo(origin)>0.3)) {
 
-              var zoomdir = new THREE.Vector3(0,0,1.0);
+              var zoomdir = new THREE.Vector3(0,0,-1.0);
               zoomdir.applyQuaternion(dolly.quaternion);
               zoomdir.multiplyScalar(diffBallScale);
               if (vr == 0) {
@@ -622,6 +628,7 @@ initCanvas = function () {
     setDimensionFactor(0.0231);
 
     setRegionsActivated();
+    setNumberOfEdges(10);
 
     //setThreshold(30);
     computeDistanceMatrix();
@@ -1463,11 +1470,11 @@ var removeEdgesGivenNode = function (indexNode) {
 };
 
 
-getIntersectedObject = function () {
+getIntersectedObject = function (myevent) {
 
     var vector = new THREE.Vector3(
-        ( event.clientX / window.innerWidth ) * 2 - 1,
-        - ( event.clientY / window.innerHeight ) * 2 + 1,
+        ( myevent.clientX / window.innerWidth ) * 2 - 1,
+        - ( myevent.clientY / window.innerHeight ) * 2 + 1,
         0.5
     );
     vector = vector.unproject( camera );
@@ -1697,7 +1704,7 @@ updateTextbox = function(text1,text2,text3,text4,text5,text6,movedir) {
 updateNodeLabel = function(text1,movedir) {
         var context = nspcanvas.getContext('2d');
         //context.fillStyle = '#ff0000'; // CHANGED
-        context.textAlign = 'left'; //'center';
+        context.textAlign = 'left'; //'center';	//'right'
         //context.font = '24px Arial';
 	context.clearRect(0,0,500,500);
         //if(text1)context.fillText(text1, 10, 20);
@@ -1765,7 +1772,7 @@ addNodeLabel = function() {
 	});
 
 	nsp = new THREE.Sprite(mat);
-	nsp.scale.set( 3, 3, 1 ); // CHANGED
+	nsp.scale.set( 1, 1, 1 ); // CHANGED
 	nsp.position.set( 0, 0, 2 ); // CHANGED
 	//scene.add(nsp);   
 	scene.add(nsp);   
