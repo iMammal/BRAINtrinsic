@@ -9,7 +9,12 @@
  * 0.4.5 Add keyboard controls for root, neighbors, and spanning tree expansion 6/20/16
  * 0.4.7 Add gestures for root, neighbots and spanning tree. ToDo: more stable gesture recognition
  * 0.4.8 Add rotation with one-hand fist grab and rotate
- *
+...
+ * 0.4.11 Got the camera on a dolly and made some of the 1-hand rotation control dolly instead of camera
+ * 0.4.12 Got the rest of the  1-hand rotation to control dolly instead of camera 
+ * 0.4.13 Got the two hand taffy pull to move the dolly rather than the camera
+
+*
  */
 
 //var threshold = 30;
@@ -471,7 +476,8 @@ updatePinchPoint = function (){
                 		grabScene = true;
 
                 		vGrabCamPos = new THREE.Vector3( 0,0,0 );
-                		vGrabCamPos.copy( 0?HMDOffset:camera.position ) ;
+                		//vGrabCamPos.copy( 0?HMDOffset:camera.position ) ;
+                		vGrabCamPos.copy( 0?HMDOffset:dolly.position ) ;
                 		vGrabScenePoint = new THREE.Vector3 ( 0,0,0 );
                 		vGrabScenePoint.copy( vHandPosition );
                 		console.log("grabScenePoint:");
