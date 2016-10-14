@@ -18,7 +18,8 @@
 *  0.4.17 Enable toggling 10 strongest connections onTouch and onPoke; onPoke Feedback; Reverse taffy zoom
 *  0.4.18 Checkpoint
 *  0.4.19 Begin coding Inertial rotation
-*  
+*  0.4.19a autosaved debugging partial edits line 556
+*  0.4.20 fixed some typos so that is runs ToDo: Implement WebVR 1.0  
  */
 
 //var threshold = 30;
@@ -522,6 +523,16 @@ updatePinchPoint = function (){
 				lastAngle = angle;
 				dAngle = lastAngle - angle;
 
+				text42 = lastAngle.toString();
+				text43 = dAngle.toString();
+                                updateTextbox('hx:'+vHandPosition.x.toString(),
+                                        "hy:"+vHandPosition.y.toString(),
+                                        "hz:"+vHandPosition.z.toString(),
+                                        "hy:"+lastAxis.x.toString(),
+                                        "hy:"+lastAxis.y.toString(),
+                                        "hz:"+lastAxis.z.toString(),
+                                        "hand0open");
+     
 	                        //camera.lookAt( origin );
 			  }
 
@@ -543,7 +554,14 @@ updatePinchPoint = function (){
                 		console.log(vGrabCamPos);
 			    } else {
 
-                	      if ( angle > 0.000) {
+                	      if ( dAngle > 0.000) {
+
+	                              updateTextbox("h:"+vHandPosition.y.toString(),
+					'hx:'+vHandPosition.x.toString(),
+                                        "hy:"+vHandPosition.y.toString(),
+                                        "hz:"+vHandPosition.z.toString(),
+                                        "hand0");
+
 
                           	//var axis = ( new THREE.Vector3() ).crossVectors( _rotateStart, _rotateEnd ).normalize(),
                                 quaternion = new THREE.Quaternion();
@@ -553,7 +571,7 @@ updatePinchPoint = function (){
 					HMDOffset.copy(vGrabCamPos.applyQuaternion(quaternion));
 				} else {
 					//camera.position.copy(vGrabCamPos.applyQuaternion(quaternion));
-					dolly.position.applyQuaternion(quaternion));
+					dolly.position.applyQuaternion(quaternion);
 				}
 
 				//dolly.position.	
@@ -561,8 +579,10 @@ updatePinchPoint = function (){
             		}
 	
 			if (hand && hand.pinchStrength < 0.5) grabScene = false;
+			
 			return hand?hand.palmPosition:0;
 			//break;
+		   }
 		case 2:
 			if(Math.random()<0.1){
 				console.log("hand1: ",frame.hands[0].palmPosition,frame.hands[0].pinchStrength);
