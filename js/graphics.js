@@ -63,6 +63,7 @@ var device, sensor;
 
 var vGrabCamPos,grabScene,vGrabScenePoint;
 
+var dolly;
 
 var isMobile = function () {
   var check = false;
@@ -455,7 +456,8 @@ updatePinchPoint = function (){
 	                        if(0) {
 					HMDOffset.copy(vGrabCamPos.applyQuaternion(quaternion));
 				} else {
-					camera.position.copy(vGrabCamPos.applyQuaternion(quaternion));
+					//camera.position.copy(vGrabCamPos.applyQuaternion(quaternion));
+					dolly.position.copy(vGrabCamPos.applyQuaternion(quaternion));
 				}
 
 	                        //camera.lookAt( origin );
@@ -601,12 +603,19 @@ initCanvas = function () {
     computeDistanceMatrix();
     var light;
 
-
     scene = new THREE.Scene();
+  
+    // setup dolly that camera rides on.
+    dolly = new THREE.Group();
+    dolly.position.set(0000, 0000, 00050);
+    scene.add(dolly);
+         
     camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 3000);
 
-    camera.position.z = 50;
+    camera.position.z = 0.00050;
     spheres = [];
+
+    dolly.add(camera);
 
     canvas = document.getElementById('canvas');
 
@@ -640,7 +649,7 @@ initCanvas = function () {
     canvas.appendChild(renderer.domElement);
 
 
-    controls = new THREE.TrackballControls(camera, renderer.domElement);
+    controls = new THREE.TrackballControls(dolly, renderer.domElement);
     controls.rotateSpeed = 0.5;
 
 
@@ -798,72 +807,72 @@ initCanvas = function () {
       return effect.setFullScreen(true);
     }
     if (event.key === 'a' || event.keyCode === 97) {
-	console.log('a:',camera.position);
+	console.log('a:',dolly.position);
 	var movedir = new THREE.Vector3(0,0,1);
-	//camera.position.sub(movedir);
-	//camera.matrixWorldNeedsUpdate = true;
+	//dolly.position.sub(movedir);
+	//dolly.matrixWorldNeedsUpdate = true;
 	HMDOffset.sub(movedir);
     }
     if (event.key === 'd' || event.keyCode === 100) {
-	console.log('d:',camera.position);
+	console.log('d:',dolly.position);
 	var movedir = new THREE.Vector3(0,0,-1);
-	//camera.position.sub(movedir);
-	//camera.matrixWorldNeedsUpdate = true;
+	//dolly.position.sub(movedir);
+	//dolly.matrixWorldNeedsUpdate = true;
 	HMDOffset.sub(movedir);
     }
     if (event.key === 'w' || event.keyCode === 119) {
-	console.log('w:',camera.position);
+	console.log('w:',dolly.position);
 	var movedir = new THREE.Vector3(0,1,0);
-	//camera.position.sub(movedir);
-	//camera.matrixWorldNeedsUpdate = true;
+	//dolly.position.sub(movedir);
+	//dolly.matrixWorldNeedsUpdate = true;
 	HMDOffset.sub(movedir);
     }
     if (event.key === 'x' || event.keyCode === 120) {
-	console.log('x:',camera.position);
+	console.log('x:',dolly.position);
 	var movedir = new THREE.Vector3(0,-1.0,0);
-	//camera.position.sub(movedir);
-	//camera.matrixWorldNeedsUpdate = true;
+	//dolly.position.sub(movedir);
+	//dolly.matrixWorldNeedsUpdate = true;
 	HMDOffset.sub(movedir);
     }
     if (event.key === 'e' || event.keyCode === 101) {
-	console.log('e:',camera.position);
+	console.log('e:',dolly.position);
 	var movedir = new THREE.Vector3(1.0,0,0);
-	//camera.position.sub(movedir);
-	//camera.matrixWorldNeedsUpdate = true;
+	//dolly.position.sub(movedir);
+	//dolly.matrixWorldNeedsUpdate = true;
 	HMDOffset.sub(movedir);
     }
     if (event.key === 'c' || event.keyCode === 99) {
-	console.log('c:',camera.position);
+	console.log('c:',dolly.position);
 	var movedir = new THREE.Vector3(-1.0,0,0);
-	//camera.position.sub(movedir);
-	//camera.matrixWorldNeedsUpdate = true;
+	//dolly.position.sub(movedir);
+	//dolly.matrixWorldNeedsUpdate = true;
 	HMDOffset.sub(movedir);
     }
     if (event.key === 's' || event.keyCode === 115) {
-	console.log('s:',camera.position);
+	console.log('s:',dolly.position);
 	//var movedir = new THREE.Vector3(0,0,0.1);
               var zoomdir = new THREE.Vector3(0,0,1.0);
               zoomdir.applyQuaternion(camera.quaternion);
               //zoomdir.multiplyScalar(diffBallScale);
-              //camera.position.sub(zoomdir);
+              //dolly.position.sub(zoomdir);
               HMDOffset.sub(zoomdir);
-	//camera.position.sub(movedir);
-	//camera.matrixWorldNeedsUpdate = true;
+	//dolly.position.sub(movedir);
+	//dolly.matrixWorldNeedsUpdate = true;
 	//HMDOffset.sub(movedir);
     }
     if (event.key === 'n' || event.keyCode === 110) {
-	console.log('n:',camera.position);
+	console.log('n:',dolly.position);
 	onPoke();	
     }
     if (event.key === 'm' || event.keyCode === 109) {
-	console.log('m:',camera.position);
+	console.log('m:',dolly.position);
 	onCircle();
     }
     if (event.key === 'b' || event.keyCode === 98) {
-	console.log('b:',camera.position);
+	console.log('b:',dolly.position);
     }
     if (event.key === 'v' || event.keyCode === 118) {
-	console.log('b:',camera.position);
+	console.log('b:',dolly.position);
 	requestFullscreen();
     }
 
@@ -974,9 +983,11 @@ animate = function () {
     handpositionArray = updatePinchPoint();
     var handposition = new THREE.Vector3(0,0,0);
     if(vr > 0 ) {
-	camera.position.add(HMDOffset);
+	//camera.position.add(HMDOffset);
+	dolly.position.add(HMDOffset);
 	HMDOffset.copy(handposition);
-	camera.matrixWorldNeedsUpdate = true;
+	//camera.matrixWorldNeedsUpdate = true;
+	dolly.matrixWorldNeedsUpdate = true;
     }
     
 
