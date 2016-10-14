@@ -16,7 +16,8 @@
  * 0.4.15 Text overlay displaying dolly position or region+index
 *  0.4.16 Begin Cleanup
 *  0.4.17 Enable toggling 10 strongest connections onTouch and onPoke; onPoke Feedback; Reverse taffy zoom
-*  
+*  0.4.18 Checkpoint
+*  0.4.19 Begin coding Inertial rotation
 *  
  */
 
@@ -75,6 +76,8 @@ var vr = 0;
 var device, sensor;
 
 var vGrabCamPos,grabScene,vGrabScenePoint;
+
+var lastAxis, lastAngle, dAngle;
 
 var dolly;
 
@@ -515,6 +518,10 @@ updatePinchPoint = function (){
 					dolly.position.copy(vGrabCamPos.applyQuaternion(quaternion));
 				}
 
+				lastAxis.copy(axis);
+				lastAngle = angle;
+				dAngle = lastAngle - angle;
+
 	                        //camera.lookAt( origin );
 			  }
 
@@ -534,7 +541,23 @@ updatePinchPoint = function (){
                 		console.log(vGrabScenePoint);
                 		console.log("grabCamPos:");
                 		console.log(vGrabCamPos);
-			    }
+			    } else {
+
+                	      if ( angle > 0.000) {
+
+                          	//var axis = ( new THREE.Vector3() ).crossVectors( _rotateStart, _rotateEnd ).normalize(),
+                                quaternion = new THREE.Quaternion();
+	                        //angle *= controls.rotateSpeed * 1.81;
+        	                quaternion.setFromAxisAngle( lastAxis, -dAngle );
+	                        if(0) {
+					HMDOffset.copy(vGrabCamPos.applyQuaternion(quaternion));
+				} else {
+					//camera.position.copy(vGrabCamPos.applyQuaternion(quaternion));
+					dolly.position.applyQuaternion(quaternion));
+				}
+
+				//dolly.position.	
+			      }
             		}
 	
 			if (hand && hand.pinchStrength < 0.5) grabScene = false;
@@ -677,7 +700,9 @@ initCanvas = function () {
     dolly = new THREE.Group();
     dolly.position.set(0000, 0000, 00050);
     scene.add(dolly);
-         
+        
+    lastAxis = new THREE.Vector3 (0,0,0);
+ 
     camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 3000);
 
     camera.position.z = 0.00050;
