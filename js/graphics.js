@@ -22,6 +22,7 @@
 var camera;
 var canvas;
 var amap,sp,spcanvas;
+var namap,nsp,nspcanvas;
 var renderer;
 var controls;
 var scene;
@@ -174,7 +175,7 @@ function onTouch( index, object ) {
 
         var regionName = getRegionNameByIndex(index);
         setNodeInfoPanel(regionName, index);
-	updateTextbox(regionName+index.toString());
+	updateNodeLabel(regionName+index.toString(),spheres[index].position);
 
         if(thresholdModality) {
             drawEdgesGivenNode(index);
@@ -263,7 +264,7 @@ function onCircle(){
 
 
 
-    if(touchedSphere) {
+    if(false && touchedSphere) {
         removeElementsFromEdgePanel();
         var nodeIndex = touchedSphereIndex; //sphereNodeDictionary[touchedSphere.uuid];
 
@@ -438,6 +439,10 @@ updatePinchPoint = function (){
 			if(hand && hand.palmPosition) {
 				vHandPosition.fromArray(hand.palmPosition);
                                 console.log("hand position:",vHandPosition);
+				updateTextbox('hx:'+vHandPosition.x.toString(), 
+					"hy:"+vHandPosition.y.toString(),
+					"hz:"+vHandPosition.z.toString(),
+					"hand0");
 			} else {
                 		console.log("hand but no palmPosition:");
 			}
@@ -504,6 +509,17 @@ updatePinchPoint = function (){
         var hand2Pos = new THREE.Vector3(0,0,0);
         hand1Pos.fromArray(hand.palmPosition);
         hand2Pos.fromArray(hand2.palmPosition);
+
+	if(Math.random()<0.1){
+				updateTextbox('h1x:'+hand1Pos.x.toString(), 
+					"h1y:"+hand1Pos.y.toString(),
+					"h1z:"+hand1Pos.z.toString(),
+					"h2x:"+hand2Pos.x.toString(),
+					"h2y:"+hand2Pos.y.toString(),
+					"h2z:"+hand2Pos.z.toString(),
+					"hand0");
+
+	}
 
         var handvec = new THREE.Vector3(1.0,0.0,0.0);
         handvec.subVectors(hand2Pos, hand1Pos);
@@ -960,7 +976,7 @@ initCanvas = function () {
 
     createLegend(activeGroup);
 
-    
+    addNodeLabel(); 
     addTextbox();
     addSkybox();
     animate();
@@ -1059,7 +1075,8 @@ animate = function () {
 
     for(var i = 0; i < spheres.length; i++){
         if (spheres[i].visible) {
-		spheres[i].lookAt(camera.position);
+		//spheres[i].lookAt(camera.position);
+		spheres[i].lookAt(dolly.position);
 		if ( //(vr > 0) && 
 		    ((tempDist = spheres[i].position.distanceTo(handposition)) <  nearestSphereDist) ) {
 			nearestSphereDist = tempDist;
@@ -1092,8 +1109,10 @@ animate = function () {
   } else {
     for(var i = 0; i < spheres.length; i++){
         if (spheres[i].visible) {
-		spheres[i].lookAt(camera.position);
+		//spheres[i].lookAt(camera.position);
+		spheres[i].lookAt(dolly.position);
 	}
+
     }	
   } // if (true			
     
@@ -1222,6 +1241,7 @@ var drawRegions = function(dataset) {
 
             if(visibleNodes[i]){
                 //spheres[i].lookAt( camera.position);
+                spheres[i].lookAt( dolly.position);
                 scene.add(spheres[i]);
             }
         }
@@ -1656,7 +1676,7 @@ createLine = function (start,end, name){
     return line;
 };
 
-updateTextbox = function(text1,text2,text3,text4,movedir) {
+updateTextbox = function(text1,text2,text3,text4,text5,text6,movedir) {
         var context = spcanvas.getContext('2d');
         //context.fillStyle = '#ff0000'; // CHANGED
         context.textAlign = 'left'; //'center';
@@ -1666,9 +1686,29 @@ updateTextbox = function(text1,text2,text3,text4,movedir) {
         if(text2)context.fillText(text2, 10, 50);
         if(text3)context.fillText(text3, 10, 80);
         if(text4)context.fillText(text4, 10, 110);
+        if(text5)context.fillText(text5, 10, 140);
+        if(text6)context.fillText(text6, 10, 170);
         amap.needsUpdate = true;
 	//if(movedir)sp.position.set(movedir.x,movedir.y,movedir.z);
         sp.needsUpdate = true;
+
+}
+
+updateNodeLabel = function(text1,movedir) {
+        var context = nspcanvas.getContext('2d');
+        //context.fillStyle = '#ff0000'; // CHANGED
+        context.textAlign = 'left'; //'center';
+        //context.font = '24px Arial';
+	context.clearRect(0,0,500,500);
+        //if(text1)context.fillText(text1, 10, 20);
+        if(text1)context.fillText(text1, 10, 120);
+        namap.needsUpdate = true;
+	if(movedir){nsp.position.set(movedir.x,movedir.y,movedir.z);
+        		//context.fillText("x:"+movedir.x.toString(), 10, 50);
+        		//context.fillText("y:"+movedir.y.toString(), 10, 80);
+        		//context.fillText("z:"+movedir.z.toString(), 10, 110);
+        }
+	nsp.needsUpdate = true;
 
 }
 
@@ -1699,6 +1739,36 @@ addTextbox = function() {
 	sp.position.set( 0, -2, 2 ); // CHANGED
 	//scene.add(sp);   
 	dolly.add(sp);   
+
+}
+
+addNodeLabel = function() {
+
+	nspcanvas = document.createElement('canvas');
+	var size = 256; // CHANGED
+	nspcanvas.width = size*2;
+	nspcanvas.height = size;
+	var context = nspcanvas.getContext('2d');
+	context.fillStyle = '#ff0000'; // CHANGED
+	context.textAlign = 'center';
+	context.font = '24px Arial';
+	context.fillText("Node Label", size / 2, size / 2);
+
+	namap = new THREE.Texture(nspcanvas);
+	namap.needsUpdate = true;
+
+	var mat = new THREE.SpriteMaterial({
+	    map: namap,
+	    trannsparent: false,
+	    useScreenCoordinates: false,
+	    color: 0xffffff // CHANGED
+	});
+
+	nsp = new THREE.Sprite(mat);
+	nsp.scale.set( 3, 3, 1 ); // CHANGED
+	nsp.position.set( 0, 0, 2 ); // CHANGED
+	//scene.add(nsp);   
+	scene.add(nsp);   
 
 }
 
