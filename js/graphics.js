@@ -26,6 +26,7 @@ var camera;
 var canvas;
 var amap,sp,spcanvas;
 var namap,nsp,nspcanvas;
+var text42="Threshold",text43="Top Edges",text44="Clear";
 var renderer;
 var controls;
 var scene;
@@ -45,6 +46,8 @@ var displayedEdges = [];
 
 var pointedObject;
 var touchedSphere, touchedSphereIndex,touchedSphereDistance;
+var labeledNodeIndex;
+var circleCount = 0;
 
 var root;
 
@@ -179,6 +182,7 @@ function onTouch( index, object ) {
         var regionName = getRegionNameByIndex(index);
         setNodeInfoPanel(regionName, index);
 	updateNodeLabel(regionName+index.toString(),spheres[index].position);
+	labeledNodeIndex = index;
 
         if( thresholdModality) {
             drawEdgesGivenNode(index);
@@ -264,17 +268,47 @@ function onDblClick(event){
 
 function onCircle(){
 
+	circleCount++;
+	
+     text42 = "CIRCLE!"+circleCount.toString();
+    //if ( (touchedSphere != null) || (touchedSphereIndex != null) ) {
+     //updateTextbox(circleCount);
+     updateTextbox("Circle:"+circleCount.toString());
+
+        if(!spt) {
+            //var nodeIndex = touchedSphereIndex; //sphereNodeDictionary[objectIntersected.object.uuid];
+
+
+	    //updateNodeLabel(nodeIndex.toString()+"POKE!"+el.toString(),spheres[nodeIndex].position);
 
 
 
-    if(false && touchedSphere) {
-        removeElementsFromEdgePanel();
-        var nodeIndex = touchedSphereIndex; //sphereNodeDictionary[touchedSphere.uuid];
+	    if(labeledNodeIndex && ( circleCount > 2)) { //(false && touchedSphere) {
+		updateNodeLabel(labeledNodeIndex.toString()+"CIRCLE!",spheres[labeledNodeIndex].position);
+        	removeElementsFromEdgePanel();
+        	//var nodeIndex = touchedSphereIndex; //sphereNodeDictionary[touchedSphere.uuid];
 
-        spt = true;
-        drawShortestPath(nodeIndex);
+        	spt = true;
+		circleCount = 0;
+     		updateTextbox("Circle:"+circleCount.toString());
+        	drawShortestPath(labeledNodeIndex);
+	    }
+      } else {
+	    if (circleCount > 2) {
+		spt = false;
+        	removeElementsFromEdgePanel();
+	     text42 = "Circle!+spt";
+		circleCount = 0;
+     		text42="Circle:"+circleCount.toString();
 
+	    if(labeledNodeIndex){
+		updateNodeLabel(labeledNodeIndex.toString()+"Circle!",spheres[labeledNodeIndex].position);
+	    } else {
+		test42 = "Circle!";
+	    }
+      }
     }
+    
 }
 
 function onClick( event ){
@@ -337,6 +371,9 @@ function onPoke(  ){
 
     //var objectIntersected = getIntersectedObject();
 
+    circleCount = 0;
+     
+     text42="Circle:"+circleCount.toString();
 
     //if (objectIntersected && visibleNodes[sphereNodeDictionary[objectIntersected.object.uuid]]) {
     if ( (touchedSphere != null) || (touchedSphereIndex != null) ) {
@@ -391,7 +428,7 @@ function onGesture(gesture,frame)
 
    if (GESTUREDEBUG) console.log(gesture.type + " with ID " + gesture.id + " in frame " + frame.id);
 
-   if ( true || (gesture.type == "screenTap") || (gesture.type == "keyTap") ){
+   if ( false || true || (gesture.type == "screenTap") || (gesture.type == "keyTap") ){
      //console.log("screenTap:"+indexPoint.position.distanceTo(middlePoint) );
      //console.log(pointedObject);
      //if(indexPoint && indexPoint.position && middlePoint && (indexPoint.position.distanceTo(middlePoint) < 0.025)) {
@@ -1694,7 +1731,11 @@ updateTextbox = function(text1,text2,text3,text4,text5,text6,movedir) {
         if(text3)context.fillText(text3, 10, 80);
         if(text4)context.fillText(text4, 10, 110);
         if(text5)context.fillText(text5, 10, 140);
+        else if(text42) context.fillText(text42, 10, 140);
         if(text6)context.fillText(text6, 10, 170);
+        if(text42)context.fillText(text42, 10, 200);
+        if(text43)context.fillText(text43, 10, 230);
+        if(text44)context.fillText(text44, 10, 260);
         amap.needsUpdate = true;
 	//if(movedir)sp.position.set(movedir.x,movedir.y,movedir.z);
         sp.needsUpdate = true;
@@ -1716,6 +1757,8 @@ updateNodeLabel = function(text1,movedir) {
         		//context.fillText("z:"+movedir.z.toString(), 10, 110);
         }
 	nsp.needsUpdate = true;
+
+	
 
 }
 
