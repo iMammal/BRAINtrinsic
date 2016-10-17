@@ -229,6 +229,22 @@ addSkyboxButton = function(){
     menu.append("br");
 };
 
+addEnterVRButton = function(){
+
+    var menu = d3.select("#nodeInfoPanel");
+
+    menu.append("button")
+        .text("Enter VR")
+        .attr("id", "enterVRBtn")
+        .append("input")
+        .attr("type","checkbox")
+        .attr("id","enterVRInput")
+        .attr("checked", "false")
+        .on("change", onVRRequestPresent());
+
+    menu.append("br");
+};
+
 setNodeInfoPanel = function (regionName, index){
     /*
      var panel = document.getElementById('nodeInfoPanel');

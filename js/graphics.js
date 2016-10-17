@@ -75,6 +75,7 @@ var HMDOffset = new THREE.Vector3(0,0,0);
 
 var vr = 0;
 var device, sensor;
+var vrDisplay = null;
 
 var vGrabCamPos,grabScene,vGrabScenePoint;
 
@@ -655,6 +656,53 @@ updatePinchPoint = function (){
 }
 
 
+      function onVRRequestPresent () {
+
+	    alert("Pressed Enter VR Button");
+	    var enterVRInput = document.getElementById('enterVRInput');
+	    var enterVRBtn = document.getElementById('enterVRBtn');
+	    enterVRInput.checked = true;
+	    enterVRBtn.text = "Exit VR";
+		console.log("Entering VR:",enterVRBtn.text,enterVRInput.checked);
+        /*vrDisplay.requestPresent([{ source: canvas }]).then(function () {
+        }, function () {
+          //VRSamplesUtil.addError("requestPresent failed.", 2000);
+          console.log("requestPresent failed.", 2000);
+        });
+      */
+}
+
+      function onVRExitPresent () {
+        if (!vrDisplay.isPresenting)
+          return;
+
+        vrDisplay.exitPresent().then(function () {
+        }, function () {
+          //VRSamplesUtil.addError("exitPresent failed.", 2000);
+          console.log("exitPresent failed.", 2000);
+        });
+      }
+
+      function onVRPresentChange () {
+        onResize();
+	
+        if (vrDisplay.isPresenting) {
+          if (vrDisplay.capabilities.hasExternalDisplay) {
+	    enterVRBtn = document.getElementById('enterVRBtn');
+	    enterVRBtn.text = "ExitVR";
+		console.log("Entering VR:",enterVRBtn);
+          }
+        } else {
+          if (vrDisplay.capabilities.hasExternalDisplay) {
+            VRSamplesUtil.removeButton(vrPresentButton);
+            vrPresentButton = VRSamplesUtil.addButton("Enter VR", "E", "media/icons/cardboard64.png", onVRRequestPresent);
+          }
+        }
+      }
+
+
+
+      
 
 function requestFullscreen() {
   var el = renderer.domElement;
@@ -704,6 +752,7 @@ initCanvas = function () {
     addDimensionFactorSlider();
     addFslRadioButton();
     addSearchPanel();
+    addEnterVRButton();
 
     setDimensionFactor(0.0231);
 
