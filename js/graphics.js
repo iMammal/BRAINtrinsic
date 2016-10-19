@@ -658,11 +658,13 @@ updatePinchPoint = function (){
 
       function onVRRequestPresent () {
 
-	    alert("Pressed Enter VR Button");
-	    var enterVRInput = document.getElementById('enterVRInput');
-	    var enterVRBtn = document.getElementById('enterVRBtn');
-	    enterVRInput.checked = true;
-	    enterVRBtn.text = "Exit VR";
+	    //alert("Pressed Enter VR Button");
+	    //var enterVRInput = document.getElementById('#enterVRInput');
+	    //var enterVRBtn = document.getElementById('#enterVRBtn');
+	    //enterVRInput.checked = true;
+	    //enterVRBtn.text="Exit VR";
+            d3.select("#enterVRBtn").text("Exit VR");
+
 		console.log("Entering VR:",enterVRBtn.text,enterVRInput.checked);
         /*vrDisplay.requestPresent([{ source: canvas }]).then(function () {
         }, function () {

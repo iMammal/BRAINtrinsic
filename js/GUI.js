@@ -236,11 +236,19 @@ addEnterVRButton = function(){
     menu.append("button")
         .text("Enter VR")
         .attr("id", "enterVRBtn")
+        .on('click', function(){
+		alert("Clicked the Enter VR button again");
+		//onVRRequestPresent();
+	})
         .append("input")
         .attr("type","checkbox")
         .attr("id","enterVRInput")
         .attr("checked", "false")
-        .on("change", onVRRequestPresent());
+        //.on("change", onVRRequestPresent());
+        //.on('click', onVRRequestPresent());
+        .on("change", function () {
+		//.attr("checked", !this.checked);
+	});
 
     menu.append("br");
 };
