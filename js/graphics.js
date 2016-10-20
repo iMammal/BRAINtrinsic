@@ -664,8 +664,9 @@ updatePinchPoint = function (){
 	    //enterVRInput.checked = true;
 	    //enterVRBtn.text="Exit VR";
             d3.select("#enterVRBtn").text("Exit VR");
+            d3.select("#enterVRBtn").on("click",function(){onVRExitPresent ()});
 
-		console.log("Entering VR:",enterVRBtn.text,enterVRInput.checked);
+		console.log("Entering VR:",enterVRBtn.text);//,enterVRInput.checked);
         /*vrDisplay.requestPresent([{ source: canvas }]).then(function () {
         }, function () {
           //VRSamplesUtil.addError("requestPresent failed.", 2000);
@@ -675,6 +676,8 @@ updatePinchPoint = function (){
 }
 
       function onVRExitPresent () {
+            d3.select("#enterVRBtn").text("Enter VR");
+            d3.select("#enterVRBtn").on("click",function(){onVRRequestPresent ()});
         if (!vrDisplay.isPresenting)
           return;
 
