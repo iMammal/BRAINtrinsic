@@ -20,6 +20,9 @@
 *  0.4.19 Begin coding Inertial rotation
 *  0.4.19a autosaved debugging partial edits line 556
 *  0.4.20 fixed some typos so that is runs ToDo: Implement WebVR 1.0  
+*  0.4.30 Tried to update to WebVR1.1; added Enter VR button and some WebGL
+*  	  Code but learned that there are easier ways with three.js
+*
  */
 
 //var threshold = 30;
@@ -74,8 +77,9 @@ var ballScaLen = 0;
 var HMDOffset = new THREE.Vector3(0,0,0);
 
 var vr = 0;
-var device, sensor;
+var device, sensor, frameData;
 var vrDisplay = null;
+var gl;
 
 var vGrabCamPos,grabScene,vGrabScenePoint;
 
@@ -667,12 +671,12 @@ updatePinchPoint = function (){
             d3.select("#enterVRBtn").on("click",function(){onVRExitPresent ()});
 
 		console.log("Entering VR:",enterVRBtn.text);//,enterVRInput.checked);
-        /*vrDisplay.requestPresent([{ source: canvas }]).then(function () {
+        vrDisplay.requestPresent([{ source: canvas }]).then(function () {
         }, function () {
           //VRSamplesUtil.addError("requestPresent failed.", 2000);
           console.log("requestPresent failed.", 2000);
         });
-      */
+      
 }
 
       function onVRExitPresent () {
@@ -693,21 +697,63 @@ updatePinchPoint = function (){
 	
         if (vrDisplay.isPresenting) {
           if (vrDisplay.capabilities.hasExternalDisplay) {
-	    enterVRBtn = document.getElementById('enterVRBtn');
-	    enterVRBtn.text = "ExitVR";
-		console.log("Entering VR:",enterVRBtn);
+	    //enterVRBtn = document.getElementById('enterVRBtn');
+	    //enterVRBtn.text = "ExitVR";
+            d3.select("#enterVRBtn").text("Exit VR");
+            d3.select("#enterVRBtn").on("click",function(){onVRExitPresent ()});
+		console.log("Entering VR:");//,enterVRBtn);
           }
         } else {
           if (vrDisplay.capabilities.hasExternalDisplay) {
-            VRSamplesUtil.removeButton(vrPresentButton);
-            vrPresentButton = VRSamplesUtil.addButton("Enter VR", "E", "media/icons/cardboard64.png", onVRRequestPresent);
+            //VRSamplesUtil.removeButton(vrPresentButton);
+            //vrPresentButton = VRSamplesUtil.addButton("Enter VR", "E", "media/icons/cardboard64.png", onVRRequestPresent);
+            d3.select("#enterVRBtn").text("Enter VR");
+            d3.select("#enterVRBtn").on("click",function(){onVRRequestPresent ()});
+		console.log("Entering VR:");//,enterVRBtn);
           }
         }
       }
 
 
 
-      
+      function initWebGL () {
+
+    canvas = document.getElementById('canvas');
+    /*var glAttribs = {
+        alpha: false,
+      	antialias: false
+    };
+    gl = canvas.getContext("webgl", glAttribs);
+      gl.clearColor(0.1, 0.2, 0.3, 1.0);
+      gl.enable(gl.DEPTH_TEST);
+      gl.enable(gl.CULL_FACE);
+   */
+   }
+      function onResize () {
+
+
+        if (vrDisplay && vrDisplay.isPresenting) {
+          // If we're presenting we want to use the drawing buffer size
+          // recommended by the VRDevice, since that will ensure the best
+          // results post-distortion.
+          var leftEye = vrDisplay.getEyeParameters("left");
+          var rightEye = vrDisplay.getEyeParameters("right");
+
+          // For simplicity we're going to render both eyes at the same size,
+          // even if one eye needs less resolution. You can render each eye at
+          // the exact size it needs, but you'll need to adjust the viewports to
+          // account for that.
+          canvas.width = Math.max(leftEye.renderWidth, rightEye.renderWidth) * 2;
+          canvas.height = Math.max(leftEye.renderHeight, rightEye.renderHeight);
+        } else {
+          // We only want to change the size of the canvas drawing buffer to
+          // match the window dimensions when we're not presenting.
+          canvas.width = canvas.offsetWidth * window.devicePixelRatio;
+          canvas.height = canvas.offsetHeight * window.devicePixelRatio;
+        }
+      }
+
+
 
 function requestFullscreen() {
   var el = renderer.domElement;
@@ -757,7 +803,7 @@ initCanvas = function () {
     addDimensionFactorSlider();
     addFslRadioButton();
     addSearchPanel();
-    addEnterVRButton();
+    //addEnterVRButton();
 
     setDimensionFactor(0.0231);
 
@@ -776,15 +822,16 @@ initCanvas = function () {
     scene.add(dolly);
         
     lastAxis = new THREE.Vector3 (0,0,0);
- 
+    
+    //canvas = document.getElementById('canvas');
+    initWebGL();
+
     camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 3000);
 
     camera.position.z = 0.00050;
     spheres = [];
 
     dolly.add(camera);
-
-    canvas = document.getElementById('canvas');
 
     renderer = new THREE.WebGLRenderer({antialias: true}); //, canvas: canvas});
     renderer.setSize(window.innerWidth, window.innerHeight);
@@ -815,6 +862,10 @@ initCanvas = function () {
 
     canvas.appendChild(renderer.domElement);
 
+      window.addEventListener("resize", onResize, false);
+      onResize();
+      
+      frameData = new VRFrameData();
 
     controls = new THREE.TrackballControls(dolly, renderer.domElement);
     controls.rotateSpeed = 0.5;
@@ -919,6 +970,54 @@ initCanvas = function () {
     	});
 
 	effect.setSize(window.innerWidth, window.innerHeight);
+
+
+	navigator = window.navigator;
+
+	if (navigator.getVRDisplays) {
+         navigator.getVRDisplays().then(function (displays) {
+          if (displays.length > 0) {
+            vrDisplay = displays[0];
+            vrDisplay.depthNear = 0.1;
+            vrDisplay.depthFar = 1024.0;
+
+            if (vrDisplay.capabilities.canPresent)
+    		addEnterVRButton();
+
+            window.addEventListener('vrdisplaypresentchange', onVRPresentChange, false);
+            window.addEventListener('vrdisplayactivate', onVRRequestPresent, false);
+            window.addEventListener('vrdisplaydeactivate', onVRExitPresent, false);
+
+	    //init webgl contest for vr + maybe external
+            //initWebGL(vrDisplay.capabilities.hasExternalDisplay);
+          } else {
+	    //init webgl contest for no external disokay
+            //initWebGL(false);
+            console.log("WebVR supported, but no VRDisplays found.", 3000);
+
+          }
+        });
+      } else if (navigator.getVRDevices) {
+
+        // Only use preserveDrawingBuffer if we have an external display to
+        // mirror to.
+        //
+        //initWebGL(false);
+  	console.log("Your browser supports WebVR but not the latest version. See <a href='http://webvr.info'>webvr.info</a> for more info.");
+
+      } else {
+        // No VR means no mirroring, so create WebGL content without
+        // preserveDrawingBuffer
+        //initWebGL(false);
+        console.log("Your browser does not support WebVR. See <a href='http://webvr.info'>webvr.info</a> for assistance.");
+      }
+
+
+
+
+
+
+
 
 	//manager = new WebVRManager(renderer, effect, {hideButton: false});
 /*
@@ -1185,11 +1284,26 @@ updateScene = function(){
 
 animate = function () {
 
+    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+
+
+  if (vrDisplay) {
+    // When presenting content to the VRDisplay we want to update at its
+    // refresh rate if it differs from the refresh rate of the main
+    // display. Calling VRDisplay.requestAnimationFrame ensures we render
+    // at the right speed for VR.
     requestAnimationFrame(animate);
     controls.update();
 
-  if (true) {
-    //controls.update(  );
+    // As a general rule you want to get the pose as late as possible
+    // and call VRDisplay.submitFrame as early as possible after
+    // retrieving the pose. Do any work for the frame that doesn't need
+    // to know the pose earlier to ensure the lowest latency possible.
+    //var pose = vrDisplay.getPose();
+    vrDisplay.getFrameData(frameData);
+
+
+
     if(vr > 0 ) {
         oculuscontrol.update();
     }
@@ -1213,6 +1327,7 @@ animate = function () {
     if (!handpositionArray) {
 	handposition = camera.position;
     } else {
+
 	handposition.fromArray(handpositionArray);
     } 
 
