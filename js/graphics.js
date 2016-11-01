@@ -20,9 +20,18 @@
 *  0.4.19 Begin coding Inertial rotation
 *  0.4.19a autosaved debugging partial edits line 556
 *  0.4.20 fixed some typos so that is runs ToDo: Implement WebVR 1.0  
+*  0.5.0  Adopted WebVR 1.1 Display through latest three.js as of 20161031; cleaned hand controls a bit
+*  
+*  
  */
 
 //var threshold = 30;
+
+
+//if ( WEBVR.isLatestAvailable() === false ) {
+//	document.body.appendChild( WEBVR.getMessage() );
+//}
+
 
 var camera;
 var canvas;
@@ -593,8 +602,13 @@ updatePinchPoint = function (){
 
         var hand1Pos = new THREE.Vector3(0,0,0);
         var hand2Pos = new THREE.Vector3(0,0,0);
-        hand1Pos.fromArray(hand.palmPosition);
-        hand2Pos.fromArray(hand2.palmPosition);
+        if(hand) {
+		hand1Pos.fromArray(hand.palmPosition);
+	} else { return; }
+
+        if(hand2) {
+		 hand2Pos.fromArray(hand2.palmPosition);
+	} else { return; }
 
 	if(Math.random()<0.1){
 				updateTextbox('h1x:'+hand1Pos.x.toString(), 
@@ -802,10 +816,16 @@ initCanvas = function () {
     //effect = new THREE.OculusRiftEffect( renderer, { worldScale: 1 } );
     //effect.setSize( window.innerWidth, window.innerHeight );
 
-    effect = new THREE.VREffect(renderer, function(message){
-    	console.log(message);
-    });
+    // This is done again below. I just noticed this is in here twice
+    //effect = new THREE.VREffect(renderer, function(message){
+    //	console.log(message);
+    //});
 
+    /* For Oculus Development Kits, rendering was done to display because they presented as displays.
+ *
+ *  CV1 presents as a device so that is handled differently.
+ *
+ 
     effect.setSize(window.innerWidth, window.innerHeight);
       
 
@@ -841,7 +861,10 @@ initCanvas = function () {
 
 
 
-    }
+    } // switch (vr)
+
+    */
+
     if (true) { //(vr > 0) {
         //oculuscontrol = new THREE.OculusControls(camera);
 
@@ -864,11 +887,12 @@ initCanvas = function () {
       		console.log("VREffect",message);
     	});
 
-	effect.setSize(window.innerWidth, window.innerHeight);
+	// The size was already set in the renderer definition above
+	//effect.setSize(window.innerWidth, window.innerHeight);
 
 	//manager = new WebVRManager(renderer, effect, {hideButton: false});
-/*
 	navigator = window.navigator;
+/*
 	if (navigator.mozGetVRDevices) {
 		console.log( "moz navigator");
 	} else if (navigator.getVRDevices) {
@@ -910,6 +934,26 @@ initCanvas = function () {
 				console.log("No HMD or HMD Position Sensor",sensor,device);
 			}
 */
+
+
+	if ( navigator.getVRDisplays ) {
+		navigator.getVRDisplays()
+			.then( function ( displays ) {
+				effect.setVRDisplay( displays[ 0 ] );
+				controls.setVRDisplay( displays[ 0 ] );
+			} )
+			.catch( function () {
+				// no displays
+				//vr = 0;
+			} );
+		
+		if (vr > 0) {
+			document.body.appendChild( WEBVR.getButton( effect ) );
+		}
+	}
+							//
+							//
+
 
   var onkey = function(event) {
     if (event.key === 'z' || event.keyCode === 122) {

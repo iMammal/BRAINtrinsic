@@ -33,8 +33,15 @@
     <script src="js/indexedDB.js"></script>
 
     <!-- These two scripts are brought in from the THREE.js repo -->
-    <script src="js/external-libraries/VRControls.js"></script>
-    <script src="js/external-libraries/VREffect.js"></script>
+    <script src="js/external-libraries/controls/VRControls.js"></script>
+    <script src="js/external-libraries/effects/VREffect.js"></script>
+    <script src="js/external-libraries/vr/WebVR.js">
+
+	if ( WEBVR.isLatestAvailable() === false ) {
+		document.body.appendChild( WEBVR.getMessage() );
+	}
+
+    </script>
 
     <!-- These two scripts are brought in from the Leap Motion repo -->
     <script src="js/external-libraries/leap-0.6.4.min.js"></script>
