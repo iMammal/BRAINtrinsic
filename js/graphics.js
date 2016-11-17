@@ -21,6 +21,7 @@
 *  0.4.19a autosaved debugging partial edits line 556
 *  0.4.20 fixed some typos so that is runs ToDo: Implement WebVR 1.0  
 *  0.5.0  Adopted WebVR 1.1 Display through latest three.js as of 20161031; cleaned hand controls a bit
+*  0.5.1  Fixed scaling and rotation bugs. (Mostly - rotation still wonky sometimes, maybe around poles.)
 *  
 *  
  */
@@ -88,6 +89,8 @@ var device, sensor;
 var vGrabCamPos,grabScene,vGrabScenePoint;
 
 var lastAxis, lastAngle, dAngle;
+
+var dbgZoom, dbgRot=1;
 
 var dolly;
 
@@ -498,9 +501,11 @@ updatePinchPoint = function (){
 				updateTextbox('hx:'+vHandPosition.x.toString(), 
 					"hy:"+vHandPosition.y.toString(),
 					"hz:"+vHandPosition.z.toString(),
+					grabScene?"grabScene+":"grabScene-",
 					"hand0");
 			} else {
                 		console.log("hand but no palmPosition:");
+				return 0;
 			}
     //if ( (touchedSphere != null) || (touchedSphereIndex != null) ) {
 			
@@ -532,24 +537,27 @@ updatePinchPoint = function (){
 				lastAngle = angle;
 				dAngle = lastAngle - angle;
 
-				text42 = lastAngle.toString();
-				text43 = dAngle.toString();
-                                updateTextbox('hx:'+vHandPosition.x.toString(),
+				if(dbgRot) {
+				    text42 = "lastAngle:"+lastAngle.toString();
+				    text43 = "dAngle:"+dAngle.toString();
+				    text44 = grabScene?"grabScene+":"grabScene-";
+                                    updateTextbox('hx:'+vHandPosition.x.toString(),
                                         "hy:"+vHandPosition.y.toString(),
                                         "hz:"+vHandPosition.z.toString(),
-                                        "hy:"+lastAxis.x.toString(),
-                                        "hy:"+lastAxis.y.toString(),
-                                        "hz:"+lastAxis.z.toString(),
+                                        "lx:"+lastAxis.x.toString(),
+                                        "ly:"+lastAxis.y.toString(),
+                                        "lz:"+lastAxis.z.toString(),
                                         "hand0open");
-     
+     				}
 	                        //camera.lookAt( origin );
-			  }
+			  } // if ( angle > 0.000) ...
+
+			  if (hand && hand.pinchStrength < 0.5) grabScene = false;
 
 
 
-
-			} else {
-			    if (hand && ONEHANDCONTROL && (!touchedSphere)  && (hand.pinchStrength > 0.5) ) {
+			} else {  //  if (hand && grabScene && vGrabScenePoint) ...
+			    if (hand &&  (!touchedSphere)  && (hand.pinchStrength > 0.5) ) {
                 		grabScene = true;
 
                 		vGrabCamPos = new THREE.Vector3( 0,0,0 );
@@ -561,7 +569,7 @@ updatePinchPoint = function (){
                 		console.log(vGrabScenePoint);
                 		console.log("grabCamPos:");
                 		console.log(vGrabCamPos);
-			    } else {
+			    } else { //  if (hand...
 
                 	      if ( dAngle > 0.000) {
 
@@ -569,6 +577,7 @@ updatePinchPoint = function (){
 					'hx:'+vHandPosition.x.toString(),
                                         "hy:"+vHandPosition.y.toString(),
                                         "hz:"+vHandPosition.z.toString(),
+					grabScene?"grabScene+":"grabScene-",
                                         "hand0");
 
 
@@ -584,8 +593,8 @@ updatePinchPoint = function (){
 				}
 
 				//dolly.position.	
-			      }
-            		}
+			      } // if ( dAngle...
+            		    } // else 
 	
 			if (hand && hand.pinchStrength < 0.5) grabScene = false;
 			
@@ -604,29 +613,33 @@ updatePinchPoint = function (){
         var hand2Pos = new THREE.Vector3(0,0,0);
         if(hand) {
 		hand1Pos.fromArray(hand.palmPosition);
-	} else { return; }
+	} else { return 0; }
 
         if(hand2) {
 		 hand2Pos.fromArray(hand2.palmPosition);
-	} else { return; }
-
-	if(Math.random()<0.1){
-				updateTextbox('h1x:'+hand1Pos.x.toString(), 
-					"h1y:"+hand1Pos.y.toString(),
-					"h1z:"+hand1Pos.z.toString(),
-					"h2x:"+hand2Pos.x.toString(),
-					"h2y:"+hand2Pos.y.toString(),
-					"h2z:"+hand2Pos.z.toString(),
-					"hand0");
-
-	}
+	} else { return 0; }
 
         var handvec = new THREE.Vector3(1.0,0.0,0.0);
         handvec.subVectors(hand2Pos, hand1Pos);
 
         var handvecLen = handvec.length();
         //var halfHandvecLen = handvec.multiplyScalar(0.5);
-      pinchStrength = (hand.pinchStrength + hand2.pinchStrength) / 2;
+        pinchStrength = (hand.pinchStrength + hand2.pinchStrength) / 2;
+	if((Math.random()<0.1) && dbgZoom) {
+				text42 = "handvecLen:"+handvec.length();
+				text43 = "ballScaLen:"+ballScaLen;
+				text44 = "pinchStrength:"+pinchStrength;
+				updateTextbox('h1x:'+hand1Pos.x.toString(), 
+					"h1y:"+hand1Pos.y.toString(),
+					"h1z:"+hand1Pos.z.toString(),
+					"h2x:"+hand2Pos.x.toString(),
+					"h2y:"+hand2Pos.y.toString(),
+					"h2z:"+hand2Pos.z.toString(),
+					ballRot?"ballRot":"!ballRot");
+					//"hand0");
+
+	}
+
       if (pinchStrength > 0.8) {
 
          if (!ballRot) {
@@ -635,6 +648,7 @@ updatePinchPoint = function (){
             ballScaLen = handvecLen;
             //ballScaCam.copy(camera.scale);
             ballRot = true;
+	    grabScene = false; 
           } else {
 
 	    var diffBallScale;
@@ -644,7 +658,7 @@ updatePinchPoint = function (){
 
               var zoomdir = new THREE.Vector3(0,0,-1.0);
               zoomdir.applyQuaternion(dolly.quaternion);
-              zoomdir.multiplyScalar(diffBallScale);
+              zoomdir.multiplyScalar(diffBallScale*5);
               if (vr == 0) {
                 camera.position.sub(zoomdir);
                 camera.matrixWorldNeedsUpdate = true;
@@ -655,18 +669,19 @@ updatePinchPoint = function (){
 	      }
             }
 
-	  } // if (!ballRot) 
+	  } // if  (!ballRot)  ... else ...
 
-	}
-	else {
-		ballrot = false;
+	} else {
+		ballRot = false;
+		grabScene = false; 
         } // if (pinchStrength
 	
       } // switch
 
 
-    }
-}
+    } //     if( frame.hands )...
+
+} // function
 
 
 
@@ -739,7 +754,7 @@ initCanvas = function () {
  
     camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 3000);
 
-    camera.position.z = 0.00050;
+    camera.position.z = -0.00050;
     spheres = [];
 
     dolly.add(camera);
@@ -1078,6 +1093,20 @@ initCanvas = function () {
 	console.log('b:',dolly.position);
 	requestFullscreen();
     }
+
+    if (event.key === 'o' || event.keyCode === 111) {
+	if(dbgRot){
+		dbgRot=0;
+		dbgZoom=1;
+		console.log('Debugging Zoom');
+	} else {
+		dbgRot=1;
+		dbgZoom=0;
+		console.log('Debugging Rotation');
+	}
+	requestFullscreen();
+    }
+    
 
   };
 
@@ -1814,7 +1843,7 @@ updateTextbox = function(text1,text2,text3,text4,text5,text6,movedir) {
         //context.fillStyle = '#ff0000'; // CHANGED
         context.textAlign = 'left'; //'center';
         //context.font = '24px Arial';
-	context.clearRect(0,0,500,500);
+	context.clearRect(0,0,500,550);
         if(text1)context.fillText(text1, 10, 20);
         if(text2)context.fillText(text2, 10, 50);
         if(text3)context.fillText(text3, 10, 80);
