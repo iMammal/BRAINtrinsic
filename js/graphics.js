@@ -22,6 +22,7 @@
 *  0.4.20 fixed some typos so that is runs ToDo: Implement WebVR 1.0  
 *  0.5.0  Adopted WebVR 1.1 Display through latest three.js as of 20161031; cleaned hand controls a bit
 *  0.5.1  Fixed scaling and rotation bugs. (Mostly - rotation still wonky sometimes, maybe around poles.)
+*  0.5.2  Started Experiment with distance varient camera rotation speed. Didn't work well. Added 'o' key to remove debug text.
 *  
 *  
  */
@@ -498,17 +499,21 @@ updatePinchPoint = function (){
 			if(hand && hand.palmPosition) {
 				vHandPosition.fromArray(hand.palmPosition);
                                 console.log("hand position:",vHandPosition);
-				updateTextbox('hx:'+vHandPosition.x.toString(), 
+				if(dbgRot) {
+				    updateTextbox('hx:'+vHandPosition.x.toString(), 
 					"hy:"+vHandPosition.y.toString(),
 					"hz:"+vHandPosition.z.toString(),
 					grabScene?"grabScene+":"grabScene-",
 					"hand0");
+				    }
 			} else {
                 		console.log("hand but no palmPosition:");
 				return 0;
 			}
     //if ( (touchedSphere != null) || (touchedSphereIndex != null) ) {
 			
+			var dollyDistOffset = 1.1;// dolly.position.lengthSq()/50.0; //Sq();
+
             		if (hand && grabScene && vGrabScenePoint) {
 			  // if(ONEHANDMOVE) {
 		          //  var vGrabSceneDifference = new THREE.Vector3(0,0,0);
@@ -524,7 +529,7 @@ updatePinchPoint = function (){
 
                           	var axis = ( new THREE.Vector3() ).crossVectors( _rotateStart, _rotateEnd ).normalize(),
                                 quaternion = new THREE.Quaternion();
-	                        angle *= controls.rotateSpeed * 1.81;
+	                        angle *= controls.rotateSpeed * 1.81 * dollyDistOffset;
         	                quaternion.setFromAxisAngle( axis, -angle );
 	                        if(0) {
 					HMDOffset.copy(vGrabCamPos.applyQuaternion(quaternion));
@@ -540,7 +545,7 @@ updatePinchPoint = function (){
 				if(dbgRot) {
 				    text42 = "lastAngle:"+lastAngle.toString();
 				    text43 = "dAngle:"+dAngle.toString();
-				    text44 = grabScene?"grabScene+":"grabScene-";
+				    text44 = "dollyDistOffset:"+dollyDistOffset; //grabScene?"grabScene+":"grabScene-";
                                     updateTextbox('hx:'+vHandPosition.x.toString(),
                                         "hy:"+vHandPosition.y.toString(),
                                         "hz:"+vHandPosition.z.toString(),
@@ -573,13 +578,14 @@ updatePinchPoint = function (){
 
                 	      if ( dAngle > 0.000) {
 
-	                              updateTextbox("h:"+vHandPosition.y.toString(),
-					'hx:'+vHandPosition.x.toString(),
+				if(dbgRot) {
+	                            updateTextbox(//"h:"+vHandPosition.y.toString(),
+				        "hx:"+vHandPosition.x.toString(),
                                         "hy:"+vHandPosition.y.toString(),
                                         "hz:"+vHandPosition.z.toString(),
 					grabScene?"grabScene+":"grabScene-",
                                         "hand0");
-
+				}
 
                           	//var axis = ( new THREE.Vector3() ).crossVectors( _rotateStart, _rotateEnd ).normalize(),
                                 quaternion = new THREE.Quaternion();
@@ -1099,7 +1105,16 @@ initCanvas = function () {
 		dbgRot=0;
 		dbgZoom=1;
 		console.log('Debugging Zoom');
-	} else {
+	} else if (dbgZoom) {
+		dbgRot=0;
+		dbgZoom=0;
+		text42 = "";
+		text43 = "";
+		text44 = "";
+		updateTextbox("","","","","","","");//+vHandPosition.y.toString(),
+		console.log('Debugging Off');
+	}
+	 else {
 		dbgRot=1;
 		dbgZoom=0;
 		console.log('Debugging Rotation');
