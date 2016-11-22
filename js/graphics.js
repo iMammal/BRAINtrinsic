@@ -23,6 +23,7 @@
 *  0.5.0  Adopted WebVR 1.1 Display through latest three.js as of 20161031; cleaned hand controls a bit
 *  0.5.1  Fixed scaling and rotation bugs. (Mostly - rotation still wonky sometimes, maybe around poles.)
 *  0.5.2  Started Experiment with distance varient camera rotation speed. Didn't work well. Added 'o' key to remove debug text.
+*  0.5.3  Inertial rotation only when one hand is detected open.
 *  
 *  
  */
@@ -539,13 +540,14 @@ updatePinchPoint = function (){
 				}
 
 				lastAxis.copy(axis);
-				lastAngle = angle;
 				dAngle = lastAngle - angle;
+				lastAngle = angle;
 
 				if(dbgRot) {
 				    text42 = "lastAngle:"+lastAngle.toString();
-				    text43 = "dAngle:"+dAngle.toString();
-				    text44 = "dollyDistOffset:"+dollyDistOffset; //grabScene?"grabScene+":"grabScene-";
+				    text43 = "angle:"+angle.toString();
+				    text44 = "dAngle:"+dAngle.toString();
+				    //text44 = "dollyDistOffset:"+dollyDistOffset; //grabScene?"grabScene+":"grabScene-";
                                     updateTextbox('hx:'+vHandPosition.x.toString(),
                                         "hy:"+vHandPosition.y.toString(),
                                         "hz:"+vHandPosition.z.toString(),
@@ -591,12 +593,9 @@ updatePinchPoint = function (){
                                 quaternion = new THREE.Quaternion();
 	                        //angle *= controls.rotateSpeed * 1.81;
         	                quaternion.setFromAxisAngle( lastAxis, -dAngle );
-	                        if(0) {
-					HMDOffset.copy(vGrabCamPos.applyQuaternion(quaternion));
-				} else {
+					//HMDOffset.copy(vGrabCamPos.applyQuaternion(quaternion));
 					//camera.position.copy(vGrabCamPos.applyQuaternion(quaternion));
-					dolly.position.applyQuaternion(quaternion);
-				}
+				dolly.position.applyQuaternion(quaternion);
 
 				//dolly.position.	
 			      } // if ( dAngle...
