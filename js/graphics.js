@@ -24,6 +24,7 @@
 *  0.5.1  Fixed scaling and rotation bugs. (Mostly - rotation still wonky sometimes, maybe around poles.)
 *  0.5.2  Started Experiment with distance varient camera rotation speed. Didn't work well. Added 'o' key to remove debug text.
 *  0.5.3  Inertial rotation only when one hand is detected open.
+*  0.5.4  Inertial rotation when hands removed or both hands present but paused when one hand is detected open.
 *  
 *  
  */
@@ -578,31 +579,11 @@ updatePinchPoint = function (){
                 		console.log(vGrabCamPos);
 			    } else { //  if (hand...
 
-                	      if ( dAngle > 0.000) {
-
-				if(dbgRot) {
-	                            updateTextbox(//"h:"+vHandPosition.y.toString(),
-				        "hx:"+vHandPosition.x.toString(),
-                                        "hy:"+vHandPosition.y.toString(),
-                                        "hz:"+vHandPosition.z.toString(),
-					grabScene?"grabScene+":"grabScene-",
-                                        "hand0");
-				}
-
-                          	//var axis = ( new THREE.Vector3() ).crossVectors( _rotateStart, _rotateEnd ).normalize(),
-                                quaternion = new THREE.Quaternion();
-	                        //angle *= controls.rotateSpeed * 1.81;
-        	                quaternion.setFromAxisAngle( lastAxis, -dAngle );
-					//HMDOffset.copy(vGrabCamPos.applyQuaternion(quaternion));
-					//camera.position.copy(vGrabCamPos.applyQuaternion(quaternion));
-				dolly.position.applyQuaternion(quaternion);
-
-				//dolly.position.	
-			      } // if ( dAngle...
             		    } // else 
 	
 			if (hand && hand.pinchStrength < 0.5) grabScene = false;
 			
+
 			return hand?hand.palmPosition:0;
 			//break;
 		   }
@@ -683,6 +664,27 @@ updatePinchPoint = function (){
 	
       } // switch
 
+                	      if ( dAngle > 0.000) {
+
+				if(0 && dbgRot) {
+	                            updateTextbox(//"h:"+vHandPosition.y.toString(),
+				        "hx:"+vHandPosition.x.toString(),
+                                        "hy:"+vHandPosition.y.toString(),
+                                        "hz:"+vHandPosition.z.toString(),
+					grabScene?"grabScene+":"grabScene-",
+                                        "hand0");
+				}
+
+                          	//var axis = ( new THREE.Vector3() ).crossVectors( _rotateStart, _rotateEnd ).normalize(),
+                                quaternion = new THREE.Quaternion();
+	                        //angle *= controls.rotateSpeed * 1.81;
+        	                quaternion.setFromAxisAngle( lastAxis, -dAngle );
+					//HMDOffset.copy(vGrabCamPos.applyQuaternion(quaternion));
+					//camera.position.copy(vGrabCamPos.applyQuaternion(quaternion));
+				dolly.position.applyQuaternion(quaternion);
+
+				//dolly.position.	
+			      } // if ( dAngle...
 
     } //     if( frame.hands )...
 
