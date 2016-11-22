@@ -25,6 +25,7 @@
 *  0.5.2  Started Experiment with distance varient camera rotation speed. Didn't work well. Added 'o' key to remove debug text.
 *  0.5.3  Inertial rotation only when one hand is detected open.
 *  0.5.4  Inertial rotation when hands removed or both hands present but paused when one hand is detected open.
+*  0.5.5  Inertial rotation whether hands present or not until pinch and hold still to stop.
 *  
 *  
  */
@@ -578,6 +579,28 @@ updatePinchPoint = function (){
                 		console.log("grabCamPos:");
                 		console.log(vGrabCamPos);
 			    } else { //  if (hand...
+			// Inertial rotation (When one open hand detected)
+                	      if ( dAngle > 0.000) {
+
+				if(0 && dbgRot) {
+	                            updateTextbox(//"h:"+vHandPosition.y.toString(),
+				        "hx:"+vHandPosition.x.toString(),
+                                        "hy:"+vHandPosition.y.toString(),
+                                        "hz:"+vHandPosition.z.toString(),
+					grabScene?"grabScene+":"grabScene-",
+                                        "hand0");
+				}
+
+                          	//var axis = ( new THREE.Vector3() ).crossVectors( _rotateStart, _rotateEnd ).normalize(),
+                                quaternion = new THREE.Quaternion();
+	                        //angle *= controls.rotateSpeed * 1.81;
+        	                quaternion.setFromAxisAngle( lastAxis, -dAngle );
+					//HMDOffset.copy(vGrabCamPos.applyQuaternion(quaternion));
+					//camera.position.copy(vGrabCamPos.applyQuaternion(quaternion));
+				dolly.position.applyQuaternion(quaternion);
+
+				//dolly.position.	
+			      } // if ( dAngle...
 
             		    } // else 
 	
@@ -664,6 +687,7 @@ updatePinchPoint = function (){
 	
       } // switch
 
+			// Inertial rotation (When no or both hands detected)
                 	      if ( dAngle > 0.000) {
 
 				if(0 && dbgRot) {
