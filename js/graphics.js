@@ -26,6 +26,7 @@
 *  0.5.3  Inertial rotation only when one hand is detected open.
 *  0.5.4  Inertial rotation when hands removed or both hands present but paused when one hand is detected open.
 *  0.5.5  Inertial rotation whether hands present or not until pinch and hold still to stop.
+*  0.5.6  Inertial angular velocity calculated from averaging 3 samples from last 6 frames to smoothen leap motion tracking noise.
 *  
 *  
  */
@@ -92,7 +93,7 @@ var device, sensor;
 
 var vGrabCamPos,grabScene,vGrabScenePoint;
 
-var lastAxis, lastAngle, dAngle;
+var lastAxis, lastAngle5,lastAngle4,lastAngle3,lastAngle2,lastAngle1,lastAngle, dAngle;
 
 var dbgZoom, dbgRot=1;
 
@@ -542,11 +543,17 @@ updatePinchPoint = function (){
 				}
 
 				lastAxis.copy(axis);
-				dAngle = lastAngle - angle;
+				//dAngle = lastAngle - angle;
+				dAngle = ((lastAngle5 - lastAngle4) + (lastAngle3-lastAngle2) + (lastAngle1-lastAngle))/3.0;
+				lastAngle5 = lastAngle4;
+				lastAngle4 = lastAngle3;
+				lastAngle3 = lastAngle2;
+				lastAngle2 = lastAngle1;
+				lastAngle1 = lastAngle;
 				lastAngle = angle;
 
-				if(dbgRot) {
-				    text42 = "lastAngle:"+lastAngle.toString();
+				if(dbgRot && lastAngle5) {
+				    text42 = "lastAngle5:"+lastAngle5.toString();
 				    text43 = "angle:"+angle.toString();
 				    text44 = "dAngle:"+dAngle.toString();
 				    //text44 = "dollyDistOffset:"+dollyDistOffset; //grabScene?"grabScene+":"grabScene-";
@@ -580,7 +587,7 @@ updatePinchPoint = function (){
                 		console.log(vGrabCamPos);
 			    } else { //  if (hand...
 			// Inertial rotation (When one open hand detected)
-                	      if ( dAngle > 0.000) {
+                	      if ( (dAngle > 0.0001) || (dAngle < 0.0001) ) {
 
 				if(0 && dbgRot) {
 	                            updateTextbox(//"h:"+vHandPosition.y.toString(),
@@ -688,7 +695,8 @@ updatePinchPoint = function (){
       } // switch
 
 			// Inertial rotation (When no or both hands detected)
-                	      if ( dAngle > 0.000) {
+                	      //if ( dAngle > 0.000) {
+                	      if ( (dAngle > 0.0001) || (dAngle < 0.0001) ) {
 
 				if(0 && dbgRot) {
 	                            updateTextbox(//"h:"+vHandPosition.y.toString(),
