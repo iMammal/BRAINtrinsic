@@ -27,6 +27,9 @@
 *  0.5.4  Inertial rotation when hands removed or both hands present but paused when one hand is detected open.
 *  0.5.5  Inertial rotation whether hands present or not until pinch and hold still to stop.
 *  0.5.6  Inertial angular velocity calculated from averaging 3 samples from last 6 frames to smoothen leap motion tracking noise.
+*  0.5.7  Sthengthen and smoothen inertial rotation  with soe better averaging math 
+*  
+*
 *  
 *  
  */
@@ -93,7 +96,7 @@ var device, sensor;
 
 var vGrabCamPos,grabScene,vGrabScenePoint;
 
-var lastAxis, lastAngle5,lastAngle4,lastAngle3,lastAngle2,lastAngle1,lastAngle, dAngle;
+var lastAxis, lastAxis2, lastAxis4, lastAngle5,lastAngle4,lastAngle3,lastAngle2,lastAngle1,lastAngle, dAngle;
 
 var dbgZoom, dbgRot=1;
 
@@ -542,9 +545,15 @@ updatePinchPoint = function (){
 					dolly.position.copy(vGrabCamPos.applyQuaternion(quaternion));
 				}
 
+				if(lastAxis4 && lastAxis2) lastAxis4.copy(LastAxis2);
+				if(lastAxis2 && axis) lastAxis2.copy(axis);
 				lastAxis.copy(axis);
-				//dAngle = lastAngle - angle;
-				dAngle = ((lastAngle5 - lastAngle4) + (lastAngle3-lastAngle2) + (lastAngle1-lastAngle))/3.0;
+				if (lastAxis2) lastAxis.add(lastAxis2);
+				if (lastAxis4) lastAxis.add(lastAxis4);
+				lastAxis.normalize();//divideScalar(3.0);
+
+				//dAngle = lastAngle;// - angle;
+				dAngle += ((lastAngle5 + lastAngle4) + (lastAngle3+lastAngle2) + (lastAngle1+lastAngle)+angle)/7.0;
 				lastAngle5 = lastAngle4;
 				lastAngle4 = lastAngle3;
 				lastAngle3 = lastAngle2;
@@ -567,6 +576,9 @@ updatePinchPoint = function (){
      				}
 	                        //camera.lookAt( origin );
 			  } // if ( angle > 0.000) ...
+			  else {
+				dAngle += lastAngle - angle;
+			  }
 
 			  if (hand && hand.pinchStrength < 0.5) grabScene = false;
 
@@ -585,6 +597,8 @@ updatePinchPoint = function (){
                 		console.log(vGrabScenePoint);
                 		console.log("grabCamPos:");
                 		console.log(vGrabCamPos);
+				dAngle = 0.0
+
 			    } else { //  if (hand...
 			// Inertial rotation (When one open hand detected)
                 	      if ( (dAngle > 0.0001) || (dAngle < 0.0001) ) {
