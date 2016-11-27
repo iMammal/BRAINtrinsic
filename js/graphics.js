@@ -28,6 +28,7 @@
 *  0.5.5  Inertial rotation whether hands present or not until pinch and hold still to stop.
 *  0.5.6  Inertial angular velocity calculated from averaging 3 samples from last 6 frames to smoothen leap motion tracking noise.
 *  0.5.7  Sthengthen and smoothen inertial rotation  with soe better averaging math 
+*  0.5.8  Minor adjustment on inertial rotation math and added 1% friction drag per frame.
 *  
 *
 *  
@@ -553,7 +554,7 @@ updatePinchPoint = function (){
 				lastAxis.normalize();//divideScalar(3.0);
 
 				//dAngle = lastAngle;// - angle;
-				dAngle += ((lastAngle5 + lastAngle4) + (lastAngle3+lastAngle2) + (lastAngle1+lastAngle)+angle)/7.0;
+				dAngle = ((lastAngle5 + lastAngle4) + 2.0*(lastAngle3+lastAngle2) + 3.0*(lastAngle1+lastAngle)+6.0*angle)/18.0;
 				lastAngle5 = lastAngle4;
 				lastAngle4 = lastAngle3;
 				lastAngle3 = lastAngle2;
@@ -602,6 +603,8 @@ updatePinchPoint = function (){
 			    } else { //  if (hand...
 			// Inertial rotation (When one open hand detected)
                 	      if ( (dAngle > 0.0001) || (dAngle < 0.0001) ) {
+
+				dAngle *= 0.99; // Frictional Drag
 
 				if(0 && dbgRot) {
 	                            updateTextbox(//"h:"+vHandPosition.y.toString(),
