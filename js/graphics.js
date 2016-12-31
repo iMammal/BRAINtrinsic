@@ -30,6 +30,7 @@
 *  0.5.7  Sthengthen and smoothen inertial rotation  with soe better averaging math 
 *  0.5.8  Minor adjustment on inertial rotation math and added 1% friction drag per frame.
 *  0.5.9  Begin experimenting with Oculus Touch Controllers
+*  0.6.0  Inplement Basic Touch support for tracking
 *  
 *  
 * 
@@ -83,7 +84,7 @@ var distanceArray;
 
 var thresholdModality = false; //true;
 
-var stats, frame, controller;
+var stats, frame, controller, controller1, controller2;
 
 var mouse = new THREE.Vector2();
 
@@ -1015,34 +1016,34 @@ initCanvas = function () {
     addTextbox();
     
 
-                var gamepads = navigator.getGamepads();
-
-		if ((gamepads.length > 0) && gamepads[0]) console.log("GamepadID: "+gamepads[0].id);
-		if ((gamepads.length > 1) && gamepads[1]) console.log("GamepadID: "+gamepads[1].id);
-		if ((gamepads.length > 2) && gamepads[2]) console.log("GamepadID: "+gamepads[2].id);
-		if ((gamepads.length > 3) && gamepads[3]) console.log("GamepadID: "+gamepads[3].id);
-                for ( var i = 0, j = 0; i < 4; i ++ ) {
-
-                        var gamepad = gamepads[ i ];
-
-			if (gamepad) console.log("GamepadID: "+gamepad.id);
-                        if ( gamepad && gamepad.id === 'Oculus Touch (Left)' ) {
-
-                                //if ( j === id ) return gamepad;
-                                console.log("Gamepad "+j);
+                                // controllers
                                 
-				updateTextbox(j,gamepad.id);
+                                controller1 = new THREE.ViveController( 0 );
+                                controller1.standingMatrix = oculuscontrol.getStandingMatrix();
+                                dolly.add( controller1 );
 
-                                j ++;
+                                controller2 = new THREE.ViveController( 1 );
+                                controller2.standingMatrix = oculuscontrol.getStandingMatrix();
+                                dolly.add( controller2 );
+//  external-libraries
 
-                        }
 
-                }
-		
-		if (j == 0) { 
-			updateTextbox("No Gamepads Connected!",gamepads.length );
-			console.log("No Gamepads Connected!"+gamepads.length );
-		}
+                                var loader = new THREE.OBJLoader();
+                                loader.setPath( 'js/external-libraries/models/obj/vive-controller/' );
+                                loader.load( 'vr_controller_vive_1_5.obj', function ( object ) {
+
+                                        var loader = new THREE.TextureLoader();
+                                        loader.setPath( 'js/external-libraries/models/obj/vive-controller/' );
+
+                                        var controller = object.children[ 0 ];
+                                        controller.material.map = loader.load( 'onepointfive_texture.png' );
+                                        controller.material.specularMap = loader.load( 'onepointfive_spec.png' );
+
+                                        controller1.add( object.clone() );
+                                        controller2.add( object.clone() );
+
+                                } );
+
 
 
 	if ( navigator.getVRDisplays ) {
@@ -1305,7 +1306,11 @@ updateScene = function(){
 
 animate = function () {
 
-    requestAnimationFrame(animate);
+    effect.requestAnimationFrame(animate);
+
+                                controller1.update();
+                                controller2.update();
+
     controls.update();
 
   if (true) {
