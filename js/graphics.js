@@ -29,6 +29,11 @@
 *  0.5.6  Inertial angular velocity calculated from averaging 3 samples from last 6 frames to smoothen leap motion tracking noise.
 *  0.5.7  Sthengthen and smoothen inertial rotation  with soe better averaging math 
 *  0.5.8  Minor adjustment on inertial rotation math and added 1% friction drag per frame.
+*  0.5.9  Begin experimenting with Oculus Touch Controllers
+*  
+*  
+* 
+*
 *  
 *
 *  
@@ -1006,6 +1011,39 @@ initCanvas = function () {
 			}
 */
 
+    addNodeLabel(); 
+    addTextbox();
+    
+
+                var gamepads = navigator.getGamepads();
+
+		if ((gamepads.length > 0) && gamepads[0]) console.log("GamepadID: "+gamepads[0].id);
+		if ((gamepads.length > 1) && gamepads[1]) console.log("GamepadID: "+gamepads[1].id);
+		if ((gamepads.length > 2) && gamepads[2]) console.log("GamepadID: "+gamepads[2].id);
+		if ((gamepads.length > 3) && gamepads[3]) console.log("GamepadID: "+gamepads[3].id);
+                for ( var i = 0, j = 0; i < 4; i ++ ) {
+
+                        var gamepad = gamepads[ i ];
+
+			if (gamepad) console.log("GamepadID: "+gamepad.id);
+                        if ( gamepad && gamepad.id === 'Oculus Touch (Left)' ) {
+
+                                //if ( j === id ) return gamepad;
+                                console.log("Gamepad "+j);
+                                
+				updateTextbox(j,gamepad.id);
+
+                                j ++;
+
+                        }
+
+                }
+		
+		if (j == 0) { 
+			updateTextbox("No Gamepads Connected!",gamepads.length );
+			console.log("No Gamepads Connected!"+gamepads.length );
+		}
+
 
 	if ( navigator.getVRDisplays ) {
 		navigator.getVRDisplays()
@@ -1203,8 +1241,6 @@ initCanvas = function () {
 
     createLegend(activeGroup);
 
-    addNodeLabel(); 
-    addTextbox();
     addSkybox();
     animate();
 
