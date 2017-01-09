@@ -31,6 +31,7 @@
 *  0.5.8  Minor adjustment on inertial rotation math and added 1% friction drag per frame.
 *  0.5.9  Begin experimenting with Oculus Touch Controllers
 *  0.6.0  Inplement Basic Touch support for tracking
+*  0.6.1  Inplement Touch version of Leap Motion support where trigger strench is fist strengh
 *  
 *  
 * 
@@ -487,6 +488,285 @@ function onGesture(gesture,frame)
 }
 
 /*//////////////////////////////////////
+ * updateControllerPoint: Implement Oculus Touch Cntrollers
+ * for taffy pull gesture for movement in VR space
+ * Written by Morris CHukhman 1/1/17
+*///////////////////////////////////////
+
+var ONEHANDCONTROL = true;
+
+updateControllerPoint = function (){
+    if( frame.tools.length > 0 ){
+
+        console.log("tool: ",frame.tools[0].tipPosition);
+
+    }
+
+    var numControllers = controller1?1:0 + controller2?1:0;
+
+		          var origin = new THREE.Vector3(0,0,0);
+    if( controller1 || controller2) {  //frame.hands ){
+	switch (numControllers){ //frame.hands.length){
+		case 0:
+			break;
+		case 1:
+			if((Math.random()<0.01)&&(controller1))console.log("controller1: ",controller1.position, controller1.getButtonState('trigger')); //frame.hands[0].palmPosition,frame.hands[0].pinchStrength);
+		        var hand = frame.hands[0];
+			var vHandPosition = new THREE.Vector3 (0,0,0);
+			if(hand && hand.palmPosition) {
+				vHandPosition.fromArray(hand.palmPosition);
+                                console.log("hand position:",vHandPosition);
+				if(dbgRot) {
+				    updateTextbox('hx:'+vHandPosition.x.toString(), 
+					"hy:"+vHandPosition.y.toString(),
+					"hz:"+vHandPosition.z.toString(),
+					grabScene?"grabScene+":"grabScene-",
+					"controller0");
+				    }
+			} else {
+                		console.log("hand but no palmPosition:");
+				return 0;
+			}
+    //if ( (touchedSphere != null) || (touchedSphereIndex != null) ) {
+			
+			var dollyDistOffset = 1.1;// dolly.position.lengthSq()/50.0; //Sq();
+
+            		if (hand && grabScene && vGrabScenePoint) {
+			  // if(ONEHANDMOVE) {
+		          //  var vGrabSceneDifference = new THREE.Vector3(0,0,0);
+
+		          //  vGrabSceneDifference.subVectors(vHandPosition, vGrabScenePoint );
+        		  //  vGrabSceneDifference.multiplyScalar(speed);
+			  //}
+		          var _rotateStart = vGrabScenePoint;
+		          var _rotateEnd = vHandPosition;
+		          var angle = Math.acos( _rotateStart.dot( _rotateEnd ) / _rotateStart.length() / _rotateEnd.length() );
+
+                	  if ( angle > 0.000) {
+
+                          	var axis = ( new THREE.Vector3() ).crossVectors( _rotateStart, _rotateEnd ).normalize(),
+                                quaternion = new THREE.Quaternion();
+	                        angle *= controls.rotateSpeed * 1.81 * dollyDistOffset;
+        	                quaternion.setFromAxisAngle( axis, -angle );
+	                        if(0) {
+					HMDOffset.copy(vGrabCamPos.applyQuaternion(quaternion));
+				} else {
+					//camera.position.copy(vGrabCamPos.applyQuaternion(quaternion));
+					dolly.position.copy(vGrabCamPos.applyQuaternion(quaternion));
+				}
+
+				if(lastAxis4 && lastAxis2) lastAxis4.copy(LastAxis2);
+				if(lastAxis2 && axis) lastAxis2.copy(axis);
+				lastAxis.copy(axis);
+				if (lastAxis2) lastAxis.add(lastAxis2);
+				if (lastAxis4) lastAxis.add(lastAxis4);
+				lastAxis.normalize();//divideScalar(3.0);
+
+				//dAngle = lastAngle;// - angle;
+				dAngle = ((lastAngle5 + lastAngle4) + 2.0*(lastAngle3+lastAngle2) + 3.0*(lastAngle1+lastAngle)+6.0*angle)/18.0;
+				lastAngle5 = lastAngle4;
+				lastAngle4 = lastAngle3;
+				lastAngle3 = lastAngle2;
+				lastAngle2 = lastAngle1;
+				lastAngle1 = lastAngle;
+				lastAngle = angle;
+
+				if(dbgRot && (controller1 || controller2)) {
+				    text42 = "lastAngle5:"+lastAngle5.toString();
+				    text43 = "angle:"+angle.toString();
+				    text44 = "dAngle:"+dAngle.toString();
+				    //text44 = "dollyDistOffset:"+dollyDistOffset; //grabScene?"grabScene+":"grabScene-";
+                                    updateTextbox('hx:'+vHandPosition.x.toString(),
+                                        "cy:"+controller1.position.x.toString(),
+                                        "hy:"+vHandPosition.y.toString(),
+                                        "cy:"+controller1.position.y.toString(),
+                                        "hz:"+vHandPosition.z.toString(),
+                                        "cz:"+controller1.position.z.toString(),
+                                        //"lx:"+lastAxis.x.toString(),
+                                        //"ly:"+lastAxis.y.toString(),
+                                        //"lz:"+lastAxis.z.toString(),
+                                        "controller0open");
+     				} else 
+				if(dbgRot && lastAngle5) {
+				    text42 = "lastAngle5:"+lastAngle5.toString();
+				    text43 = "angle:"+angle.toString();
+				    text44 = "dAngle:"+dAngle.toString();
+				    //text44 = "dollyDistOffset:"+dollyDistOffset; //grabScene?"grabScene+":"grabScene-";
+                                    updateTextbox('hx:'+vHandPosition.x.toString(),
+                                        "hy:"+vHandPosition.y.toString(),
+                                        //"hy:"+vHandPosition.y.toString(),
+                                        //"hy:"+vHandPosition.y.toString(),
+                                        "hz:"+vHandPosition.z.toString(),
+                                        //"hz:"+vHandPosition.z.toString(),
+                                        "lx:"+lastAxis.x.toString(),
+                                        "ly:"+lastAxis.y.toString(),
+                                        "lz:"+lastAxis.z.toString(),
+                                        "hand0open");
+     				}
+	                        //camera.lookAt( origin );
+			  } // if ( angle > 0.000) ...
+			  else {
+				dAngle += lastAngle - angle;
+			  }
+
+			  if (hand && hand.pinchStrength < 0.5) grabScene = false;
+
+
+
+			} else {  //  if (hand && grabScene && vGrabScenePoint) ...
+			    if (hand &&  (!touchedSphere)  && (hand.pinchStrength > 0.5) ) {
+                		grabScene = true;
+
+                		vGrabCamPos = new THREE.Vector3( 0,0,0 );
+                		//vGrabCamPos.copy( 0?HMDOffset:camera.position ) ;
+                		vGrabCamPos.copy( 0?HMDOffset:dolly.position ) ;
+                		vGrabScenePoint = new THREE.Vector3 ( 0,0,0 );
+                		vGrabScenePoint.copy( vHandPosition );
+                		console.log("grabScenePoint:");
+                		console.log(vGrabScenePoint);
+                		console.log("grabCamPos:");
+                		console.log(vGrabCamPos);
+				dAngle = 0.0
+
+			    } else { //  if (hand...
+			// Inertial rotation (When one open hand detected)
+                	      if ( (dAngle > 0.0001) || (dAngle < 0.0001) ) {
+
+				dAngle *= 0.99; // Frictional Drag
+
+				if(0 && dbgRot) {
+	                            updateTextbox(//"h:"+vHandPosition.y.toString(),
+				        "hx:"+vHandPosition.x.toString(),
+                                        "hy:"+vHandPosition.y.toString(),
+                                        "hz:"+vHandPosition.z.toString(),
+					grabScene?"grabScene+":"grabScene-",
+                                        "hand0");
+				}
+
+                          	//var axis = ( new THREE.Vector3() ).crossVectors( _rotateStart, _rotateEnd ).normalize(),
+                                quaternion = new THREE.Quaternion();
+	                        //angle *= controls.rotateSpeed * 1.81;
+        	                quaternion.setFromAxisAngle( lastAxis, -dAngle );
+					//HMDOffset.copy(vGrabCamPos.applyQuaternion(quaternion));
+					//camera.position.copy(vGrabCamPos.applyQuaternion(quaternion));
+				dolly.position.applyQuaternion(quaternion);
+
+				//dolly.position.	
+			      } // if ( dAngle...
+
+            		    } // else 
+	
+			if (hand && hand.pinchStrength < 0.5) grabScene = false;
+			
+
+			return hand?hand.palmPosition:0;
+			//break;
+		   }
+		case 2:
+			if(Math.random()<0.1){
+				console.log("hand1: ",frame.hands[0].palmPosition,frame.hands[0].pinchStrength);
+				console.log("hand2: ",frame.hands[1].palmPosition,frame.hands[1].pinchStrength);
+			}
+		        var hand = frame.hands[0];
+		        var hand2 = frame.hands[1];
+
+        var hand1Pos = new THREE.Vector3(0,0,0);
+        var hand2Pos = new THREE.Vector3(0,0,0);
+        if(hand) {
+		hand1Pos.fromArray(hand.palmPosition);
+	} else { return 0; }
+
+        if(hand2) {
+		 hand2Pos.fromArray(hand2.palmPosition);
+	} else { return 0; }
+
+        var handvec = new THREE.Vector3(1.0,0.0,0.0);
+        handvec.subVectors(hand2Pos, hand1Pos);
+
+        var handvecLen = handvec.length();
+        //var halfHandvecLen = handvec.multiplyScalar(0.5);
+        pinchStrength = (hand.pinchStrength + hand2.pinchStrength) / 2;
+	if((Math.random()<0.1) && dbgZoom) {
+				text42 = "handvecLen:"+handvec.length();
+				text43 = "ballScaLen:"+ballScaLen;
+				text44 = "pinchStrength:"+pinchStrength;
+				updateTextbox('h1x:'+hand1Pos.x.toString(), 
+					"h1y:"+hand1Pos.y.toString(),
+					"h1z:"+hand1Pos.z.toString(),
+					"h2x:"+hand2Pos.x.toString(),
+					"h2y:"+hand2Pos.y.toString(),
+					"h2z:"+hand2Pos.z.toString(),
+					ballRot?"ballRot":"!ballRot");
+					//"hand0");
+
+	}
+
+      if (pinchStrength > 0.8) {
+
+         if (!ballRot) {
+            //ballRotAngle.copy(handvec);
+            //ballRotCam.copy(camera.rotation);
+            ballScaLen = handvecLen;
+            //ballScaCam.copy(camera.scale);
+            ballRot = true;
+	    grabScene = false; 
+          } else {
+
+	    var diffBallScale;
+            if (ballScaLen != 0) diffBallScale = handvecLen - ballScaLen;
+
+            if (( diffBallScale != 0) && (dolly.position.distanceTo(origin)>0.3)) {
+
+              var zoomdir = new THREE.Vector3(0,0,-1.0);
+              zoomdir.applyQuaternion(dolly.quaternion);
+              zoomdir.multiplyScalar(diffBallScale*5);
+              if (vr == 0) {
+                camera.position.sub(zoomdir);
+                camera.matrixWorldNeedsUpdate = true;
+                console.log("zoom: ",zoomdir,camera.position,diffBallScale);
+	      } else {
+                HMDOffset.sub(zoomdir);
+                console.log("zoom: ",zoomdir,HMDOffset,diffBallScale);
+	      }
+            }
+
+	  } // if  (!ballRot)  ... else ...
+
+	} else {
+		ballRot = false;
+		grabScene = false; 
+        } // if (pinchStrength
+	
+      } // switch
+
+			// Inertial rotation (When no or both hands detected)
+                	      //if ( dAngle > 0.000) {
+                	      if ( (dAngle > 0.0001) || (dAngle < 0.0001) ) {
+
+				if(0 && dbgRot) {
+	                            updateTextbox(//"h:"+vHandPosition.y.toString(),
+				        "hx:"+vHandPosition.x.toString(),
+                                        "hy:"+vHandPosition.y.toString(),
+                                        "hz:"+vHandPosition.z.toString(),
+					grabScene?"grabScene+":"grabScene-",
+                                        "hand0");
+				}
+
+                          	//var axis = ( new THREE.Vector3() ).crossVectors( _rotateStart, _rotateEnd ).normalize(),
+                                quaternion = new THREE.Quaternion();
+	                        //angle *= controls.rotateSpeed * 1.81;
+        	                quaternion.setFromAxisAngle( lastAxis, -dAngle );
+					//HMDOffset.copy(vGrabCamPos.applyQuaternion(quaternion));
+					//camera.position.copy(vGrabCamPos.applyQuaternion(quaternion));
+				dolly.position.applyQuaternion(quaternion);
+
+				//dolly.position.	
+			      } // if ( dAngle...
+
+    } //     if( frame.hands )...
+
+} // function
+/*//////////////////////////////////////
  * updatePinchPoint: Implement Leap Motion hands
  * for taffy pull gesture for movement in VR space
  * Written by Morris CHukhman 6/1/16
@@ -568,6 +848,22 @@ updatePinchPoint = function (){
 				lastAngle1 = lastAngle;
 				lastAngle = angle;
 
+				if(dbgRot && (controller1 || controller2)) {
+				    text42 = "lastAngle5:"+lastAngle5.toString();
+				    text43 = "angle:"+angle.toString();
+				    text44 = "dAngle:"+dAngle.toString();
+				    //text44 = "dollyDistOffset:"+dollyDistOffset; //grabScene?"grabScene+":"grabScene-";
+                                    updateTextbox('hx:'+vHandPosition.x.toString(),
+                                        "vy:"+controller1.position.x.toString(),
+                                        "hy:"+vHandPosition.y.toString(),
+                                        "vy:"+controller1.position.y.toString(),
+                                        "hz:"+vHandPosition.z.toString(),
+                                        "vz:"+controller1.position.z.toString(),
+                                        //"lx:"+lastAxis.x.toString(),
+                                        //"ly:"+lastAxis.y.toString(),
+                                        //"lz:"+lastAxis.z.toString(),
+                                        "hand0open");
+     				} else 
 				if(dbgRot && lastAngle5) {
 				    text42 = "lastAngle5:"+lastAngle5.toString();
 				    text43 = "angle:"+angle.toString();
@@ -575,7 +871,10 @@ updatePinchPoint = function (){
 				    //text44 = "dollyDistOffset:"+dollyDistOffset; //grabScene?"grabScene+":"grabScene-";
                                     updateTextbox('hx:'+vHandPosition.x.toString(),
                                         "hy:"+vHandPosition.y.toString(),
+                                        //"hy:"+vHandPosition.y.toString(),
+                                        //"hy:"+vHandPosition.y.toString(),
                                         "hz:"+vHandPosition.z.toString(),
+                                        //"hz:"+vHandPosition.z.toString(),
                                         "lx:"+lastAxis.x.toString(),
                                         "ly:"+lastAxis.y.toString(),
                                         "lz:"+lastAxis.z.toString(),
@@ -871,6 +1170,7 @@ initCanvas = function () {
       // The parent of the bones remain the scene, allowing the data to remain in easy-to-work-with world space.
       // (As the hands will usually interact with multiple objects in the scene.)
       effectiveParent: camera
+      //effectiveParent: 
 
     });
 
@@ -1320,7 +1620,12 @@ animate = function () {
     }
     frame = controller.frame();
     var handpositionArray = 0;
-    handpositionArray = updatePinchPoint();
+    //handpositionArray = (controller1 || controller2)?updateControllerPoint():updatePinchPoint();
+    if (controller1 || controller2) 
+	updateControllerPoint();
+    else
+	updatePinchPoint();
+    //handpositionArray = (controller1 || controller2)?updateControllerPoint():updatePinchPoint();
     var handposition = new THREE.Vector3(0,0,0);
     if(vr > 0 ) {
 	//camera.position.add(HMDOffset);
