@@ -511,15 +511,17 @@ updateControllerPoint = function (){
 			break;
 		case 1:
 			if((Math.random()<0.01)&&(controller1))console.log("controller1: ",controller1.position, controller1.getButtonState('trigger')); //frame.hands[0].palmPosition,frame.hands[0].pinchStrength);
-		        var hand = frame.hands[0];
-			var vHandPosition = new THREE.Vector3 (0,0,0);
-			if(hand && hand.palmPosition) {
-				vHandPosition.fromArray(hand.palmPosition);
-                                console.log("hand position:",vHandPosition);
+		        /////var hand = frame.hands[0];
+			var vCntr1Position = new THREE.Vector3 (0,0,0);
+			/////if(hand && hand.palmPosition) {
+				vHandPosition = vCntr1Position;
+			if(controller1 && controller1.position) {
+				vCntr1Position.copy(controller1.position);
+                                console.log("controller1 position:",vCntr1Position);
 				if(dbgRot) {
-				    updateTextbox('hx:'+vHandPosition.x.toString(), 
-					"hy:"+vHandPosition.y.toString(),
-					"hz:"+vHandPosition.z.toString(),
+				    updateTextbox('cx:'+vCntr1Position.x.toString(), 
+					"cy:"+vCntr1Position.y.toString(),
+					"cz:"+vCntr1Position.z.toString(),
 					grabScene?"grabScene+":"grabScene-",
 					"controller0");
 				    }
