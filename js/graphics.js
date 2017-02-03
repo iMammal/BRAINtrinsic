@@ -106,7 +106,7 @@ var vGrabCamPos,grabScene,vGrabScenePoint;
 
 var lastAxis, lastAxis2, lastAxis4, lastAngle5,lastAngle4,lastAngle3,lastAngle2,lastAngle1,lastAngle, dAngle;
 
-var dbgZoom, dbgRot=1;
+var dbgZoom=1, dbgRot=1;
 
 var DBGCTRL=0;
 
@@ -504,11 +504,11 @@ updateControllerPoint = function (){
 
     }
 
-    var numControllers = controller1?1:0 + controller2?1:0;
+    var numControllers =  (controller1.getButtonState('trigger') && controller2.getButtonState('trigger'))?2:1; //Math.random(  ) * 3; //  2controller1.is?1:0 + controller2?1:0;
 
 		          var origin = new THREE.Vector3(0,0,0);
     if( controller1 || controller2) {  //frame.hands ){
-	switch (numControllers){ //frame.hands.length){
+	switch (Math.floor(numControllers)){ //frame.hands.length){
 		case 0:
 			break;
 		case 1:
@@ -566,8 +566,9 @@ updateControllerPoint = function (){
 				if (lastAxis4) lastAxis.add(lastAxis4);
 				lastAxis.normalize();//divideScalar(3.0);
 
-				//dAngle = lastAngle;// - angle;
-				dAngle = ((lastAngle5 + lastAngle4) + 2.0*(lastAngle3+lastAngle2) + 3.0*(lastAngle1+lastAngle)+6.0*angle)/18.0;
+				dAngle = ( (lastAngle4-lastAngle3) + 3.0 *(lastAngle2-lastAngle1) + 6.0*(lastAngle - angle) ) / 12.0;
+				//dAngle = lastAngle - angle;
+				//dAngle = ((lastAngle5 + lastAngle4) + 2.0*(lastAngle3+lastAngle2) + 3.0*(lastAngle1+lastAngle)+6.0*angle)/18.0;
 				lastAngle5 = lastAngle4;
 				lastAngle4 = lastAngle3;
 				lastAngle3 = lastAngle2;
@@ -610,86 +611,92 @@ updateControllerPoint = function (){
 	                        //camera.lookAt( origin );
 			  } // if ( angle > 0.000) ...
 			  else {
-				dAngle += lastAngle - angle;
+				//dAngle += lastAngle - angle;
 			  }
 
 			  //if (hand && hand.pinchStrength < 0.5) grabScene = false;
               if (controller1 && (!controller1.getButtonState('trigger'))) grabScene = false;
 
 			} else {  //  if (controller1 && grabScene && vGrabScenePoint) ...
-			    if (controller1 &&  (!touchedSphere)  && controller1.getButtonState('trigger') ) {
-                		grabScene = true;
+                if (controller1 && (!touchedSphere) && controller1.getButtonState('trigger')) {
+                    grabScene = true;
 
-                		vGrabCamPos = new THREE.Vector3( 0,0,0 );
-                		//vGrabCamPos.copy( 0?HMDOffset:camera.position ) ;
-                		vGrabCamPos.copy( 0?HMDOffset:dolly.position ) ;
-                		vGrabScenePoint = new THREE.Vector3 ( 0,0,0 );
-                		vGrabScenePoint.copy( vHandPosition );
-                		console.log("grabScenePoint:");
-                		console.log(vGrabScenePoint);
-                		console.log("grabCamPos:");
-                		console.log(vGrabCamPos);
-				dAngle = 0.0
+                    vGrabCamPos = new THREE.Vector3(0, 0, 0);
+                    //vGrabCamPos.copy( 0?HMDOffset:camera.position ) ;
+                    vGrabCamPos.copy(0 ? HMDOffset : dolly.position);
+                    vGrabScenePoint = new THREE.Vector3(0, 0, 0);
+                    vGrabScenePoint.copy(vHandPosition);
+                    console.log("grabScenePoint:");
+                    console.log(vGrabScenePoint);
+                    console.log("grabCamPos:");
+                    console.log(vGrabCamPos);
+                    dAngle = 0.0
 
-			    } else { //  if (hand...
-			// Inertial rotation (When one open hand detected)
-                	      if ( (dAngle > 0.0001) || (dAngle < 0.0001) ) {
+                } else { //  if (hand...
+                    // Inertial rotation (When one open hand detected)
+                    if ((dAngle > 0.0001) || (dAngle < 0.0001)) {
 
-				dAngle *= 0.99; // Frictional Drag
+                        dAngle *= 0.99; // Frictional Drag
 
-				if(0 && dbgRot) {
-	                            updateTextbox(//"h:"+vHandPosition.y.toString(),
-				        "hx:"+vHandPosition.x.toString(),
-                                        "hy:"+vHandPosition.y.toString(),
-                                        "hz:"+vHandPosition.z.toString(),
-					grabScene?"grabScene+":"grabScene-",
-                                        "controller1");
-				}
+                        if (0 && dbgRot) {
+                            updateTextbox(//"h:"+vHandPosition.y.toString(),
+                                "hx:" + vHandPosition.x.toString(),
+                                "hy:" + vHandPosition.y.toString(),
+                                "hz:" + vHandPosition.z.toString(),
+                                grabScene ? "grabScene+" : "grabScene-",
+                                "controller1");
+                        }
 
-                          	//var axis = ( new THREE.Vector3() ).crossVectors( _rotateStart, _rotateEnd ).normalize(),
-                                quaternion = new THREE.Quaternion();
-	                        //angle *= controls.rotateSpeed * 1.81;
-        	                quaternion.setFromAxisAngle( lastAxis, -dAngle );
-					//HMDOffset.copy(vGrabCamPos.applyQuaternion(quaternion));
-					//camera.position.copy(vGrabCamPos.applyQuaternion(quaternion));
-				dolly.position.applyQuaternion(quaternion);
+                        //var axis = ( new THREE.Vector3() ).crossVectors( _rotateStart, _rotateEnd ).normalize(),
+                        quaternion = new THREE.Quaternion();
+                        //angle *= controls.rotateSpeed * 1.81;
+                        quaternion.setFromAxisAngle(lastAxis, -lastAngle); //dAngle);
+                        //HMDOffset.copy(vGrabCamPos.applyQuaternion(quaternion));
+                        //camera.position.copy(vGrabCamPos.applyQuaternion(quaternion));
+                        dolly.position.applyQuaternion(quaternion);
 
-				//dolly.position.	
-			      } // if ( dAngle...
+                        //dolly.position.
+                    } // if ( dAngle...
 
-            		    } // else 
-	
-			//if (hand && hand.pinchStrength < 0.5) grabScene = false;
-            if (controller1 && (!controller1.getButtonState('trigger'))) grabScene = false;
+                } // else
 
-			//return hand?hand.palmPosition:0;
-            return controller1?controller1.position:0; //        .palmPosition:0;
+                //if (hand && hand.pinchStrength < 0.5) grabScene = false;
+                if (controller1 && (!controller1.getButtonState('trigger'))) grabScene = false;
+            }
+
+            //return hand?hand.palmPosition:0;
+            if(1) return controller1?controller1.position:0; //        .palmPosition:0;
 			//break;
-		   }
+
 		case 2:
-			if(Math.random()<0.1){
-				console.log("hand1: ",frame.hands[0].palmPosition,frame.hands[0].pinchStrength);
-				console.log("hand2: ",frame.hands[1].palmPosition,frame.hands[1].pinchStrength);
+			if((Math.random()<0.1) && controller1 && controller2) {
+				//console.log("hand1: ",frame.hands[0].palmPosition,frame.hands[0].pinchStrength);
+                console.log("controller1: ",controller1.position.x,controller1.position.y,controller1.position.z, controller1.getButtonState('trigger'));
+                //console.log("hand2: ",frame.hands[1].palmPosition,frame.hands[1].pinchStrength);
+                console.log("controller2: ",controller2.position.x,controller2.position.y,controller2.position.z, controller2.getButtonState('trigger'));
 			}
 		        var hand = frame.hands[0];
 		        var hand2 = frame.hands[1];
 
-        var hand1Pos = new THREE.Vector3(0,0,0);
-        var hand2Pos = new THREE.Vector3(0,0,0);
-        if(hand) {
-		hand1Pos.fromArray(hand.palmPosition);
-	} else { return 0; }
+         var hand1Pos = new THREE.Vector3(0,0,0);
+         var hand2Pos = new THREE.Vector3(0,0,0);
+         var controller1Pos = new THREE.Vector3(0,0,0);
+         var controller2Pos = new THREE.Vector3(0,0,0);
 
-        if(hand2) {
-		 hand2Pos.fromArray(hand2.palmPosition);
-	} else { return 0; }
+         if(controller1) {
+		    hand1Pos.copy(controller1.position);
+	     } else { return 0; }
+
+	     if(controller2) {
+             hand2Pos.copy(controller2.position);
+	     } else { return 0; }
 
         var handvec = new THREE.Vector3(1.0,0.0,0.0);
         handvec.subVectors(hand2Pos, hand1Pos);
 
         var handvecLen = handvec.length();
         //var halfHandvecLen = handvec.multiplyScalar(0.5);
-        pinchStrength = (hand.pinchStrength + hand2.pinchStrength) / 2;
+        pinchStrength = (controller1.getButtonState('trigger') && controller2.getButtonState('trigger'))?1:0; //(hand.pinchStrength + hand2.pinchStrength) / 2;
 	if((Math.random()<0.1) && dbgZoom) {
 				text42 = "handvecLen:"+handvec.length();
 				text43 = "ballScaLen:"+ballScaLen;
@@ -707,13 +714,16 @@ updateControllerPoint = function (){
 
       if (pinchStrength > 0.8) {
 
+	    //grabScene = false;
+
          if (!ballRot) {
             //ballRotAngle.copy(handvec);
             //ballRotCam.copy(camera.rotation);
             ballScaLen = handvecLen;
             //ballScaCam.copy(camera.scale);
             ballRot = true;
-	    grabScene = false; 
+	        grabScene = false;
+	        lastAngle = 0.0;
           } else {
 
 	    var diffBallScale;
